@@ -2,7 +2,7 @@
 name: "\U0001F4C5To-Do-List\U0001F4C5"
 about: 오늘 할일에 대해 기록해주세요.
 title: "\U0001F4C5[ToDo] 2025/[월]/[일] [이름]"
-labels: ''
+labels: "\U0001F4C5ToDo\U0001F4C5"
 assignees: ''
 
 ---

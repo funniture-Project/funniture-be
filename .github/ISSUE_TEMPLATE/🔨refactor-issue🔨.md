@@ -2,7 +2,7 @@
 name: "\U0001F528Refactor-Issue\U0001F528"
 about: 수정 한 기능에 대해 기록해주세요.
 title: "\U0001F528[Refactor] 2025/[월]/[일] [이름]"
-labels: ''
+labels: "\U0001F528Refactor\U0001F528"
 assignees: ''
 
 ---

@@ -2,7 +2,7 @@
 name: "\U0001F6ABError-Template\U0001F6AB"
 about: 에러 상황이나 에러 해결과정을 기록해주세요.
 title: "\U0001F6AB[Error] 2025/[월]/[일] [이름]"
-labels: ''
+labels: "\U0001F6ABError\U0001F6AB"
 assignees: ''
 
 ---
