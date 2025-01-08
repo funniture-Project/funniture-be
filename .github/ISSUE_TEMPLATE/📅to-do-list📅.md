@@ -1,5 +1,5 @@
 ---
-name: "\U0001F4C5TO DO List\U0001F4C5"
+name: "\U0001F4C5TO-DO-List\U0001F4C5"
 about: 오늘 할일에 대해 기록해주세요.
 title: "[ToDo] 2025/[월]/[일] [이름]"
 labels: ''
