@@ -10,10 +10,10 @@ import lombok.ToString;
 // 자신이 필요한걸로 변경해서 하세요!
 //@Entity
 //@Table(name = "tbl_product")
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
+//@Getter
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@ToString
 public class Product {
 
 }
