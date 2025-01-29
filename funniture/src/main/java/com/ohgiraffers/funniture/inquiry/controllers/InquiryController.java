@@ -29,12 +29,10 @@ public class InquiryController {
     @GetMapping("/list")
     public ResponseEntity<ResponseMessage> findAll (){
 
-        System.out.println("컨트롤러 동작");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
         List<InquiryDTO> result = inquiryService.findAllInquiry();
-        System.out.println("컨트롤러 result = " + result);
 
         Map<String , Object> map = new HashMap<>();
         map.put("result" , result);
