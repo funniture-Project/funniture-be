@@ -1,9 +1,6 @@
 package com.ohgiraffers.funniture.product.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,8 +31,9 @@ public class ProductEntity {
     @Column(name = "used_stock")
     private int usedStock;
 
-    @Column(name = "category_code")
-    private int categoryCode;
+    @ManyToOne
+    @JoinColumn(name = "category_code")
+    private CategoryEntity category;
 
     // 정산 판매가
     @Column(name = "regular_price")
