@@ -8,4 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 public class ProductDTO {
+
+    private String productNo;
+
 }
