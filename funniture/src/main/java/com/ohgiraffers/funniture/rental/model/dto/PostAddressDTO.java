@@ -17,9 +17,9 @@ public class PostAddressDTO {
 
     private String destinationPhone;  // 배송지 전화번호
 
-    private String reciever;          // 받는이
+    private String receiver;          // 받는이
 
-    private String destinationAdress; // 배송지주소
+    private String destinationAddress; // 배송지주소
 
 
 }

@@ -1,7 +1,9 @@
 package com.ohgiraffers.funniture.rental.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -25,11 +27,14 @@ public class RentalDTO {
 
     private int rentalNumber;       // 대여갯수
 
-    private Date orderDate;         // 주문일
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime orderDate;         // 주문일
 
-    private Date rentalStartDate;   // 대여시작일
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime rentalStartDate;   // 대여시작일
 
-    private Date rentalEndDate;     // 대여마감일
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime rentalEndDate;     // 대여마감일
 
     private String rentalState;     // 대여진행상태
 
@@ -38,4 +43,18 @@ public class RentalDTO {
     private String deliveryNo;      // 운송장번호
 
     private String deliveryMemo;    // 배송메모
+
+    // *************************Join************************
+
+    private MemberDTO memberDTO;    // 제공자, 대여자
+
+    private PostAddressDTO postAddressDTO; // 배송지
+
+    private ProductDTO productDTO;  // 상품
+
+    private RentalOptionInfoDTO rentalOptionInfoDTO; // 대여조건
+
+    private OwnerInfoDTO ownerInfoDTO;  // 제공자 사업정보
+
+    private CategoryDTO categoryDTO;
 }

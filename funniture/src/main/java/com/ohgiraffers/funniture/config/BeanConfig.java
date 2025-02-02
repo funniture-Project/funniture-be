@@ -1,11 +1,14 @@
 package com.ohgiraffers.funniture.config;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.modelmapper.ModelMapper;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@MapperScan(basePackages = "com.ohgiraffers.funniture", annotationClass = Mapper.class)
 @ComponentScan(basePackages = "com.ohgiraffers.funniture") // funniture 하위 다 읽을 수 있게 설정
 public class BeanConfig {
 
