@@ -11,9 +11,17 @@ import java.util.Date;
 @ToString
 public class MemberDTO {
 
-    private String memberId;      // 회원번호
+    private String memberId;      // 사용자회원번호
+
+    private String ownerId;      // 회원번호
 
     private String email;         // 이메일
+
+    private String ownerEmail;    // 제공자 이메일
+
+    private String ownerName;    // 제공자 이름
+
+    private String ownerPhone;    // 제공자 휴대전화번호
 
     private String password;      // 비밀번호
 

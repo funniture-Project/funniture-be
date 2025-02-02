@@ -11,7 +11,7 @@ public class OwnerInfoDTO {
 
     private String storeNo;         // 사업자 등록번호(PK)
 
-    private String memberId;        // 제공자 회원번호(FK)
+    private String ownerId;        // 제공자 회원번호(FK)
 
     private String storeName;       // 사업장 이름
 
