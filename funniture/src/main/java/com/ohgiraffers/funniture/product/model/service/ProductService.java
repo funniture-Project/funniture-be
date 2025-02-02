@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,22 +27,35 @@ public class ProductService {
     public List<ProductDTO> getProductAll(Integer categoryCode) {
         System.out.println("categoryCode = " + categoryCode);
 
+        List<ProductEntity> productEntityList = new ArrayList<>();
+
         if (categoryCode == null ){
-            List<ProductEntity> productEntityList = productRepository.findAll();
-    //        System.out.println("엔티티 조회 productEntityList = " + productEntityList);
-            return productEntityList.stream().map(product -> modelMapper.map(product, ProductDTO.class))
-                    .collect(Collectors.toList());
+            productEntityList = productRepository.findAll();
         } else {
-            List<ProductEntity> productEntityList = productRepository.findByCategory_CategoryCode(categoryCode);
-            //        System.out.println("엔티티 조회 productEntityList = " + productEntityList);
-            return productEntityList.stream().map(product -> modelMapper.map(product, ProductDTO.class))
-                    .collect(Collectors.toList());
+            productEntityList = productRepository.findByCategory_CategoryCode(categoryCode);
         }
+        return productEntityList.stream().map(product -> modelMapper.map(product, ProductDTO.class))
+                .collect(Collectors.toList());
     }
 
-    public List<CategoryDTO> getCategoryList() {
+    public ProductDTO getProductInfoByNo(String productNo) {
 
-        List<CategoryEntity> categoryList = categoryRepository.findAll();
+       ProductEntity product = productRepository.findById(productNo)
+                                                .orElseThrow(IllegalArgumentException::new);
+
+        // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
+        return modelMapper.map(product, ProductDTO.class);
+    }
+
+    public List<CategoryDTO> getCategoryList(Integer refCategoryCode) {
+
+        List<CategoryEntity> categoryList = new ArrayList<>();
+
+        if (refCategoryCode == null ){
+            categoryList = categoryRepository.findAll();
+        } else {
+            categoryList = categoryRepository.findByRefCategoryCode(refCategoryCode);
+        }
 
         return categoryList.stream().map(category -> modelMapper.map(category, CategoryDTO.class))
                 .collect(Collectors.toList());
