@@ -38,4 +38,16 @@ public class RentalDTO {
     private String deliveryNo;      // 운송장번호
 
     private String deliveryMemo;    // 배송메모
+
+    // *************************Join************************
+
+    private MemberDTO memberDTO;    // 제공자, 대여자
+
+    private PostAddressDTO postAddressDTO; // 배송지
+
+    private ProductDTO productDTO;  // 상품
+
+    private RentalOptionInfoDTO rentalOptionInfoDTO; // 대여조건
+
+    private OwnerInfoDTO ownerInfoDTO;  // 제공자 사업정보
 }
