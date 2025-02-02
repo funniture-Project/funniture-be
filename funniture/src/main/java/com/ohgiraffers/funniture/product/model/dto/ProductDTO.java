@@ -26,6 +26,9 @@ public class ProductDTO {
     // 판매 상태
     private String productStatus;
 
-    // 이미지 존재 여부 (대표 이미지)
-    private boolean hasImg;
+    // 대표이미지 링크
+    private String productImageLink;
+
+    // 대표이미지 ID
+    private String productImageId;
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// 25-01-27 16:41분 / 이쪽도 주석해야 run 됨
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, String> {
 

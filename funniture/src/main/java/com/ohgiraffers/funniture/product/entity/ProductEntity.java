@@ -47,7 +47,11 @@ public class ProductEntity {
     @Column(name = "product_status")
     private String productStatus;
 
-    // 이미지 존재 여부 (대표 이미지)
-    @Column(name = "has_product_image")
-    private boolean hasImg;
+    // 대표 이미지 링크
+    @Column(name = "productImageLink")
+    private String product_image_link;
+
+    // 대표 이미지 ID(삭제 시 필요)
+    @Column(name = "productImageId")
+    private String product_image_id;
 }
