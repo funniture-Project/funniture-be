@@ -38,7 +38,4 @@ public class MemberDTO {
     private String imageLink;     // 이미지 링크
 
     private String imageId;       // 이미지 ID
-
-
-
 }

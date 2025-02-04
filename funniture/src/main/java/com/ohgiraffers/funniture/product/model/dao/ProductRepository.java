@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, String> {
-
     // category 에서의 category_code 를 비교해야하기 때문에 findByCategory_CategoryCode
     List<ProductEntity> findByCategory_CategoryCode(int categoryCode);
-
 }
