@@ -20,14 +20,14 @@ import java.util.Map;
 // @Tag : 관련 있는 API 들의 그룹을 짓기 위한 어노테이션
 @Tag(name = "Rental API")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/rental")
 @RequiredArgsConstructor
 public class RentalController {
 
     private final RentalService rentalService;
 
     // 관리자(예약정보 - 예약전체리스트)
-    @GetMapping("/v1/rental/allList")
+    @GetMapping("/allList")
     public ResponseEntity<ResponseMessage> findRentalAllListByAdmin() {
 
         HttpHeaders headers = new HttpHeaders();
@@ -41,7 +41,4 @@ public class RentalController {
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", res));
     }
-
-
-
 }

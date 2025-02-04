@@ -95,7 +95,6 @@
         r.rental_end_date,
         r.rental_number,
         o.store_name,
-        o.owner_id,
         owner_m.email AS 'owner_email',
         owner_m.user_name AS 'owner_name',
         owner_m.phone_number AS 'owner_phone',
@@ -103,10 +102,11 @@
         FROM
         tbl_rental r
         LEFT JOIN tbl_member m ON r.member_id = m.member_id
-        LEFT JOIN tbl_ownerinfo o ON r.owner_no = o.owner_id
+        LEFT JOIN tbl_ownerinfo o ON o.member_id = r.owner_no
         LEFT JOIN tbl_product p ON r.product_no = p.product_no
         LEFT JOIN tbl_member owner_m ON r.owner_no = owner_m.member_id
         LEFT JOIN tbl_category c ON c.category_code = p.category_code
         ORDER BY r.order_date DESC
     </select>
+
 </mapper>
