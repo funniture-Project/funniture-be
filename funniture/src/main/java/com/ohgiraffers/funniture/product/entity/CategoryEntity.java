@@ -16,6 +16,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class CategoryEntity {
+
     @Id
     @Column(name = "category_code")
     private int categoryCode;

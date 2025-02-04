@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 // 자신이 필요한걸로 변경해서 하세요!
 @Entity
 @Table(name = "tbl_product")
@@ -47,7 +49,16 @@ public class ProductEntity {
     @Column(name = "product_status")
     private String productStatus;
 
-    // 이미지 존재 여부 (대표 이미지)
-    @Column(name = "has_product_image")
-    private boolean hasImg;
+    // 대표 이미지 링크
+    @Column(name = "productImageLink")
+    private String productImageLink;
+
+    // 대표 이미지 ID(삭제 시 필요)
+    @Column(name = "productImageId")
+    private String productImageId;
+
+    // 상품 대여조건 리스트
+    @OneToMany
+    @JoinColumn(name = "product_no")
+    private List<RentalOptionInfoEntity> rentalOptionList;
 }

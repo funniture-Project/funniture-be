@@ -2,6 +2,8 @@ package com.ohgiraffers.funniture.product.model.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -26,6 +28,12 @@ public class ProductDTO {
     // 판매 상태
     private String productStatus;
 
-    // 이미지 존재 여부 (대표 이미지)
-    private boolean hasImg;
+    // 대표이미지 링크
+    private String productImageLink;
+
+    // 대표이미지 ID
+    private String productImageId;
+
+    // 대여 조건 리스트
+    private List<RentalOptionInfoDTO> rentalOptionList;
 }
