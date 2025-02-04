@@ -1,9 +1,6 @@
 package com.ohgiraffers.funniture.rental.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +14,16 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Rental {
+public class RentalEntity {
+    
+
 
     @Id
     @Column(name = "rental_no")
     private String rentalNo;        // 예약번호 (pk)
+
+    @Embedded
+    private RentalInfo rentalInfo; // 대여 정보 포함
 
     @Column(name = "member_id")
     private String memberId;        // 대여자 회원번호 (fk)
@@ -38,29 +40,24 @@ public class Rental {
     @Column(name = "product_no")
     private String productNo;       // 상품번호 (fk)
 
-    @Column(name = "rental_number")
-    private int rentalNumber;       // 대여갯수
-
-    @Column(name = "order_date")
-    private Date orderDate;         // 주문일
-
-    @Column(name = "rental_start_date")
-    private Date rentalStartDate;   // 대여시작일
-
-    @Column(name = "rental_end_date")
-    private Date rentalEndDate;     // 대여마감일
-
-    @Column(name="rental_state")
-    private String rentalState;     // 대여진행상태
-
-    @Column(name = "deliver_com")
-    private String deliverCom;      // 택배사
-
-    @Column(name = "delivery_no")
-    private String deliveryNo;      // 운송장번호
-
-    @Column(name = "delivery_memo")
-    private String deliveryMemo;    // 배송메모
-
+    //    @ManyToOne
+//    @JoinColumn(name = "renter_id") // 대여자 (회원)
+//    private User renter;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "provider_id") // 제공자 (회원)
+//    private User provider;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "product_id") // 상품
+//    private Product product;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "rental_condition_id") // 대여 조건
+//    private RentalCondition rentalCondition;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "shipping_address_id") // 배송지
+//    private Address shippingAddress;
 
 }
