@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,40 @@ public class InquiryService {
 
         System.out.println("서비스에 잘 오는지inquiryDTO = " + inquiryDTO);
 
-    inquiryRepository.save(modelMapper.map(inquiryDTO , Inquiry.class));
+        inquiryRepository.save(modelMapper.map(inquiryDTO , Inquiry.class));
+    }
 
+    public String getMaxInquiry() {
+
+        String maxIn = inquiryRepository.maxInquiry();
+        System.out.println("maxIn 잘 받아 오는지 = " + maxIn);
+
+        return maxIn;
+    }
+
+    @Transactional
+    public void modifyByInquiryNo(String inquiryNo, InquiryDTO inquiryDTO) {
+
+        Inquiry result = inquiryRepository.findById(inquiryNo).orElseThrow();
+        System.out.println("inquiryNO로 잘 조회해 오는지 = " + result);
+
+        result = result.toBuilder()
+                .memberId(inquiryDTO.getMemberId())
+                .inquiryContent(inquiryDTO.getInquiryContent())
+                .showStatus(inquiryDTO.getShowStatus())
+                .qnaType(inquiryDTO.getQnaType())
+                .productNo(inquiryDTO.getProductNo())
+                .qnaWriteTime(LocalDateTime.now()).build();
+
+        inquiryRepository.save(result);
+
+    }
+
+    @Transactional
+    public void deleteByInquiryNo(String inquiryNo) {
+
+        System.out.println("서비스에 inquiryNo 잘 넘어오나 = " + inquiryNo);
+
+        inquiryRepository.deleteById(inquiryNo);
     }
 }

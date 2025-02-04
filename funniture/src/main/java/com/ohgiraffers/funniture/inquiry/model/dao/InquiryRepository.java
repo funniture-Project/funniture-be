@@ -9,4 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, String> {
 
+    @Query(value = "SELECT MAX(INQUIRY_NO) FROM TBL_INQUIRY",
+           nativeQuery = true)
+    String maxInquiry();
+
 }

@@ -63,8 +63,11 @@ public class InquiryController {
 
         System.out.println("json에서 들어온 inquiryDTO = " + inquiryDTO);
 
-        String frontNo = "IN";
-//        int backNo =
+        String maxInquiry = inquiryService.getMaxInquiry();
+        System.out.println("컨트롤러 maxInquiry = " + maxInquiry);
+
+        String newNo = returnInquiryNo(maxInquiry);
+        inquiryDTO.setInquiryNo(newNo);
 
         inquiryService.inquiryRegist(inquiryDTO);
 
@@ -72,6 +75,44 @@ public class InquiryController {
         return ResponseEntity.ok()
                 .headers(headersMethod())
                 .body(new ResponseMessage(201, "등록 성공", map));
+    }
+
+    public String returnInquiryNo(String maxInquiry){
+        if (maxInquiry == null || maxInquiry.isEmpty()){
+            return "INQ001";
+        } else {
+            int newInquiryNo = Integer.parseInt(maxInquiry.substring(3)) + 1;
+            System.out.println("newInquiryNo = " + newInquiryNo);
+            return String.format("INQ%03d",newInquiryNo);
+        }
+    }
+
+    @PutMapping("/modify/{inquiryNo}")
+    public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
+                                                        ,@RequestBody InquiryDTO inquiryDTO){
+
+        System.out.println("컨트롤러 : 화면에서 inquiryNo 받아오나 = " + inquiryNo);
+
+        inquiryService.modifyByInquiryNo(inquiryNo,inquiryDTO);
+
+        Map<String , Object> map = new HashMap<>();
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(201, "수정 성공", map));
+    }
+
+    @DeleteMapping("/delete/{inquiryNo}")
+    public ResponseEntity<ResponseMessage> inquiryDelete(@PathVariable String inquiryNo){
+        System.out.println("화면에서 inquiryNo 잘 받아오나 = " + inquiryNo);
+
+        inquiryService.deleteByInquiryNo(inquiryNo);
+
+        Map<String , Object> map = new HashMap<>();
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(201, "삭제 성공", map));
     }
 
 }
