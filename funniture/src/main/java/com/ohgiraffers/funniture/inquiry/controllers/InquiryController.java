@@ -35,24 +35,18 @@ public class InquiryController {
     @GetMapping("/list")
     public ResponseEntity<ResponseMessage> findAllInquiry (){
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-
         List<InquiryDTO> result = inquiryService.findAllInquiry();
 
         Map<String , Object> map = new HashMap<>();
         map.put("result" , result);
 
         return ResponseEntity.ok()
-                .headers(headers)
+                .headers(headersMethod())
                 .body(new ResponseMessage(200 , "조회 성공",map));
     }
 
     @GetMapping("/list/{inquiryNo}")
     public ResponseEntity<ResponseMessage> findByInquiryNo(@PathVariable String inquiryNo){
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         InquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
 
@@ -60,7 +54,7 @@ public class InquiryController {
         map.put("map", inquiry);
 
         return ResponseEntity.ok()
-                .headers(headers)
+                .headers(headersMethod())
                 .body(new ResponseMessage(200, "조회 성공", map));
     }
 
@@ -77,7 +71,7 @@ public class InquiryController {
         Map<String , Object> map = new HashMap<>();
         return ResponseEntity.ok()
                 .headers(headersMethod())
-                .body(new ResponseMessage(200, "조회 성공", map));
+                .body(new ResponseMessage(201, "등록 성공", map));
     }
 
 }
