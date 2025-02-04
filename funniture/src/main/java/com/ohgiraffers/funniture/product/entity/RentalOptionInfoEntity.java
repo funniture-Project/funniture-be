@@ -29,4 +29,6 @@ public class RentalOptionInfoEntity {
     @Column(name = "as_number")
     private Integer asNumber;
 
+    
+
 }

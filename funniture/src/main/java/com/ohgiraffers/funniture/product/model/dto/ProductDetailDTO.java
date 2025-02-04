@@ -4,12 +4,12 @@ import lombok.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Getter
 @Setter
-@ToString
-public class ProductDTO {
+public class ProductDetailDTO {
 
     private String productNo;
     private String productName;
@@ -17,7 +17,7 @@ public class ProductDTO {
     private int totalStock;
     private Integer usedStock;
 
-    private int categoryCode;
+    private CategoryDTO categoryCode;
 
     // 정산 판매가
     private int regularPrice;
@@ -33,4 +33,7 @@ public class ProductDTO {
 
     // 대표이미지 ID
     private String productImageId;
+
+    // 대여 조건 리스트
+    private List<RentalOptionInfoDTO> rentalOptionList;
 }

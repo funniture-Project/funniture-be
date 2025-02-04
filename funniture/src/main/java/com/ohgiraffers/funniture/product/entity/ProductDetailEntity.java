@@ -8,14 +8,14 @@ import lombok.ToString;
 
 import java.util.List;
 
+// 자신이 필요한걸로 변경해서 하세요!
 @Entity
 @Table(name = "tbl_product")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ProductEntity {
-
+public class ProductDetailEntity {
 
     @Id
     @Column(name = "product_no")
@@ -33,8 +33,9 @@ public class ProductEntity {
     @Column(name = "used_stock")
     private int usedStock;
 
-    @Column(name = "category_code")
-    private int categoryCode;
+    @ManyToOne
+    @JoinColumn(name = "category_code")
+    private CategoryEntity category;
 
     // 정산 판매가
     @Column(name = "regular_price")
@@ -56,4 +57,8 @@ public class ProductEntity {
     @Column(name = "productImageId")
     private String productImageId;
 
+    // 상품 대여조건 리스트
+    @OneToMany
+    @JoinColumn(name = "product_no")
+    private List<RentalOptionInfoEntity> rentalOptionList;
 }
