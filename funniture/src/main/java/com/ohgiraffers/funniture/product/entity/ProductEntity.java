@@ -55,5 +55,4 @@ public class ProductEntity {
     // 대표 이미지 ID(삭제 시 필요)
     @Column(name = "productImageId")
     private String productImageId;
-
 }

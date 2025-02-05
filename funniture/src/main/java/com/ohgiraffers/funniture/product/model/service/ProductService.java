@@ -9,6 +9,7 @@ import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
 import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
+import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
+    // 상품 조회
     public List<ProductDTO> getProductAll(List<Integer> categoryCode) {
         System.out.println("categoryCode = " + categoryCode);
 
@@ -49,6 +51,13 @@ public class ProductService {
 
         // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
         return modelMapper.map(product, ProductDetailDTO.class);
+    }
+
+    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
+        List<Object[]> results = productRepository.findAllProductsWithPriceList();
+        return results.stream()
+                .map(ProductWithPriceDTO::fromQueryResult)
+                .toList();
     }
 
     public List<CategoryDTO> getCategoryList(Integer refCategoryCode) {

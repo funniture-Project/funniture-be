@@ -1,6 +1,5 @@
 package com.ohgiraffers.funniture.product.model.dao;
 
-import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +16,24 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
 
     @Query(value = "SELECT * FROM tbl_product p WHERE p.category_code IN :categoryCode", nativeQuery = true)
     List<ProductEntity> findByCategoryCodeIn(@Param("categoryCode") List<Integer> categoryCode);
+
+    @Query(value = """
+        SELECT 
+            p.product_no, 
+            p.product_name, 
+            p.owner_no, 
+            p.total_stock, 
+            p.used_stock, 
+            p.category_code, 
+            p.regular_price, 
+            p.product_content, 
+            p.product_status, 
+            p.product_image_link, 
+            p.product_image_id, 
+            COALESCE(GROUP_CONCAT(ri.rental_price ORDER BY ri.rental_price ASC), '') AS price_list
+        FROM tbl_product p
+        LEFT JOIN tbl_rentaloptioninfo ri ON p.product_no = ri.product_no
+        GROUP BY p.product_no
+        """, nativeQuery = true)
+    List<Object[]> findAllProductsWithPriceList();
 }
