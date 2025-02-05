@@ -21,13 +21,10 @@ public class RentalDTO {
 
     private String productNo;       // 상품번호 (fk)
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime rentalStartDate;   // 대여시작일
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime rentalEndDate;     // 대여마감일
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;         // 주문일
 
     private int rentalNumber;       // 대여갯수
@@ -43,18 +40,4 @@ public class RentalDTO {
     private int destinationNo;      // 배송지 식별번호 (fk)
 
     private String deliveryMemo;    // 배송메모
-
-    // *************************Join************************
-
-    private MemberDTO memberDTO;    // 제공자, 대여자
-
-    private PostAddressDTO postAddressDTO; // 배송지
-
-    private ProductDTO productDTO;  // 상품
-
-    private RentalOptionInfoDTO rentalOptionInfoDTO; // 대여조건
-
-    private OwnerInfoDTO ownerInfoDTO;  // 제공자 사업정보
-
-    private CategoryDTO categoryDTO;
 }

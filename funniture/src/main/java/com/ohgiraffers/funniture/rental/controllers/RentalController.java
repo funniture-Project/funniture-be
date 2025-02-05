@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.rental.controllers;
 
+import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
 import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
 import com.ohgiraffers.funniture.rental.model.service.RentalService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -8,11 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,18 @@ public class RentalController {
 
     private final RentalService rentalService;
 
+    // 예약등록
+    @PostMapping("/insert")
+    public ResponseEntity<ResponseMessage> insertRental(@RequestBody RentalDTO rentalDTO) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        rentalService.insertRental(rentalDTO);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "등록완료", null));
+    }
+
     // 관리자(예약정보 - 예약전체리스트)
     @GetMapping("/allList")
     public ResponseEntity<ResponseMessage> findRentalAllListByAdmin() {
@@ -33,12 +46,8 @@ public class RentalController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        List<RentalDTO> allList = rentalService.findRentalAllListByAdmin();
 
-        Map<String, Object> res = new HashMap<>();
-        res.put("allList", allList);
-        System.out.println("res = " + res);
 
-        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", res));
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", null));
     }
 }
