@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.product.controllers;
 import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
+import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
 import com.ohgiraffers.funniture.product.model.service.ProductService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -113,6 +114,21 @@ public class ProductController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "카테고리 전체 조회 성공", map));
+    }
+
+    @GetMapping("/test")
+    private ResponseEntity<ResponseMessage> getAllProductsWithPrices(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        List<ProductWithPriceDTO> result = productService.getAllProductsWithPrices();
+        responseMap.put("result",result);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "전체 상품 리스트 가격과 함께 조회 성공", responseMap));
     }
 
 }
