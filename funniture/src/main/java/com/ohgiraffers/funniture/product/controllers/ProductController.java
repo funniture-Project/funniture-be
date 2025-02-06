@@ -31,34 +31,57 @@ public class ProductController {
     // ?categoryCode=10로 작성 시 해당 카테고리 상품만 출력, 없으면 전체
     // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
 
-    // product 조회
+    // product 조회 (전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회)
     @GetMapping
-    public ResponseEntity<ResponseMessage> getProductAll(@RequestParam(required = false) List<Integer> categoryCode){
+    public ResponseEntity<ResponseMessage> getProductAll(@RequestParam(required = false) List<Integer> categoryCode, @RequestParam(required = false) String ownerNo){
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        System.out.println("categoryCode = " + categoryCode);
-        List<ProductWithPriceDTO> result = productService.getProductAll(categoryCode);
-        responseMap.put("result",result);
+        // 보내는 데이터 (service를 1개만 쓰기 위해서)
+        Map<String,Object> sendData = new HashMap<>();
+
+        // 받는 데이터 (반환이 map 형태)
+        Map<String,Object> receiveData = new HashMap<>();
+
+        if (ownerNo == null){
+            List<ProductWithPriceDTO> results = productService.getProductAll(categoryCode);
+            responseMap.put("result",results);
+        } else {
+            sendData.put("ownerNo",ownerNo);
+            receiveData = productService.getProductInfoByNo(sendData);
+            List<ProductDetailDTO> results = (List<ProductDetailDTO>) receiveData.get("ownerNoResults");
+            if (results.isEmpty()){
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+            }
+
+            responseMap.put("result",results);
+        }
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "전체 상품 리스트 조회 성공", responseMap));
     }
-    
-    // 상세 정보 조회
+
+    // 상세 정보 조회 (상품 상세 페이지, 제공자 상품 수정)
     @GetMapping("/{productNo}")
     public ResponseEntity<ResponseMessage> getProductDetail(@PathVariable String productNo){
         Map<String, Object> responseMap = new HashMap<>();
+        Map<String,Object> sendData = new HashMap<>();
+        Map<String,Object> receiveData = new HashMap<>();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         if (productNo != null){
-            ProductDetailDTO result = productService.getProductInfoByNo(productNo);
+            sendData.put("productNo",productNo);
+            receiveData = productService.getProductInfoByNo(sendData);
+
+            ProductDetailDTO result = (ProductDetailDTO) receiveData.get("productNoResult");
 
             // 결과가 없을 경우 처리 (상품을 찾지 못한 경우)
             if (result == null) {
@@ -79,6 +102,7 @@ public class ProductController {
         }
     }
 
+    // 상품 등록
     @PostMapping("/register")
     public void registerProduct(@RequestBody ProductDTO product){
 
@@ -100,6 +124,7 @@ public class ProductController {
         productService.registerProduct(product);
     }
 
+    // 상품 카테고리 조회, 상위 카테고리별 조회
     @GetMapping("/category")
     private ResponseEntity<ResponseMessage> getCategoryList(@RequestParam(required = false) Integer refCategoryCode){
 

@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,14 +34,12 @@ public class ProductService {
     private final ProductWithPriceRepository ProductWithPriceRepository;
     private final CategoryRepository categoryRepository;
 
-    // 상품 조회
+    // 전체 상품 조회, 카테고리별 상품 조회(상품 + 가격 리스트)
     public List<ProductWithPriceDTO> getProductAll(List<Integer> categoryCode) {
-        System.out.println("categoryCode = " + categoryCode);
 
         List<ProductWithPriceEntity> productEntityList = new ArrayList<>();
 
         if (categoryCode == null ){
-//            productEntityList = productRepository.findAll();
             productEntityList = ProductWithPriceRepository.findAllProductsList();
         } else {
             productEntityList = ProductWithPriceRepository.findAllProductsListByCategoryIn(categoryCode);
@@ -48,15 +48,27 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public ProductDetailDTO getProductInfoByNo(String productNo) {
+    // 상품 번호에따른 상품 상세 조회
+    public Map<String, Object> getProductInfoByNo(Map<String, Object> receiveData) {
+        Map<String, Object> results = new HashMap<>();
 
-       ProductDetailEntity product = productDetailRepository.findById(productNo)
-                                                .orElseThrow(IllegalArgumentException::new);
+        if (receiveData.containsKey("productNo")){
+            ProductDetailEntity product = productDetailRepository.findById((String) receiveData.get("productNo"))
+                    .orElseThrow(IllegalArgumentException::new);
 
-        // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
-        return modelMapper.map(product, ProductDetailDTO.class);
+            // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
+            results.put("productNoResult", modelMapper.map(product, ProductDetailDTO.class));
+        } else if (receiveData.containsKey("ownerNo")) {
+            List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerNo((String) receiveData.get("ownerNo"));
+
+            results.put("ownerNoResults",productList.stream().map(product -> modelMapper.map(product, ProductDetailDTO.class))
+                    .collect(Collectors.toList()));
+        }
+
+        return results;
     }
 
+    // 카테고리 조회
     public List<CategoryDTO> getCategoryList(Integer refCategoryCode) {
 
         List<CategoryEntity> categoryList = new ArrayList<>();
@@ -64,6 +76,7 @@ public class ProductService {
         if (refCategoryCode == null ){
             categoryList = categoryRepository.findAll();
         } else {
+            // 상위 카테고리에 따른 카테고리
             categoryList = categoryRepository.findByRefCategoryCode(refCategoryCode);
         }
 
@@ -71,6 +84,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    // 상품 등록
     @Transactional
     public void registerProduct(ProductDTO product) {
         try {
@@ -81,6 +95,12 @@ public class ProductService {
         }
     }
 
+    // 상품 현재 번호 확인
+    public String findMaxNO() {
+        return productRepository.findMaxNo();
+    }
+
+
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
 //        List<Object[]> results = productRepository.findAllProductsWithPriceList();
@@ -89,7 +109,4 @@ public class ProductService {
 //                .toList();
 //    }
 
-    public String findMaxNO() {
-        return productRepository.findMaxNo();
-    }
 }

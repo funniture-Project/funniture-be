@@ -17,7 +17,7 @@ public class ProductDetailDTO {
     private int totalStock;
     private Integer usedStock;
 
-    private CategoryDTO categoryCode;
+    private CategoryDTO category;
 
     // 정산 판매가
     private int regularPrice;
