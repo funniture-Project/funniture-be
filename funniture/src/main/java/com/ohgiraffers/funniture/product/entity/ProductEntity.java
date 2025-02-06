@@ -15,8 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class ProductEntity {
-
-
     @Id
     @Column(name = "product_no")
     private String productNo;
@@ -45,14 +43,14 @@ public class ProductEntity {
     private String productContent;
 
     // 판매 상태
-    @Column(name = "product_status")
+    @Column(name = "product_status", insertable = false)
     private String productStatus;
 
     // 대표 이미지 링크
-    @Column(name = "productImageLink")
+    @Column(name = "product_image_link", insertable = false)
     private String productImageLink;
 
     // 대표 이미지 ID(삭제 시 필요)
-    @Column(name = "productImageId")
+    @Column(name = "product_image_id", insertable = false)
     private String productImageId;
 }

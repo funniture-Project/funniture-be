@@ -50,11 +50,11 @@ public class ProductDetailEntity {
     private String productStatus;
 
     // 대표 이미지 링크
-    @Column(name = "productImageLink")
+    @Column(name = "product_image_link")
     private String productImageLink;
 
     // 대표 이미지 ID(삭제 시 필요)
-    @Column(name = "productImageId")
+    @Column(name = "product_image_id")
     private String productImageId;
 
     // 상품 대여조건 리스트

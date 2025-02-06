@@ -2,7 +2,9 @@ package com.ohgiraffers.funniture.product.model.dto;
 
 import lombok.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,23 +37,14 @@ public class ProductWithPriceDTO {
     private String productImageId;
 
     // 가격 리스트
-//    private List<Integer> priceList;
     private String priceList;
 
-    public static ProductWithPriceDTO fromQueryResult(Object[] result) {
-        return new ProductWithPriceDTO(
-                (String) result[0],  // product_no
-                (String) result[1],  // product_name
-                (String) result[2],  // owner_no
-                (int) result[3],     // total_stock
-                (Integer) result[4], // used_stock
-                (int) result[5],     // category_code
-                (int) result[6],     // regular_price
-                (String) result[7],  // product_content
-                (String) result[8],  // product_status
-                (String) result[9],  // productImageLink
-                (String) result[10], // productImageId
-                (String) result[11]  // priceList
-        );
+    public List<Integer> getPriceListAsIntegers() {
+        if (priceList == null || priceList.isEmpty()) {
+            return List.of();
+        }
+        return Arrays.stream(priceList.split(",")) // 쉼표로 분할
+                .map(Integer::parseInt)     // 정수 변환
+                .collect(Collectors.toList());
     }
 }

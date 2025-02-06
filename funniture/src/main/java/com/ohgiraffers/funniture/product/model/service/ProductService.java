@@ -3,9 +3,11 @@ package com.ohgiraffers.funniture.product.model.service;
 import com.ohgiraffers.funniture.product.entity.CategoryEntity;
 import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
+import com.ohgiraffers.funniture.product.entity.ProductWithPriceEntity;
 import com.ohgiraffers.funniture.product.model.dao.CategoryRepository;
 import com.ohgiraffers.funniture.product.model.dao.ProductDetailRepository;
 import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
+import com.ohgiraffers.funniture.product.model.dao.ProductWithPriceRepository;
 import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
@@ -27,20 +29,22 @@ public class ProductService {
     private final ModelMapper modelMapper;
     private final ProductDetailRepository productDetailRepository;
     private final ProductRepository productRepository;
+    private final ProductWithPriceRepository ProductWithPriceRepository;
     private final CategoryRepository categoryRepository;
 
     // 상품 조회
-    public List<ProductDTO> getProductAll(List<Integer> categoryCode) {
+    public List<ProductWithPriceDTO> getProductAll(List<Integer> categoryCode) {
         System.out.println("categoryCode = " + categoryCode);
 
-        List<ProductEntity> productEntityList = new ArrayList<>();
+        List<ProductWithPriceEntity> productEntityList = new ArrayList<>();
 
         if (categoryCode == null ){
-            productEntityList = productRepository.findAll();
+//            productEntityList = productRepository.findAll();
+            productEntityList = ProductWithPriceRepository.findAllProductsList();
         } else {
-            productEntityList = productRepository.findByCategoryCodeIn(categoryCode);
+            productEntityList = ProductWithPriceRepository.findAllProductsListByCategoryIn(categoryCode);
         }
-        return productEntityList.stream().map(product -> modelMapper.map(product, ProductDTO.class))
+        return productEntityList.stream().map(product -> modelMapper.map(product, ProductWithPriceDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -51,13 +55,6 @@ public class ProductService {
 
         // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
         return modelMapper.map(product, ProductDetailDTO.class);
-    }
-
-    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
-        List<Object[]> results = productRepository.findAllProductsWithPriceList();
-        return results.stream()
-                .map(ProductWithPriceDTO::fromQueryResult)
-                .toList();
     }
 
     public List<CategoryDTO> getCategoryList(Integer refCategoryCode) {
@@ -83,6 +80,14 @@ public class ProductService {
             System.out.println("error = " + e.getMessage());
         }
     }
+
+    // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
+//    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
+//        List<Object[]> results = productRepository.findAllProductsWithPriceList();
+//        return results.stream()
+//                .map(ProductWithPriceDTO::fromQueryResult)
+//                .toList();
+//    }
 
     public String findMaxNO() {
         return productRepository.findMaxNo();

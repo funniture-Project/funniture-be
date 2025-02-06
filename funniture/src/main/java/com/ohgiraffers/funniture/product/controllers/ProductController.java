@@ -41,7 +41,7 @@ public class ProductController {
         Map<String, Object> responseMap = new HashMap<>();
 
         System.out.println("categoryCode = " + categoryCode);
-        List<ProductDTO> result = productService.getProductAll(categoryCode);
+        List<ProductWithPriceDTO> result = productService.getProductAll(categoryCode);
         responseMap.put("result",result);
 
         return ResponseEntity.ok()
@@ -114,21 +114,6 @@ public class ProductController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "카테고리 전체 조회 성공", map));
-    }
-
-    @GetMapping("/test")
-    private ResponseEntity<ResponseMessage> getAllProductsWithPrices(){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
-
-        Map<String, Object> responseMap = new HashMap<>();
-
-        List<ProductWithPriceDTO> result = productService.getAllProductsWithPrices();
-        responseMap.put("result",result);
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(new ResponseMessage(200, "전체 상품 리스트 가격과 함께 조회 성공", responseMap));
     }
 
 }
