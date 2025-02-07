@@ -46,8 +46,6 @@ public class RentalController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-
-
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", null));
     }
 }
