@@ -46,6 +46,11 @@ public class RentalController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", null));
+        List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin();
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("adminRentalList", adminRentalList);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", res));
     }
 }
