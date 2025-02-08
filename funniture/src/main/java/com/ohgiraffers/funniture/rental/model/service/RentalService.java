@@ -1,6 +1,8 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
+import com.ohgiraffers.funniture.rental.entity.AdminRentalEntity;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
+import com.ohgiraffers.funniture.rental.model.dao.AdminRentalRepository;
 import com.ohgiraffers.funniture.rental.model.dao.RentalMapper;
 import com.ohgiraffers.funniture.rental.model.dao.RentalRepository;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
@@ -23,6 +25,7 @@ public class RentalService {
     private final RentalMapper rentalMapper;
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
+    private final AdminRentalRepository adminRentalRepository;
 
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
@@ -50,4 +53,8 @@ public class RentalService {
     }
 
 
+    public List<AdminRentalViewDTO> findRentalAllListByAdmin() {
+
+        return adminRentalRepository.findRentalAllListByAdmin();
+    }
 }
