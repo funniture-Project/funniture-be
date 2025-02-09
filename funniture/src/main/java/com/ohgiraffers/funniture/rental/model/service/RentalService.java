@@ -5,8 +5,10 @@ import com.ohgiraffers.funniture.rental.entity.RentalEntity;
 import com.ohgiraffers.funniture.rental.model.dao.AdminRentalRepository;
 import com.ohgiraffers.funniture.rental.model.dao.RentalMapper;
 import com.ohgiraffers.funniture.rental.model.dao.RentalRepository;
+import com.ohgiraffers.funniture.rental.model.dao.UserRentalRepository;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
 import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
+import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class RentalService {
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
     private final AdminRentalRepository adminRentalRepository;
+    private final UserRentalRepository userRentalRepository;
 
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
@@ -56,5 +59,9 @@ public class RentalService {
     public List<AdminRentalViewDTO> findRentalAllListByAdmin() {
 
         return adminRentalRepository.findRentalAllListByAdmin();
+    }
+
+    public List<UserOrderViewDTO> findRentalOrderListByUser() {
+        return userRentalRepository.findRentalOrderListByUser();
     }
 }
