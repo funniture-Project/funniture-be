@@ -49,23 +49,22 @@ public class ProductService {
     }
 
     // 상품 번호에따른 상품 상세 조회
-    public Map<String, Object> getProductInfoByNo(Map<String, Object> receiveData) {
-        Map<String, Object> results = new HashMap<>();
+    public ProductDetailDTO getProductInfoByNo(String productNo) {
 
-        if (receiveData.containsKey("productNo")){
-            ProductDetailEntity product = productDetailRepository.findById((String) receiveData.get("productNo"))
-                    .orElseThrow(IllegalArgumentException::new);
+        ProductDetailEntity product = productDetailRepository.findById(productNo)
+                .orElseThrow(IllegalArgumentException::new);
 
-            // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
-            results.put("productNoResult", modelMapper.map(product, ProductDetailDTO.class));
-        } else if (receiveData.containsKey("ownerNo")) {
-            List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerNo((String) receiveData.get("ownerNo"));
+        // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
+        return modelMapper.map(product, ProductDetailDTO.class);
+    }
 
-            results.put("ownerNoResults",productList.stream().map(product -> modelMapper.map(product, ProductDetailDTO.class))
-                    .collect(Collectors.toList()));
-        }
+    // 제공자별 상품 조회
+    public List<ProductDetailDTO> getProductInfoByOwner(String ownerNo){
 
-        return results;
+        List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerNo(ownerNo);
+
+        return productList.stream().map(product -> modelMapper.map(product, ProductDetailDTO.class))
+                .collect(Collectors.toList());
     }
 
     // 카테고리 조회

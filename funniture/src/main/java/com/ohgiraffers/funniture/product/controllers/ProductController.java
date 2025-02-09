@@ -40,19 +40,12 @@ public class ProductController {
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        // 보내는 데이터 (service를 1개만 쓰기 위해서)
-        Map<String,Object> sendData = new HashMap<>();
-
-        // 받는 데이터 (반환이 map 형태)
-        Map<String,Object> receiveData = new HashMap<>();
-
         if (ownerNo == null){
             List<ProductWithPriceDTO> results = productService.getProductAll(categoryCode);
             responseMap.put("result",results);
         } else {
-            sendData.put("ownerNo",ownerNo);
-            receiveData = productService.getProductInfoByNo(sendData);
-            List<ProductDetailDTO> results = (List<ProductDetailDTO>) receiveData.get("ownerNoResults");
+            List<ProductDetailDTO> results = productService.getProductInfoByOwner(ownerNo);
+
             if (results.isEmpty()){
                 return ResponseEntity.ok()
                         .headers(headers)
@@ -71,17 +64,13 @@ public class ProductController {
     @GetMapping("/{productNo}")
     public ResponseEntity<ResponseMessage> getProductDetail(@PathVariable String productNo){
         Map<String, Object> responseMap = new HashMap<>();
-        Map<String,Object> sendData = new HashMap<>();
-        Map<String,Object> receiveData = new HashMap<>();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         if (productNo != null){
-            sendData.put("productNo",productNo);
-            receiveData = productService.getProductInfoByNo(sendData);
 
-            ProductDetailDTO result = (ProductDetailDTO) receiveData.get("productNoResult");
+            ProductDetailDTO result = productService.getProductInfoByNo(productNo);
 
             // 결과가 없을 경우 처리 (상품을 찾지 못한 경우)
             if (result == null) {
