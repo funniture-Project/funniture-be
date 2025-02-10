@@ -1,5 +1,5 @@
 ---
-name: Feature-Issue
+name: Feature-Issue✨
 about: 추가하신 새로운 기능에 대해 기록해주세요.
 title: "✨[Feature] 2025/[월]/[일] [이름]"
 labels: "✨Feature✨"
