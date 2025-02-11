@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 // @Tag : 관련 있는 API 들의 그룹을 짓기 위한 어노테이션
-@Tag(name = "Product API")
+@Tag(name = "INQUIRY API")
 @RestController
 @RequestMapping("/api/v1/inquiry")
 @RequiredArgsConstructor
@@ -58,13 +58,27 @@ public class InquiryController {
                 .body(new ResponseMessage(200, "조회 성공", map));
     }
 
+    // 상세 페이지에 해당 상품에 대한 전체 문의
+    @GetMapping ("/product/{productNo}")
+    public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
+        System.out.println("컨트롤러 productNo = " + productNo);
+        List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
+
+        Map <String , Object> map = new HashMap<>();
+        map.put("map", result);
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(200, "조회 성공", map));
+    }
+
     @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
 
-        System.out.println("json에서 들어온 inquiryDTO = " + inquiryDTO);
+        System.out.println("살인마 json에서 들어온 inquiryDTO = " + inquiryDTO);
 
         String maxInquiry = inquiryService.getMaxInquiry();
-        System.out.println("컨트롤러 maxInquiry = " + maxInquiry);
+        System.out.println("유어 마인드 컨트롤러 maxInquiry = " + maxInquiry);
 
         String newNo = returnInquiryNo(maxInquiry);
         inquiryDTO.setInquiryNo(newNo);

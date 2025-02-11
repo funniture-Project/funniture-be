@@ -76,4 +76,13 @@ public class InquiryService {
 
         inquiryRepository.deleteById(inquiryNo);
     }
+
+    public List<InquiryDTO> findByProductNo(String productNo) {
+        System.out.println("서비스 productNo = " + productNo);
+
+        List<Inquiry> result = inquiryRepository.findByProductNo(productNo);
+
+        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class))
+                        .collect(Collectors.toList());
+    }
 }
