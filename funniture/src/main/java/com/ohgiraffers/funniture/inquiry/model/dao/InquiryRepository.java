@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, String> {
 
@@ -13,4 +15,6 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
            nativeQuery = true)
     String maxInquiry();
 
+    @Query(value = "SELECT * FROM INQUIRY WHERE PRODUCT_NO = :productNo", nativeQuery = true)
+    List<Inquiry> findByProductNo(String productNo);
 }

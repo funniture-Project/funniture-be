@@ -58,13 +58,26 @@ public class InquiryController {
                 .body(new ResponseMessage(200, "조회 성공", map));
     }
 
+    @GetMapping ("/product/{productNo}")
+    public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
+        System.out.println("컨트롤러 productNo = " + productNo);
+        List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
+
+        Map <String , Object> map = new HashMap<>();
+        map.put("map", result);
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(200, "조회 성공", map));
+    }
+
     @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
 
-        System.out.println("json에서 들어온 inquiryDTO = " + inquiryDTO);
+        System.out.println("살인마json에서 들어온 inquiryDTO = " + inquiryDTO);
 
         String maxInquiry = inquiryService.getMaxInquiry();
-        System.out.println("컨트롤러 maxInquiry = " + maxInquiry);
+        System.out.println("유어 마인드 컨트롤러 maxInquiry = " + maxInquiry);
 
         String newNo = returnInquiryNo(maxInquiry);
         inquiryDTO.setInquiryNo(newNo);
