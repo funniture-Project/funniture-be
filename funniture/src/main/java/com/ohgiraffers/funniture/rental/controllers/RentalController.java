@@ -2,17 +2,18 @@ package com.ohgiraffers.funniture.rental.controllers;
 
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
 import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
+import com.ohgiraffers.funniture.rental.model.dto.AdminRentalSearchCriteria;
 import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
 import com.ohgiraffers.funniture.rental.model.service.RentalService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class RentalController {
     }
 
     // 사용자 조회(주문/배송)
-    @GetMapping("user/orderList")
+    @GetMapping("user/orders")
     public ResponseEntity<ResponseMessage> findRentalOrderListByUser(){
 
 
@@ -58,13 +59,22 @@ public class RentalController {
     }
 
     // 관리자 조회(예약정보 - 예약전체리스트)
-    @GetMapping("admin/allList")
-    public ResponseEntity<ResponseMessage> findRentalAllListByAdmin() {
+    @GetMapping("admin/rentals")
+    public ResponseEntity<ResponseMessage> findRentalAllListByAdmin(@RequestParam(required = false) String rentalState,
+                                                                    @RequestParam(required = false) String storeName,
+                                                                    @RequestParam(required = false) String categoryName,
+                                                                    @RequestParam(required = false)
+                                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime searchDate,
+                                                                    @RequestParam(required = false) String rentalNo
+    ) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin();
+        // 검색 조건 DTO로 변환
+        AdminRentalSearchCriteria criteria = new AdminRentalSearchCriteria(rentalState, storeName, categoryName, searchDate, rentalNo);
+
+        List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria);
 
         Map<String, Object> res = new HashMap<>();
         res.put("adminRentalList", adminRentalList);
