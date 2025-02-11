@@ -19,8 +19,12 @@ public class Inquiry {
     @Column
     private String inquiryNo;
 
-    @Column
-    private String memberId;
+//    @Column
+//    private String memberId;
+// 문의를 작성한 회원 (Member와 ManyToOne 관계)
+    @ManyToOne
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
+    private Member member;
 
     @Column
     private String inquiryContent;
@@ -31,8 +35,12 @@ public class Inquiry {
     @Column
     private int qnaType;
 
-    @Column
-    private String productNo;
+//    @Column
+//    private String productNo;
+
+    @ManyToOne
+    @JoinColumn(name = "product_no", referencedColumnName = "product_no")  // Product와 연결
+    private Product product;
 
     @Column
     private LocalDateTime qnaWriteTime;

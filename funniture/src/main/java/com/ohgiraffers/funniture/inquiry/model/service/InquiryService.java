@@ -1,8 +1,10 @@
 package com.ohgiraffers.funniture.inquiry.model.service;
 
 import com.ohgiraffers.funniture.inquiry.entity.Inquiry;
+import com.ohgiraffers.funniture.inquiry.entity.Member;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -57,13 +59,14 @@ public class InquiryService {
         Inquiry result = inquiryRepository.findById(inquiryNo).orElseThrow();
         System.out.println("inquiryNO로 잘 조회해 오는지 = " + result);
 
-        result = result.toBuilder()
-                .memberId(inquiryDTO.getMemberId())
-                .inquiryContent(inquiryDTO.getInquiryContent())
-                .showStatus(inquiryDTO.getShowStatus())
-                .qnaType(inquiryDTO.getQnaType())
-                .productNo(inquiryDTO.getProductNo())
-                .qnaWriteTime(LocalDateTime.now()).build();
+
+//        result = result.toBuilder()
+//                .member(inquiryDTO.getMember().getMemberId())
+//                .inquiryContent(inquiryDTO.getInquiryContent())
+//                .showStatus(inquiryDTO.getShowStatus())
+//                .qnaType(inquiryDTO.getQnaType())
+//                .product(inquiryDTO.getProduct())
+//                .qnaWriteTime(LocalDateTime.now()).build();
 
         inquiryRepository.save(result);
 
@@ -84,5 +87,13 @@ public class InquiryService {
 
         return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class))
                         .collect(Collectors.toList());
+    }
+
+    public List<MemberDTO> findByInquiryOwnerPage() {
+
+        // 조인하는 엔티티 다시 만들어야 함. Inquiry 말고 조인한 애로
+        List<Member> result = inquiryRepository.findAllInquiryOwnerPage();
+
+        return result.stream().map(all -> modelMapper.map(all , MemberDTO.class)).collect(Collectors.toList());
     }
 }

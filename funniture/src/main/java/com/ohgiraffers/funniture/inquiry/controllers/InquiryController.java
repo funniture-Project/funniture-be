@@ -101,21 +101,7 @@ public class InquiryController {
         }
     }
 
-    @PutMapping("/modify/{inquiryNo}")
-    public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
-                                                        ,@RequestBody InquiryDTO inquiryDTO){
-
-        System.out.println("컨트롤러 : 화면에서 inquiryNo 받아오나 = " + inquiryNo);
-
-        inquiryService.modifyByInquiryNo(inquiryNo,inquiryDTO);
-
-        Map<String , Object> map = new HashMap<>();
-
-        return ResponseEntity.ok()
-                .headers(headersMethod())
-                .body(new ResponseMessage(201, "수정 성공", map));
-    }
-
+    // 본인이 작성한 문의 삭제하기
     @DeleteMapping("/delete/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryDelete(@PathVariable String inquiryNo){
         System.out.println("화면에서 inquiryNo 잘 받아오나 = " + inquiryNo);
