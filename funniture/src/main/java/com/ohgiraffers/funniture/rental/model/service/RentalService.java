@@ -1,13 +1,10 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
-import com.ohgiraffers.funniture.rental.entity.AdminRentalEntity;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
-import com.ohgiraffers.funniture.rental.model.dao.AdminRentalRepository;
-import com.ohgiraffers.funniture.rental.model.dao.RentalMapper;
-import com.ohgiraffers.funniture.rental.model.dao.RentalRepository;
-import com.ohgiraffers.funniture.rental.model.dao.UserRentalRepository;
+import com.ohgiraffers.funniture.rental.model.dao.*;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
 import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
+import com.ohgiraffers.funniture.rental.model.dto.AdminRentalSearchCriteria;
 import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,7 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +25,7 @@ public class RentalService {
     private final ModelMapper modelMapper;
     private final AdminRentalRepository adminRentalRepository;
     private final UserRentalRepository userRentalRepository;
+    private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
 
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
@@ -55,13 +52,14 @@ public class RentalService {
         rentalRepository.save(modelMapper.map(rentalDTO, RentalEntity.class));
     }
 
-
-    public List<AdminRentalViewDTO> findRentalAllListByAdmin() {
-
-        return adminRentalRepository.findRentalAllListByAdmin();
+    // 관리자 예약 조회
+    public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
+        return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria);
     }
+
 
     public List<UserOrderViewDTO> findRentalOrderListByUser() {
         return userRentalRepository.findRentalOrderListByUser();
     }
+
 }

@@ -51,6 +51,6 @@ public class AdminProductEntity {
     private AdminCategoryEntity adminCategory;
 
     @ManyToOne
-    @JoinColumn(name = "owner_no")
+    @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
     private AdminOwnerInfoEntity adminOwnerInfo;
 }
