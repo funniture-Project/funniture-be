@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 // @Tag : 관련 있는 API 들의 그룹을 짓기 위한 어노테이션
+//@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Product API")
 @RestController
 @RequestMapping("/api/v1/product")

@@ -26,4 +26,7 @@ public class CategoryEntity {
 
     @Column(name = "ref_category_code")
     private Integer refCategoryCode;
+
+    @Column(name = "category_image")
+    private String categoryImage;
 }
