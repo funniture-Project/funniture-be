@@ -15,6 +15,6 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
            nativeQuery = true)
     String maxInquiry();
 
-    @Query(value = "SELECT * FROM INQUIRY WHERE PRODUCT_NO = :productNo", nativeQuery = true)
+    @Query(value = "SELECT * FROM TBL_INQUIRY WHERE PRODUCT_NO = :productNo", nativeQuery = true)
     List<Inquiry> findByProductNo(String productNo);
 }
