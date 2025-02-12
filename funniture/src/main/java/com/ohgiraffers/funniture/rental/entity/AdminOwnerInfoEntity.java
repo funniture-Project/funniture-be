@@ -37,5 +37,4 @@ public class AdminOwnerInfoEntity {
 
     @Column(name = "attechment_link")
     private String attechmentLink;
-
 }

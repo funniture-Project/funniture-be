@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.model.service;
 
+import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.product.entity.CategoryEntity;
 import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
@@ -32,15 +33,12 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     // 전체 상품 조회, 카테고리별 상품 조회(상품 + 가격 리스트)
-    public List<ProductWithPriceDTO> getProductAll(List<Integer> categoryCode) {
+    public List<ProductWithPriceDTO> getProductAll(ProductSearchCondition condition) {
 
         List<ProductWithPriceEntity> productEntityList = new ArrayList<>();
 
-        if (categoryCode == null ){
-            productEntityList = ProductWithPriceRepository.findAllProductsList();
-        } else {
-            productEntityList = ProductWithPriceRepository.findAllProductsListByCategoryIn(categoryCode);
-        }
+        productEntityList = ProductWithPriceRepository.findSearchProductList(condition);
+
         return productEntityList.stream().map(product -> modelMapper.map(product, ProductWithPriceDTO.class))
                 .collect(Collectors.toList());
     }
@@ -84,10 +82,12 @@ public class ProductService {
     public void registerProduct(ProductDTO product) {
         try {
             productRepository.save(modelMapper.map(product, ProductEntity.class));
-            System.out.println("상품 등록 성공!!");
         } catch (Exception e) {
+            System.out.println("e = " + e);
             System.out.println("error = " + e.getMessage());
         }
+
+        System.out.println("상품 등록 성공!!");
     }
 
     // 상품 현재 번호 확인

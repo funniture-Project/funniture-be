@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class Product {
+
     @Id
     @Column(name = "product_no")
     private String productNo;
@@ -24,9 +25,11 @@ public class Product {
     private String productName;
 
     // 수정
-    @ManyToOne
-    @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
-    private Member owner;
+//    @ManyToOne
+//    @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
+
+    @Column(name = "owner_no")
+    private String owner;
 
     @Column(name = "total_stock")
     private int totalStock;

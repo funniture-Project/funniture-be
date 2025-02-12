@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.controllers;
 
+import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
@@ -11,11 +12,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
@@ -37,11 +40,12 @@ public class ProductController {
     // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
 
     // product 조회 (전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회)
-    @Operation(summary = "상품 조회",
-            description = "전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회",
+    @Operation(summary = "상품 조회 (상품 정보 + 가격 리스트)",
+            description = "전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회, 검색명으로 조회",
             parameters = {
                     @Parameter(name = "categoryCode", description = "조회할 카테고리 코드 리스트 (선택)"),
-                    @Parameter(name = "ownerNo", description = "상품 제공자의 회원번호 (선택)")
+                    @Parameter(name = "ownerNo", description = "상품 제공자의 번호 리스트 (선택)"),
+                    @Parameter(name = "searchText", description = "상품 검색명 (선택)")
             }
     )
     @ApiResponses({
@@ -49,39 +53,63 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping
-    public ResponseEntity<ResponseMessage> getProductAll(@RequestParam(required = false) List<Integer> categoryCode, @RequestParam(required = false) String ownerNo){
+    public ResponseEntity<ResponseMessage> getProductAll(@ModelAttribute ProductSearchCondition condition){
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        if (ownerNo == null){
-            List<ProductWithPriceDTO> results = productService.getProductAll(categoryCode);
+        List<ProductWithPriceDTO> results = productService.getProductAll(condition);
 
-            if (results.isEmpty()){
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
-            }
-
-            responseMap.put("result",results);
-        } else {
-            List<ProductDetailDTO> results = productService.getProductInfoByOwner(ownerNo);
-
-            if (results.isEmpty()){
-                return ResponseEntity.ok()
-                        .headers(headers)
-                        .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
-            }
-
-            responseMap.put("result",results);
+        if (results.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
         }
+
+        responseMap.put("result",results);
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "전체 상품 리스트 조회 성공", responseMap));
     }
+
+
+    // 제공자별 등록한 상품 조회
+    @Operation(summary = "제공자가 등록한 상품 조회 (상품 정보 + 렌탈 옵션 정보 + 카테고리 정보)",
+            description = "제공자가 등록한 상품 조회",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "상품 제공자의 회원번호 (필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 상품이 없음"),
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    @GetMapping("/owner")
+    public ResponseEntity<ResponseMessage> getProductAll(@RequestParam(required = false) String ownerNo ){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        List<ProductDetailDTO> results = productService.getProductInfoByOwner(ownerNo);
+        if (results.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+        }
+
+        responseMap.put("result",results);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "제공자가 등롣한 상품 리스트 조회 성공", responseMap));
+    }
+
+
 
     @Operation(summary = "상품 상세 정보 조회",
             description = "상품 상세 페이지, 제공자 상품 수정에서 사용",
@@ -125,28 +153,70 @@ public class ProductController {
         }
     }
 
+    @Operation(summary = "상품 등록",
+            description = "상품 등록 페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "401",description = "필수값 부족. errors 확인"),
+            @ApiResponse(responseCode = "400",description = "상품 등록에 실패."),
+            @ApiResponse(responseCode = "200", description = "상품 등록 성공")
+    })
     // 상품 등록
     @PostMapping("/register")
-    public void registerProduct(@RequestBody ProductDTO product){
+    public ResponseEntity<ResponseMessage> registerProduct(@Valid @RequestBody ProductDTO product, BindingResult bindingResult){
 
-        String maxNo = productService.findMaxNO();
+        Map<String, Object> responseMap = new HashMap<>();
 
-        System.out.println("mawNo = " + maxNo);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
-        if (maxNo == null || maxNo.isEmpty()){
-            product.setProductNo("PRD001");
+        if (bindingResult.hasErrors()){
+            System.out.println("bindingResult = " + bindingResult);
+
+            responseMap.put("errors",bindingResult.getAllErrors().stream().map(error -> error.getDefaultMessage()));
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(401, "필수값 부족",responseMap));
         } else {
-            String newNo = String.format("PRD%03d", Integer.parseInt(maxNo.substring(3)) + 1);
-            System.out.println("newNo = " + newNo);
+            String maxNo = productService.findMaxNO();
 
-            product.setProductNo(newNo);
+            System.out.println("mawNo = " + maxNo);
+
+            if (maxNo == null || maxNo.isEmpty()){
+                product.setProductNo("PRD001");
+            } else {
+                String newNo = String.format("PRD%03d", Integer.parseInt(maxNo.substring(3)) + 1);
+                System.out.println("newNo = " + newNo);
+
+                product.setProductNo(newNo);
+            }
+
+            productService.registerProduct(product);
+
+            String checkNo = productService.findMaxNO();
+            System.out.println("product = " + product.getProductNo() + ", checkNo : " + checkNo);
+
+            if (product.getProductNo().equals(checkNo)){
+
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(new ResponseMessage(201, "상품 등록 성공", null));
+            }
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(400, "잘못된 요청", null));
         }
-
-        System.out.println("product = " + product);
-
-        productService.registerProduct(product);
     }
 
+    @Operation(summary = "카테고리 조회",
+            description = "상품 카테고리 조회, 상위 카테고리별 조회 "
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "카테고리 전체 조회 성공"),
+            @ApiResponse(responseCode = "204", description = "카테고리 없음")
+    })
     // 상품 카테고리 조회, 상위 카테고리별 조회
     @GetMapping("/category")
     private ResponseEntity<ResponseMessage> getCategoryList(@RequestParam(required = false) Integer refCategoryCode){
@@ -157,6 +227,13 @@ public class ProductController {
         headers.setContentType(new MediaType( "application","json",Charset.forName("UTF-8")));
 
         Map<String, Object> map = new HashMap<>();
+
+        if (categoryList.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 카테고리 없음", null));
+        }
+
         map.put("result",categoryList);
 
         return ResponseEntity.ok()

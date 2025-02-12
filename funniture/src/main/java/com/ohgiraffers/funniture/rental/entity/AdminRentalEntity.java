@@ -56,5 +56,4 @@ public class AdminRentalEntity {
     @ManyToOne
     @JoinColumn(name = "product_no")
     private AdminProductEntity adminProduct;       // 상품번호 (fk)
-
 }
