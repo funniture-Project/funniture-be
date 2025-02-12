@@ -17,10 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,8 +48,7 @@ public class ProductService {
     // 상품 번호에따른 상품 상세 조회
     public ProductDetailDTO getProductInfoByNo(String productNo) {
 
-        ProductDetailEntity product = productDetailRepository.findById(productNo)
-                .orElseThrow(IllegalArgumentException::new);
+        Optional<ProductDetailEntity> product = productDetailRepository.findById(productNo);
 
         // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
         return modelMapper.map(product, ProductDetailDTO.class);

@@ -6,6 +6,10 @@ import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
 import com.ohgiraffers.funniture.product.model.service.ProductService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +37,17 @@ public class ProductController {
     // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
 
     // product 조회 (전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회)
+    @Operation(summary = "상품 조회",
+            description = "전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회",
+            parameters = {
+                    @Parameter(name = "categoryCode", description = "조회할 카테고리 코드 리스트 (선택)"),
+                    @Parameter(name = "ownerNo", description = "상품 제공자의 회원번호 (선택)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 상품이 없음"),
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
     @GetMapping
     public ResponseEntity<ResponseMessage> getProductAll(@RequestParam(required = false) List<Integer> categoryCode, @RequestParam(required = false) String ownerNo){
 
@@ -43,6 +58,13 @@ public class ProductController {
 
         if (ownerNo == null){
             List<ProductWithPriceDTO> results = productService.getProductAll(categoryCode);
+
+            if (results.isEmpty()){
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+            }
+
             responseMap.put("result",results);
         } else {
             List<ProductDetailDTO> results = productService.getProductInfoByOwner(ownerNo);
@@ -61,6 +83,17 @@ public class ProductController {
                 .body(new ResponseMessage(200, "전체 상품 리스트 조회 성공", responseMap));
     }
 
+    @Operation(summary = "상품 상세 정보 조회",
+            description = "상품 상세 페이지, 제공자 상품 수정에서 사용",
+            parameters = {
+                    @Parameter(name = "productNo", description = "상품 번호 (필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "404",description = "상품을 찾을 수 없습니다"),
+            @ApiResponse(responseCode = "400",description = "잘못된 요청입니다. productNo를 확인해주세요"),
+            @ApiResponse(responseCode = "200", description = "특정 상품 정보 조회 성공")
+    })
     // 상세 정보 조회 (상품 상세 페이지, 제공자 상품 수정)
     @GetMapping("/{productNo}")
     public ResponseEntity<ResponseMessage> getProductDetail(@PathVariable String productNo){

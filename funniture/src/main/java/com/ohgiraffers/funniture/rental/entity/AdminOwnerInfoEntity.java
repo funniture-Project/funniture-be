@@ -17,10 +17,10 @@ import lombok.ToString;
 @ToString
 public class AdminOwnerInfoEntity {
 
-    @Id
     @Column(name = "member_id")
     private String memberId;
 
+    @Id
     @Column(name = "store_no")
     private String storeNo;
 
