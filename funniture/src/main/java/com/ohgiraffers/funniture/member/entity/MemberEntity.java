@@ -21,6 +21,15 @@ public class MemberEntity {
     @Column(name = "member_id")
     private String memberId;
 
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "email")
+    private String email;
+    
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "signup_date")
     private LocalDateTime signupDate;
 
