@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.inquiry.entity;
 
+import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Builder(toBuilder = true)
-public class Inquiry {
+public class InquiryEntity {
 
     @Id
     @Column
@@ -25,7 +26,7 @@ public class Inquiry {
 // 문의를 작성한 회원 (Member와 ManyToOne 관계)
     @ManyToOne
     @JoinColumn(name = "member_id", referencedColumnName = "member_id")
-    private Member member;
+    private MemberEntity member;
 
     @Column
     private String inquiryContent;
