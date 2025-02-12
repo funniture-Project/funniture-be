@@ -12,6 +12,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -46,10 +48,17 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
         }
         // 4. 검색날짜(사용날짜이상 만료날짜 이하 사이의 날짜면 다 조회)
         // loe '<=' goe '>='
-        if(criteria.getSearchDate() != null){
-            builder.and(rental.rentalStartDate.loe(criteria.getSearchDate()))
-                   .and(rental.rentalEndDate.goe(criteria.getSearchDate()));
+        if (criteria.getSearchDate() != null) {
+            LocalDateTime searchDateTime = criteria.getSearchDate(); // LocalDateTime
+            LocalDate searchDate = searchDateTime.toLocalDate(); // LocalDate로 변환
+
+            LocalDateTime startOfDay = searchDate.atStartOfDay(); // ✅ 2025-02-01 00:00:00
+            LocalDateTime endOfDay = searchDate.atTime(23, 59, 59); // ✅ 2025-02-01 23:59:59
+
+            builder.and(rental.rentalStartDate.loe(endOfDay)) // rentalStartDate <= 2025-02-01 23:59:59
+                    .and(rental.rentalEndDate.goe(startOfDay)); // rentalEndDate >= 2025-02-01 00:00:00
         }
+
         if(criteria.getRentalNo() != null){
             builder.and(rental.rentalNo.eq(criteria.getRentalNo()));
         }

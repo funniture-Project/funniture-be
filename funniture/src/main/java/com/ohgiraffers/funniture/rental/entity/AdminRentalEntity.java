@@ -2,6 +2,7 @@ package com.ohgiraffers.funniture.rental.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -23,9 +24,11 @@ public class AdminRentalEntity {
     @Column(name = "order_date") // 주문일
     private LocalDateTime orderDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "rental_start_date") // 대여 시작일
     private LocalDateTime rentalStartDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "rental_end_date") // 대여 마감일
     private LocalDateTime rentalEndDate;
 

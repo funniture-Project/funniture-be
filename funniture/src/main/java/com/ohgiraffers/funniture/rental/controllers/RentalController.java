@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,7 @@ public class RentalController {
     private final RentalService rentalService;
 
     // 사용자 예약 등록
-    @PostMapping("user/insert")
+    @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> insertRental(@RequestBody RentalDTO rentalDTO) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -41,16 +43,16 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "등록완료", null));
     }
 
-    // 사용자 조회(주문/배송)
-    @GetMapping("user/orders")
-    public ResponseEntity<ResponseMessage> findRentalOrderListByUser(){
-
+    // 사용자의 예약 전체 조회(주문/배송)
+    @GetMapping("/user")
+    public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam(required = false) String period,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
         // 나중에 로그인한 사람 code 꺼내서 가지고 가야함, 일단 조인시켜 조회만 해놓기!!
-        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser();
+        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(period,searchDate);
 
         Map<String, Object> res = new HashMap<>();
         res.put("orderList", orderList);
@@ -58,21 +60,27 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", res));
     }
 
-    // 관리자 조회(예약정보 - 예약전체리스트)
-    @GetMapping("admin/rentals")
+    // 예약 상세 조회(사용자, 제공자 동일) /{rentalNo}
+
+
+    // 관리자 예약 전체조회 -> 사용자, 제공자 정보는 user 폴더에!
+    @GetMapping
     public ResponseEntity<ResponseMessage> findRentalAllListByAdmin(@RequestParam(required = false) String rentalState,
                                                                     @RequestParam(required = false) String storeName,
                                                                     @RequestParam(required = false) String categoryName,
-                                                                    @RequestParam(required = false)
-                                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime searchDate,
+                                                                    @RequestParam(required = false) String searchDate,
                                                                     @RequestParam(required = false) String rentalNo
     ) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
+        LocalDateTime searchDateTime =
+                LocalDate.parse(searchDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                .atStartOfDay();
+
         // 검색 조건 DTO로 변환
-        AdminRentalSearchCriteria criteria = new AdminRentalSearchCriteria(rentalState, storeName, categoryName, searchDate, rentalNo);
+        AdminRentalSearchCriteria criteria = new AdminRentalSearchCriteria(rentalState, storeName, categoryName, searchDateTime, rentalNo);
 
         List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria);
 
@@ -82,7 +90,6 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "정상조회", res));
     }
 
-    // 관리자 조회(예약상세정보(사용자,제공자 정보))
 
 
 }

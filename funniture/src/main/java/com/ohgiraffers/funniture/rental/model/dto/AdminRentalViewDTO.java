@@ -22,10 +22,10 @@ public class AdminRentalViewDTO {
 
     private String productName;     // 상품명
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime rentalStartDate;   // 대여시작일
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime rentalEndDate;     // 대여마감일
 
     private int rentalNumber;       // 대여갯수
