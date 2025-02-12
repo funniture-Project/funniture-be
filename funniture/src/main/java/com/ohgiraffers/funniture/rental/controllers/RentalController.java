@@ -75,12 +75,18 @@ public class RentalController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
+        System.out.println("searchDate = " + searchDate);
+
         LocalDateTime searchDateTime =
                 LocalDate.parse(searchDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 .atStartOfDay();
 
+        System.out.println("searchDateTime = " + searchDateTime);
+
         // 검색 조건 DTO로 변환
         AdminRentalSearchCriteria criteria = new AdminRentalSearchCriteria(rentalState, storeName, categoryName, searchDateTime, rentalNo);
+
+        System.out.println("criteria = " + criteria);
 
         List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria);
 

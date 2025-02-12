@@ -18,7 +18,7 @@ import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 @Repository
 @RequiredArgsConstructor
-public class productWithPriceDSL   implements ProductWithPriceRepository {
+public class productWithPriceDSL implements ProductWithPriceRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
