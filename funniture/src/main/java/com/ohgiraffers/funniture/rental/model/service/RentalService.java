@@ -23,10 +23,10 @@ public class RentalService {
     private final RentalMapper rentalMapper;
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
-    private final AdminRentalRepository adminRentalRepository;
-    private final UserRentalRepository userRentalRepository;
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
+    private final UserRentalRepositoryCustom userRentalRepositoryCustom;
 
+    // 사용자 - 예약 등록
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
 
@@ -52,14 +52,16 @@ public class RentalService {
         rentalRepository.save(modelMapper.map(rentalDTO, RentalEntity.class));
     }
 
-    // 관리자 예약 조회
+    // 사용자 - 예약 조회(쿼리DSL)
+    public List<UserOrderViewDTO> findRentalOrderListByUser(String period, LocalDate searchDate) {
+        return userRentalRepositoryCustom.findRentalOrderListByUser(period, searchDate);
+    }
+
+    // 관리자 - 예약 전체 조회(쿼리DSL)
     public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
         return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria);
     }
 
 
-    public List<UserOrderViewDTO> findRentalOrderListByUser() {
-        return userRentalRepository.findRentalOrderListByUser();
-    }
 
 }
