@@ -3,6 +3,10 @@ package com.ohgiraffers.funniture.inquiry.controllers;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.service.InquiryService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -16,13 +20,22 @@ import java.util.List;
 import java.util.Map;
 
 // @Tag : 관련 있는 API 들의 그룹을 짓기 위한 어노테이션
-@Tag(name = "INQUIRY API")
+@Tag(name = "Inquiry API")
 @RestController
 @RequestMapping("/api/v1/inquiry")
 @RequiredArgsConstructor
 public class InquiryController {
 
     private final InquiryService inquiryService;
+
+    @Operation(summary = "문의 조회",
+            description = "전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회, 검색명으로 조회",
+            parameters = {
+                    @Parameter(name = "categoryCode", description = "조회할 카테고리 코드 리스트 (선택)"),
+                    @Parameter(name = "ownerNo", description = "상품 제공자의 번호 리스트 (선택)"),
+                    @Parameter(name = "searchText", description = "상품 검색명 (선택)")
+            }
+    )
 
     private HttpHeaders headersMethod () {
 
@@ -74,6 +87,12 @@ public class InquiryController {
                 .body(new ResponseMessage(200, "조회 성공", map));
     }
 
+    @Operation(summary = "문의 등록",
+            description = "상세 페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "문의 등록 성공")
+    })
     // 문의 등록
     @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
@@ -104,6 +123,12 @@ public class InquiryController {
         }
     }
 
+    @Operation(summary = "문의 삭제",
+            description = "사용자 마이 페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "문의 삭제 성공")
+    })
     // 문의 번호로 삭제하기
     @DeleteMapping("/delete/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryDelete(@PathVariable String inquiryNo){
@@ -120,7 +145,12 @@ public class InquiryController {
 
 
 
-
+    @Operation(summary = "제공자 페이지 문의 조회",
+            description = "제공자 마이 페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "문의 조회 성공")
+    })
     // member_id에 따른 제공자 페이지의 전체 문의들
     @GetMapping("/owner/{ownerNo}")
     public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry (@PathVariable String ownerNo) {
@@ -137,6 +167,12 @@ public class InquiryController {
                 .body(new ResponseMessage(200, "조회 성공", map));
     }
 
+    @Operation(summary = "제공자 페이지 문의 답변 수정",
+            description = "제공자 마이 페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "문의 답변 수정 성공")
+    })
     // 문의 답변 수정하기
     @PutMapping("/modify/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
