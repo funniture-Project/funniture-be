@@ -159,7 +159,7 @@ public class ProductController {
     @ApiResponses({
             @ApiResponse(responseCode = "401",description = "필수값 부족. errors 확인"),
             @ApiResponse(responseCode = "400",description = "상품 등록에 실패."),
-            @ApiResponse(responseCode = "200", description = "상품 등록 성공")
+            @ApiResponse(responseCode = "201", description = "상품 등록 성공")
     })
     // 상품 등록
     @PostMapping("/register")
