@@ -21,6 +21,7 @@ public class Inquiry {
 
 //    @Column
 //    private String memberId;
+
 // 문의를 작성한 회원 (Member와 ManyToOne 관계)
     @ManyToOne
     @JoinColumn(name = "member_id", referencedColumnName = "member_id")
@@ -34,6 +35,8 @@ public class Inquiry {
 
     @Column
     private int qnaType;
+
+//    private String ownerNo;
 
 //    @Column
 //    private String productNo;
