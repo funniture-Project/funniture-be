@@ -132,7 +132,7 @@ public class RentalController {
         if (adminRentalList.isEmpty()){
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(new ResponseMessage(204, "등록 된 예약이 없습니다.", null));
+                    .body(new ResponseMessage(204, "예약 내역이 없습니다.", null));
         }
 
         Map<String, Object> res = new HashMap<>();
