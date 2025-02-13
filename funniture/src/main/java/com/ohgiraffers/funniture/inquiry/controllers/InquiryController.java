@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.inquiry.controllers;
 
+import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.service.InquiryService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -62,7 +63,7 @@ public class InquiryController {
     @GetMapping ("/product/{productNo}")
     public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
         System.out.println("컨트롤러 productNo = " + productNo);
-        List<OwnerInquiryDTO> result = inquiryService.findByProductNo(productNo);
+        List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
 
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
@@ -83,7 +84,7 @@ public class InquiryController {
     @GetMapping("/{inquiryNo}")
     public ResponseEntity<ResponseMessage> findByInquiryNo(@PathVariable String inquiryNo){
 
-        OwnerInquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
+        InquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
 
         Map <String , Object> map = new HashMap<>();
         map.put("map", inquiry);
@@ -102,17 +103,17 @@ public class InquiryController {
     })
     // 문의 등록
     @PostMapping("/regist")
-    public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody OwnerInquiryDTO ownerInquiryDTO){
+    public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
 
-        System.out.println("살인마 json에서 들어온 inquiryDTO = " + ownerInquiryDTO);
+        System.out.println("살인마 json에서 들어온 inquiryDTO = " + inquiryDTO);
 
         String maxInquiry = inquiryService.getMaxInquiry();
         System.out.println("유어 마인드 컨트롤러 maxInquiry = " + maxInquiry);
 
         String newNo = returnInquiryNo(maxInquiry);
-        ownerInquiryDTO.setInquiryNo(newNo);
+        inquiryDTO.setInquiryNo(newNo);
 
-        inquiryService.inquiryRegist(ownerInquiryDTO);
+//        inquiryService.inquiryRegist(inquiryDTO);
 
         Map<String , Object> map = new HashMap<>();
         return ResponseEntity.ok()

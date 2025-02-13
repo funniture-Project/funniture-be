@@ -1,7 +1,9 @@
 package com.ohgiraffers.funniture.inquiry.model.service;
 
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
+import com.ohgiraffers.funniture.inquiry.entity.InquiryRegistEntity;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
+import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,21 +28,23 @@ public class InquiryService {
                 .collect(Collectors.toList());
     }
 
-    public OwnerInquiryDTO findByInqiryNo(String inquiryNo) {
+    public InquiryDTO findByInqiryNo(String inquiryNo) {
 
         InquiryEntity result = inquiryRepository.findById(inquiryNo).orElseThrow();
         System.out.println("서비스에서 result = " + result);
 
-        return modelMapper.map(result , OwnerInquiryDTO.class);
+        return modelMapper.map(result , InquiryDTO.class);
     }
 
-    @Transactional
-    public void inquiryRegist(OwnerInquiryDTO ownerInquiryDTO) {
-
-        System.out.println("서비스에 잘 오는지inquiryDTO = " + ownerInquiryDTO);
-
-        inquiryRepository.save(modelMapper.map(ownerInquiryDTO, InquiryEntity.class));
-    }
+//    @Transactional
+//    public void inquiryRegist(InquiryDTO inquiryDTO) {
+//
+//        System.out.println("서비스에 잘 오는지inquiryDTO = " + inquiryDTO);
+//
+//        inquiryRepository.save(modelMapper.map(inquiryDTO, InquiryRegistEntity.class));
+//
+//
+//    }
 
     public String getMaxInquiry() {
 
@@ -77,12 +81,12 @@ public class InquiryService {
         inquiryRepository.deleteById(inquiryNo);
     }
 
-    public List<OwnerInquiryDTO> findByProductNo(String productNo) {
+    public List<InquiryDTO> findByProductNo(String productNo) {
         System.out.println("서비스 productNo = " + productNo);
 
         List<InquiryEntity> result = inquiryRepository.findByProductNo(productNo);
 
-        return result.stream().map(all -> modelMapper.map(all , OwnerInquiryDTO.class))
+        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class))
                         .collect(Collectors.toList());
     }
 
