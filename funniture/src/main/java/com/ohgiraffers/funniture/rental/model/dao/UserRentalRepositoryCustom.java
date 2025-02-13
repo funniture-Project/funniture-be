@@ -6,5 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface UserRentalRepositoryCustom {
-    List<UserOrderViewDTO> findRentalOrderListByUser(String period, LocalDate searchDate);
+
+    List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate);
 }
