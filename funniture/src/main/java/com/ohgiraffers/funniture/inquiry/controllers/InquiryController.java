@@ -113,7 +113,7 @@ public class InquiryController {
         String newNo = returnInquiryNo(maxInquiry);
         inquiryDTO.setInquiryNo(newNo);
 
-//        inquiryService.inquiryRegist(inquiryDTO);
+        inquiryService.inquiryRegist(inquiryDTO);
 
         Map<String , Object> map = new HashMap<>();
         return ResponseEntity.ok()
