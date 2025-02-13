@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.inquiry.model.service;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryRegistEntity;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
+import com.ohgiraffers.funniture.inquiry.model.dao.RegistRepository;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class InquiryService {
 
     private final ModelMapper modelMapper;
     private final InquiryRepository inquiryRepository;
+    private final RegistRepository registRepository;
 
     public List<OwnerInquiryDTO> findAllInquiry() {
 
@@ -36,15 +38,13 @@ public class InquiryService {
         return modelMapper.map(result , InquiryDTO.class);
     }
 
-//    @Transactional
-//    public void inquiryRegist(InquiryDTO inquiryDTO) {
-//
-//        System.out.println("서비스에 잘 오는지inquiryDTO = " + inquiryDTO);
-//
-//        inquiryRepository.save(modelMapper.map(inquiryDTO, InquiryRegistEntity.class));
-//
-//
-//    }
+    @Transactional
+    public void inquiryRegist(InquiryDTO inquiryDTO) {
+
+        System.out.println("서비스에 잘 오는지inquiryDTO = " + inquiryDTO);
+
+        registRepository.save(modelMapper.map(inquiryDTO, InquiryRegistEntity.class));
+    }
 
     public String getMaxInquiry() {
 
