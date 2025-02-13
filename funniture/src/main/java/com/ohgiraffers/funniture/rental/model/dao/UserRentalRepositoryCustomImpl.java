@@ -22,8 +22,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<UserOrderViewDTO> findRentalOrderListByUser(String period, LocalDate searchDate) {
-
+    public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
         QUserRentalEntity rental = QUserRentalEntity.userRentalEntity;
         QUserProductEntity product = QUserProductEntity.userProductEntity;
         QRentalOptionInfoEntity optionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
@@ -37,7 +36,8 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
                         optionInfo.rentalPrice))
                 .from(rental)
                 .join(rental.productEntity, product)
-                .join(rental.rentalOptionInfoEntity, optionInfo);
+                .join(rental.rentalOptionInfoEntity, optionInfo)
+                .where(rental.memberId.eq(memberId));
 
         if ("1MONTH".equals(period)) {
             searchDate = LocalDate.now().minusMonths(1); // 1개월 전 날짜
@@ -45,7 +45,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
             searchDate = LocalDate.now().minusMonths(3); // 3개월 전 날짜
         }
 
-            // 검색 날짜 필터 적용
+        // 검색 날짜 필터 적용
         if (searchDate != null) {
             LocalDateTime startOfDay = searchDate.atStartOfDay();  // 시작 시각 00:00:00
             LocalDateTime endOfDay;

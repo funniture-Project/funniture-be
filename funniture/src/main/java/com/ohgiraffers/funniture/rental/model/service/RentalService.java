@@ -53,9 +53,10 @@ public class RentalService {
     }
 
     // 사용자 - 예약 조회(쿼리DSL)
-    public List<UserOrderViewDTO> findRentalOrderListByUser(String period, LocalDate searchDate) {
-        return userRentalRepositoryCustom.findRentalOrderListByUser(period, searchDate);
+    public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
+        return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
+
 
     // 관리자 - 예약 전체 조회(쿼리DSL)
     public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {

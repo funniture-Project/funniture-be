@@ -66,14 +66,15 @@ public class RentalController {
     })
     // 사용자의 예약 전체 조회(주문/배송)
     @GetMapping("/user")
-    public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam(required = false) String period,
+    public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam String memberId,
+                                                                     @RequestParam(required = false) String period,
                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
         // 나중에 로그인한 사람 code 꺼내서 가지고 가야함, 일단 조인시켜 조회만 해놓기!!
-        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(period,searchDate);
+        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(memberId,period,searchDate);
 
         if (orderList.isEmpty()){
             return ResponseEntity.ok()
