@@ -1,8 +1,6 @@
 package com.ohgiraffers.funniture.inquiry.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,7 +10,7 @@ import java.time.LocalDateTime;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class InquiryDTO {
+public class OwnerInquiryDTO {
 
     private String inquiryNo;
 
@@ -35,7 +33,7 @@ public class InquiryDTO {
     private String productName;
 
     // JPQL의 쿼리문과 순서 맞아야 함.
-    public InquiryDTO(LocalDateTime qnaWriteTime, String userName, String memberId, String inquiryNo, String productNo, String productName, String inquiryContent) {
+    public OwnerInquiryDTO(LocalDateTime qnaWriteTime, String userName, String memberId, String inquiryNo, String productNo, String productName, String inquiryContent) {
         this.qnaWriteTime = qnaWriteTime;
         this.userName = userName;
         this.memberId = memberId;

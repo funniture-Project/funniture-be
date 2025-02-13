@@ -1,10 +1,9 @@
 package com.ohgiraffers.funniture.inquiry.controllers;
 
-import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.service.InquiryService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,7 +62,7 @@ public class InquiryController {
     @GetMapping ("/product/{productNo}")
     public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
         System.out.println("컨트롤러 productNo = " + productNo);
-        List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
+        List<OwnerInquiryDTO> result = inquiryService.findByProductNo(productNo);
 
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
@@ -84,7 +83,7 @@ public class InquiryController {
     @GetMapping("/{inquiryNo}")
     public ResponseEntity<ResponseMessage> findByInquiryNo(@PathVariable String inquiryNo){
 
-        InquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
+        OwnerInquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
 
         Map <String , Object> map = new HashMap<>();
         map.put("map", inquiry);
@@ -103,17 +102,17 @@ public class InquiryController {
     })
     // 문의 등록
     @PostMapping("/regist")
-    public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
+    public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody OwnerInquiryDTO ownerInquiryDTO){
 
-        System.out.println("살인마 json에서 들어온 inquiryDTO = " + inquiryDTO);
+        System.out.println("살인마 json에서 들어온 inquiryDTO = " + ownerInquiryDTO);
 
         String maxInquiry = inquiryService.getMaxInquiry();
         System.out.println("유어 마인드 컨트롤러 maxInquiry = " + maxInquiry);
 
         String newNo = returnInquiryNo(maxInquiry);
-        inquiryDTO.setInquiryNo(newNo);
+        ownerInquiryDTO.setInquiryNo(newNo);
 
-        inquiryService.inquiryRegist(inquiryDTO);
+        inquiryService.inquiryRegist(ownerInquiryDTO);
 
         Map<String , Object> map = new HashMap<>();
         return ResponseEntity.ok()
@@ -165,7 +164,7 @@ public class InquiryController {
     public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry (@PathVariable String ownerNo) {
 
         System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
-        List<InquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
+        List<OwnerInquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
 
         System.out.println("서비스에서 넘어온 result = " + result);
         Map <String , Object> map = new HashMap<>();
@@ -214,7 +213,7 @@ public class InquiryController {
     // 문의 답변 하기
     @PutMapping("/answer/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryAnswer(@PathVariable String inquiryNo
-            ,@RequestBody InquiryDTO inquiryDTO){
+            ,@RequestBody OwnerInquiryDTO ownerInquiryDTO){
 
         return null;
     }
@@ -229,11 +228,11 @@ public class InquiryController {
     // 문의 답변 수정하기
     @PutMapping("/modify/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
-            ,@RequestBody InquiryDTO inquiryDTO){
+            ,@RequestBody OwnerInquiryDTO ownerInquiryDTO){
 
         System.out.println("컨트롤러 : 화면에서 inquiryNo 받아오나 = " + inquiryNo);
 
-        inquiryService.modifyByInquiryNo(inquiryNo,inquiryDTO);
+        inquiryService.modifyByInquiryNo(inquiryNo, ownerInquiryDTO);
 
         Map<String , Object> map = new HashMap<>();
 
