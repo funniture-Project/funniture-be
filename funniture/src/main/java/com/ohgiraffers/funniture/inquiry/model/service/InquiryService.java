@@ -1,8 +1,10 @@
 package com.ohgiraffers.funniture.inquiry.model.service;
 
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
+import com.ohgiraffers.funniture.inquiry.entity.InquiryRegistEntity;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,11 +20,11 @@ public class InquiryService {
     private final ModelMapper modelMapper;
     private final InquiryRepository inquiryRepository;
 
-    public List<InquiryDTO> findAllInquiry() {
+    public List<OwnerInquiryDTO> findAllInquiry() {
 
         List<InquiryEntity> inquiryEntity = inquiryRepository.findAll();
         System.out.println("서비스 : 엔터티 inquiry = " + inquiryEntity);
-        return inquiryEntity.stream().map(all -> modelMapper.map(all , InquiryDTO.class))
+        return inquiryEntity.stream().map(all -> modelMapper.map(all , OwnerInquiryDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -31,16 +33,18 @@ public class InquiryService {
         InquiryEntity result = inquiryRepository.findById(inquiryNo).orElseThrow();
         System.out.println("서비스에서 result = " + result);
 
-        return modelMapper.map(result ,InquiryDTO.class);
+        return modelMapper.map(result , InquiryDTO.class);
     }
 
-    @Transactional
-    public void inquiryRegist(InquiryDTO inquiryDTO) {
-
-        System.out.println("서비스에 잘 오는지inquiryDTO = " + inquiryDTO);
-
-        inquiryRepository.save(modelMapper.map(inquiryDTO , InquiryEntity.class));
-    }
+//    @Transactional
+//    public void inquiryRegist(InquiryDTO inquiryDTO) {
+//
+//        System.out.println("서비스에 잘 오는지inquiryDTO = " + inquiryDTO);
+//
+//        inquiryRepository.save(modelMapper.map(inquiryDTO, InquiryRegistEntity.class));
+//
+//
+//    }
 
     public String getMaxInquiry() {
 
@@ -51,7 +55,7 @@ public class InquiryService {
     }
 
     @Transactional
-    public void modifyByInquiryNo(String inquiryNo, InquiryDTO inquiryDTO) {
+    public void modifyByInquiryNo(String inquiryNo, OwnerInquiryDTO ownerInquiryDTO) {
 
         InquiryEntity result = inquiryRepository.findById(inquiryNo).orElseThrow();
         System.out.println("inquiryNO로 잘 조회해 오는지 = " + result);
@@ -96,10 +100,10 @@ public class InquiryService {
 //        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class)).collect(Collectors.toList());
 //    }
 
-    public List<InquiryDTO> findByInquiryOwnerPage(String ownerNo) {
+    public List<OwnerInquiryDTO> findByInquiryOwnerPage(String ownerNo) {
 
         // 조인하는 엔티티 다시 만들어야 함. Inquiry 말고 조인한 애로
-        List<InquiryDTO> result = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
+        List<OwnerInquiryDTO> result = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
 
         System.out.println("레파지토리에서 넘어온 result = " + result);
 

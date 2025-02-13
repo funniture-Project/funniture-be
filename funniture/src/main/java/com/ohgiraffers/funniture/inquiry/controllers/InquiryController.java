@@ -1,10 +1,10 @@
 package com.ohgiraffers.funniture.inquiry.controllers;
 
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.service.InquiryService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -113,7 +113,7 @@ public class InquiryController {
         String newNo = returnInquiryNo(maxInquiry);
         inquiryDTO.setInquiryNo(newNo);
 
-        inquiryService.inquiryRegist(inquiryDTO);
+//        inquiryService.inquiryRegist(inquiryDTO);
 
         Map<String , Object> map = new HashMap<>();
         return ResponseEntity.ok()
@@ -165,7 +165,7 @@ public class InquiryController {
     public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry (@PathVariable String ownerNo) {
 
         System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
-        List<InquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
+        List<OwnerInquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
 
         System.out.println("서비스에서 넘어온 result = " + result);
         Map <String , Object> map = new HashMap<>();
@@ -214,7 +214,7 @@ public class InquiryController {
     // 문의 답변 하기
     @PutMapping("/answer/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryAnswer(@PathVariable String inquiryNo
-            ,@RequestBody InquiryDTO inquiryDTO){
+            ,@RequestBody OwnerInquiryDTO ownerInquiryDTO){
 
         return null;
     }
@@ -229,11 +229,11 @@ public class InquiryController {
     // 문의 답변 수정하기
     @PutMapping("/modify/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
-            ,@RequestBody InquiryDTO inquiryDTO){
+            ,@RequestBody OwnerInquiryDTO ownerInquiryDTO){
 
         System.out.println("컨트롤러 : 화면에서 inquiryNo 받아오나 = " + inquiryNo);
 
-        inquiryService.modifyByInquiryNo(inquiryNo,inquiryDTO);
+        inquiryService.modifyByInquiryNo(inquiryNo, ownerInquiryDTO);
 
         Map<String , Object> map = new HashMap<>();
 

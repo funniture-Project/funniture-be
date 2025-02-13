@@ -1,7 +1,7 @@
 package com.ohgiraffers.funniture.inquiry.model.dao;
 
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
-import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,7 +31,7 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
 //   List<InquiryEntity> findAllInquiryOwnerPage(String ownerNo);
 
     @Query("""
-        SELECT new com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO(
+        SELECT new com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO(
             a.qnaWriteTime,
             b.userName,
             b.memberId,
@@ -45,6 +45,6 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
         JOIN MemberEntity b ON a.memberId = b.memberId
         WHERE c.ownerNo = :ownerNo
         """)
-    List<InquiryDTO> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
+    List<OwnerInquiryDTO> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
 
 }
