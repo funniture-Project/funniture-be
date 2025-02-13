@@ -45,7 +45,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
             searchDate = LocalDate.now().minusMonths(3); // 3개월 전 날짜
         }
 
-        // 검색 날짜 필터 적용
+            // 검색 날짜 필터 적용
         if (searchDate != null) {
             LocalDateTime startOfDay = searchDate.atStartOfDay();  // 시작 시각 00:00:00
             LocalDateTime endOfDay;
