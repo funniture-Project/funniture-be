@@ -75,7 +75,6 @@ public class ProductController {
                 .body(new ResponseMessage(200, "전체 상품 리스트 조회 성공", responseMap));
     }
 
-
     // 제공자별 등록한 상품 조회
     @Operation(summary = "제공자가 등록한 상품 조회 (상품 정보 + 렌탈 옵션 정보 + 카테고리 정보)",
             description = "제공자가 등록한 상품 조회",
@@ -109,8 +108,7 @@ public class ProductController {
                 .body(new ResponseMessage(200, "제공자가 등롣한 상품 리스트 조회 성공", responseMap));
     }
 
-
-
+    // 상세 정보 조회 (상품 상세 페이지, 제공자 상품 수정)
     @Operation(summary = "상품 상세 정보 조회",
             description = "상품 상세 페이지, 제공자 상품 수정에서 사용",
             parameters = {
@@ -122,7 +120,6 @@ public class ProductController {
             @ApiResponse(responseCode = "400",description = "잘못된 요청입니다. productNo를 확인해주세요"),
             @ApiResponse(responseCode = "200", description = "특정 상품 정보 조회 성공")
     })
-    // 상세 정보 조회 (상품 상세 페이지, 제공자 상품 수정)
     @GetMapping("/{productNo}")
     public ResponseEntity<ResponseMessage> getProductDetail(@PathVariable String productNo){
         Map<String, Object> responseMap = new HashMap<>();
@@ -153,6 +150,7 @@ public class ProductController {
         }
     }
 
+    // 상품 등록
     @Operation(summary = "상품 등록",
             description = "상품 등록 페이지에서 사용"
     )
@@ -161,7 +159,6 @@ public class ProductController {
             @ApiResponse(responseCode = "400",description = "상품 등록에 실패."),
             @ApiResponse(responseCode = "201", description = "상품 등록 성공")
     })
-    // 상품 등록
     @PostMapping("/register")
     public ResponseEntity<ResponseMessage> registerProduct(@Valid @RequestBody ProductDTO product, BindingResult bindingResult){
 
@@ -210,6 +207,7 @@ public class ProductController {
         }
     }
 
+    // 상품 카테고리 조회, 상위 카테고리별 조회
     @Operation(summary = "카테고리 조회",
             description = "상품 카테고리 조회, 상위 카테고리별 조회 "
     )
@@ -217,7 +215,6 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "카테고리 전체 조회 성공"),
             @ApiResponse(responseCode = "204", description = "카테고리 없음")
     })
-    // 상품 카테고리 조회, 상위 카테고리별 조회
     @GetMapping("/category")
     private ResponseEntity<ResponseMessage> getCategoryList(@RequestParam(required = false) Integer refCategoryCode){
 
@@ -239,6 +236,32 @@ public class ProductController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "카테고리 전체 조회 성공", map));
+    }
+
+    // 카테고리별 제공자 리스트 조회
+    @GetMapping(value = "/ownerlist")
+    private ResponseEntity<ResponseMessage> getOwnerByCategory(@RequestParam(required = false) List<Integer> categoryCode){
+
+        System.out.println("categoryCode = " + categoryCode);
+
+        List<Map<String, String>> result = productService.getOwnerByCategory(categoryCode);
+
+        Map<String, Object> map = new HashMap<>();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType( "application","json",Charset.forName("UTF-8")));
+
+        map.put("result",result);
+
+        if (result.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "카테고리에 따른 제공자 정보 조회 없음", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "카테고리에 따른 제공자 정보 조회 성공", map));
     }
 
 }

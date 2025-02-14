@@ -55,7 +55,7 @@ public class webSecurityConfig {
             http
                     .csrf(csrf -> csrf.disable())// CSRF 보안 비활성화 (Postman 테스트 가능)
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/v1/auth/signup").permitAll() // 회원가입 API는 인증 없이 허용
+                            .requestMatchers("/api/v1/auth/signup","/api/v1/product/*","/api/v1/product","/api/v1/rental/*","/api/v1/rental").permitAll() // 회원가입 API는 인증 없이 허용
                             .anyRequest().authenticated()
                     );
 
