@@ -36,4 +36,25 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
         GROUP BY p.product_no
         """, nativeQuery = true)
     List<Object[]> findAllProductsWithPriceList();
+
+    @Query(value = """
+        SELECT DISTINCT
+            oi.store_name,
+            p.owner_no
+        FROM tbl_product p
+        LEFT JOIN tbl_ownerinfo oi ON p.owner_no = oi.member_id
+        WHERE p.category_code in :categoryCode
+        """, nativeQuery = true)
+    List<Object[]> getOwnerByCategory(List<Integer> categoryCode);
+
+    @Query(value = """
+        SELECT DISTINCT
+            oi.store_name,
+            p.owner_no
+        FROM tbl_product p
+        LEFT JOIN tbl_ownerinfo oi ON p.owner_no = oi.member_id
+        LEFT JOIN tbl_category c ON p.category_code = c.category_code
+        WHERE c.ref_category_code in :categoryCode
+        """, nativeQuery = true)
+    List<Object[]> getOwnerByRefCategory(List<Integer> categoryCode);
 }

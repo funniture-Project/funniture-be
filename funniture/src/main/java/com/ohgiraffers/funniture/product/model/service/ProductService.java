@@ -95,6 +95,34 @@ public class ProductService {
         return productRepository.findMaxNo();
     }
 
+    // 카테고리별 제공자 정보 확인
+    public List<Map<String, String>> getOwnerByCategory(List<Integer> categoryCode) {
+
+        System.out.println("categoryCode = " + categoryCode);
+
+        List<Object[]> ownerList = new ArrayList<>();
+
+        if (categoryCode.contains(1) || categoryCode.contains(2)){
+            ownerList = productRepository.getOwnerByRefCategory(categoryCode);
+        } else {
+            ownerList = productRepository.getOwnerByCategory(categoryCode);
+        }
+
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (Object[] owner : ownerList){
+            Map<String, String> ownerInfo = new HashMap<>();
+
+            ownerInfo.put("store_name", (String) owner[0]);
+            ownerInfo.put("owner_no", (String) owner[1]);
+            result.add(ownerInfo);
+        }
+
+        System.out.println("result = " + result);
+
+        return result;
+    }
+
 
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
