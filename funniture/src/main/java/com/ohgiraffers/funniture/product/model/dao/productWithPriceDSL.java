@@ -3,18 +3,15 @@ package com.ohgiraffers.funniture.product.model.dao;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.product.entity.*;
 import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
+import com.ohgiraffers.funniture.rental.entity.QAdminOwnerInfoEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
-import static com.querydsl.core.types.dsl.Expressions.constant;
-import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,12 +26,18 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
 
         QProductWithPriceEntity productPrice = QProductWithPriceEntity.productWithPriceEntity;
         QRentalOptionInfoEntity rentalOption = QRentalOptionInfoEntity.rentalOptionInfoEntity;
+        QAdminOwnerInfoEntity ownerInfo = QAdminOwnerInfoEntity.adminOwnerInfoEntity;
+        QCategoryEntity category = QCategoryEntity.categoryEntity;
 
         BooleanBuilder builder = new BooleanBuilder();
 
         // 카테고리 정보
         if (condition.getCategoryCode() != null){
-            builder.and(productPrice.categoryCode.in(condition.getCategoryCode()));
+            if (condition.getCategoryCode().contains(1) || condition.getCategoryCode().contains(2)){
+                builder.and(category.refCategoryCode.in(condition.getCategoryCode()));
+            } else {
+                builder.and(productPrice.categoryCode.in(condition.getCategoryCode()));
+            }
         }
 
         // 검색어
@@ -60,10 +63,13 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
                         productPrice.productStatus,
                         productPrice.productImageLink,
                         productPrice.productImageId,
+                        ownerInfo.storeName,
                         // rentalOption의 rentalPrice를 여러 값으로 이어붙이기
                         Expressions.stringTemplate("GROUP_CONCAT({0}) ", rentalOption.rentalPrice).as("priceList")))  // GROUP_CONCAT 사용List"))) // stringTemplate 사용
                 .from(productPrice)
                 .leftJoin(rentalOption).on(productPrice.productNo.eq(rentalOption.productNo))
+                .leftJoin(ownerInfo).on(productPrice.ownerNo.eq(ownerInfo.memberId))
+                .leftJoin(category).on(productPrice.categoryCode.eq(category.categoryCode))
                 .where(builder)
                 .groupBy(productPrice.productNo)
                 .fetch();

@@ -36,6 +36,8 @@ public class ProductWithPriceDTO {
     // 대표이미지 ID
     private String productImageId;
 
+    private String storeName;
+
     // 가격 리스트
     private String priceList;
 

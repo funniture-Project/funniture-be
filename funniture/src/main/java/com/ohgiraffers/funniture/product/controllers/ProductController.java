@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 // @Tag : 관련 있는 API 들의 그룹을 짓기 위한 어노테이션
-//@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000") // 프론트나 백단 중 프록시 설정 1개만 있으면 된다.
 @Tag(name = "Product API")
 @RestController
 @RequestMapping("/api/v1/product")
@@ -52,7 +52,7 @@ public class ProductController {
             @ApiResponse(responseCode = "204",description = "등록된 상품이 없음"),
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
-    @GetMapping
+    @GetMapping({"", "/"})
     public ResponseEntity<ResponseMessage> getProductAll(@ModelAttribute ProductSearchCondition condition){
 
         HttpHeaders headers = new HttpHeaders();
@@ -88,7 +88,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping("/owner")
-    public ResponseEntity<ResponseMessage> getProductAll(@RequestParam(required = false) String ownerNo ){
+    public ResponseEntity<ResponseMessage> getProductAll(@RequestParam String ownerNo ){
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
