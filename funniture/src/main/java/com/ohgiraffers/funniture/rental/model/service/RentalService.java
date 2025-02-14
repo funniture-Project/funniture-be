@@ -43,9 +43,12 @@ public class RentalService {
         String rentalNo = orderDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + String.format("%03d", count + 1);
         System.out.println("rentalNo = " + rentalNo);
 
+        String status = "예약대기";
+
         // DTO에 예약번호 & 주문일 설정 (Setter 사용)
         rentalDTO.setRentalNo(rentalNo);   // 예약번호 설정
         rentalDTO.setOrderDate(orderDate);  // 주문일 설정 (날짜 + 시간)
+        rentalDTO.setRentalState(status);   // 예약진행상태 예약대기로
         System.out.println("orderDate = " + orderDate);
 
         // JPA 저장
@@ -53,9 +56,10 @@ public class RentalService {
     }
 
     // 사용자 - 예약 조회(쿼리DSL)
-    public List<UserOrderViewDTO> findRentalOrderListByUser(String period, LocalDate searchDate) {
-        return userRentalRepositoryCustom.findRentalOrderListByUser(period, searchDate);
+    public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
+        return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
+
 
     // 관리자 - 예약 전체 조회(쿼리DSL)
     public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {

@@ -1,4 +1,4 @@
-package com.ohgiraffers.funniture.inquiry.model.dto;
+package com.ohgiraffers.funniture.member.model.dto;
 
 import lombok.*;
 

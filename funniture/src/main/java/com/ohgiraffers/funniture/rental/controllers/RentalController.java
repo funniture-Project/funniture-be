@@ -39,7 +39,7 @@ public class RentalController {
             description = "예약 등록 페이지에서 사용"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "상품 등록 성공")
+            @ApiResponse(responseCode = "201", description = "예약 등록이 완료되었습니다.")
     })
     // 사용자 예약 등록
     @PostMapping("/regist")
@@ -50,12 +50,13 @@ public class RentalController {
 
         rentalService.insertRental(rentalDTO);
 
-        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "등록완료", null));
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "예약 등록이 완료되었습니다.", null));
     }
 
     @Operation(summary = "사용자의 예약 전체 조회",
             description = "사용자 마이페이지 주문/배송에서 사용",
             parameters = {
+                    @Parameter(name = "memberId", description = "사용자 ID(필수)"),
                     @Parameter(name = "period", description = "조회 할 개월수(개월수에 orderDate 가 해당되면 조회) ex.1개월전~현재=1MONTH,3개월전~현재=3MONTH (선택)"),
                     @Parameter(name = "searchDate", description = "조회 할 날짜(선택)")
             }
@@ -66,14 +67,14 @@ public class RentalController {
     })
     // 사용자의 예약 전체 조회(주문/배송)
     @GetMapping("/user")
-    public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam(required = false) String period,
+    public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam String memberId,
+                                                                     @RequestParam(required = false) String period,
                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        // 나중에 로그인한 사람 code 꺼내서 가지고 가야함, 일단 조인시켜 조회만 해놓기!!
-        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(period,searchDate);
+        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(memberId,period,searchDate);
 
         if (orderList.isEmpty()){
             return ResponseEntity.ok()
@@ -131,7 +132,7 @@ public class RentalController {
         if (adminRentalList.isEmpty()){
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(new ResponseMessage(204, "등록 된 예약이 없습니다.", null));
+                    .body(new ResponseMessage(204, "예약 내역이 없습니다.", null));
         }
 
         Map<String, Object> res = new HashMap<>();
