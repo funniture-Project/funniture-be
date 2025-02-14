@@ -25,6 +25,7 @@ public class webSecurityConfig {
      *
      * @return WebSeruciryCusomizer
      * */
+    // 우선적으로 회원가입 할 때 활성화
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
         return (web) -> web.ignoring().requestMatchers("/css/**", "/js/**", "/images/**",
@@ -50,6 +51,8 @@ public class webSecurityConfig {
 //        return http.build();
 //    }
 
+    // 로그인 되지 않은 상태에서 회원가입 할 때 아래와 같이 csrf disable()로 해야 함.
+    // 람다 식으로 변경되어 AbstractHttpConfigurer::disable가 아닌, csrf -> csrf.disable() 이렇게 해야 함.
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             http
