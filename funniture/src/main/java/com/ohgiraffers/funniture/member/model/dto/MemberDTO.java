@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.member.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class MemberDTO {
 
     private String phoneNumber;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime signupDate;
 
     private int isConsulting;
@@ -34,5 +36,4 @@ public class MemberDTO {
 
     private String imageId;
 
-    // asdsad
 }

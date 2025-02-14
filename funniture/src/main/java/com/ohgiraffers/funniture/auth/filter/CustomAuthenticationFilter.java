@@ -1,5 +1,8 @@
 package com.ohgiraffers.funniture.auth.filter;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -18,13 +23,27 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     public Authentication attemptAuthentication (HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
+        // 토큰 생성
         UsernamePasswordAuthenticationToken authRequest;
 
+        try {
+            authRequest = getAuthRequest(request); // json 데이터에서 ID, PW 추출
+            setDetails(request, authRequest); // 요청 정보 설정
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-
-        return null;
+        return this.getAuthenticationManager().authenticate(authRequest); // 인증 수행
     }
 
     // 사용자의 로그인 리소스 요청 시 요청 정보를 임시 토큰에 저장하는 메소드
-//    private UsernamePasswordAuthenticationToken getAuthRequest (){}
+    private UsernamePasswordAuthenticationToken getAuthRequest (HttpServletRequest request) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
+
+        MemberDTO member = objectMapper.readValue(request.getInputStream(), MemberDTO.class);
+
+        return new UsernamePasswordAuthenticationToken(member.getMemberId(), member.getPassword());
+    }
 }

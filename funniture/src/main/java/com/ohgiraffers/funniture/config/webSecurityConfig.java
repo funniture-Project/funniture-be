@@ -1,5 +1,9 @@
 package com.ohgiraffers.funniture.config;
 
+import com.ohgiraffers.funniture.auth.filter.CustomAuthenticationFilter;
+import com.ohgiraffers.funniture.auth.handler.CustomAuthFailUserHandler;
+import com.ohgiraffers.funniture.auth.handler.CustomAuthSuccessHandler;
+import com.ohgiraffers.funniture.auth.handler.CustomAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -69,19 +73,20 @@ public class webSecurityConfig {
      * 3. Authentization의 인증 메서드를 제공하는 매니저로 Provider의 인터페이스를 의미한다.
      * @return AuthenticationManager
      * */
-//    @Bean
-//    public AuthenticationManager authenticationManager(){
-//        return new ProviderManager(customAuthenticationProvider());
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager(){
+        return new ProviderManager(customAuthenticationProvider());
+    }
 //
 //    /**
 //     * 4. 사용자의 아이디와 패스워드를 DB와 검증하는 handler이다.
 //     * @return CustomAuthenticationProvider
 //     * */
-//    @Bean
-//    public CustomAuthenticationProvider customAuthenticationProvider(){
-//        return new CustomAuthenticationProvider();
-//    }
+    @Bean
+    public CustomAuthenticationProvider customAuthenticationProvider(){
+        System.out.println("사용자 아이디, 비번을 db와 검증하는 CustomAuthenticationProvider = ");
+        return new CustomAuthenticationProvider();
+    }
 
     /**
      * 5. 비밀번호를 암호화 하는 인코더
@@ -97,26 +102,29 @@ public class webSecurityConfig {
      * 6. 사용자의 인증 요청을 가로채서 로그인 로직을 수행하는 필터
      * @return CustomAuthenticationFilter
      * */
-//    @Bean
-//    public CustomAuthenticationFilter customAuthenticationFilter(){
-//        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-//        customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
-//        customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthLoginSuccessHandler());
-//        customAuthenticationFilter.setAuthenticationFailureHandler(customAuthFailUserHandler());
-//        customAuthenticationFilter.afterPropertiesSet();
-//        return customAuthenticationFilter;
-//    }
+    @Bean
+    public CustomAuthenticationFilter customAuthenticationFilter(){
+                                                                                        // 3번 authenticationManager 전달
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+        customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+                                                                // 7번 customAuthLoginSuccessHandler 전달
+        customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthLoginSuccessHandler());
+                                                                // 8번 customAuthFailUserHandler 전달
+        customAuthenticationFilter.setAuthenticationFailureHandler(customAuthFailUserHandler());
+        customAuthenticationFilter.afterPropertiesSet();
+        return customAuthenticationFilter;
+    }
 
     /**
      * 7. spring security 기반의 사용자의 정보가 맞을 경우 결과를 수행하는 handler
      *
      * @return customAuthLoginSuccessHandler
      * */
-//    @Bean
-//    public CustomAuthSuccessHandler customAuthLoginSuccessHandler(){
-//        System.out.println("동작함");
-//        return new CustomAuthSuccessHandler();
-//    }
+    @Bean
+    public CustomAuthSuccessHandler customAuthLoginSuccessHandler(){
+        System.out.println("사용자 정보 맞을 때 동작하는 CustomAuthSuccessHandler");
+        return new CustomAuthSuccessHandler();
+    }
 
 
     /**
@@ -124,10 +132,11 @@ public class webSecurityConfig {
      *
      * @return CustomAuthFailUreHandler
      * */
-//    @Bean
-//    public CustomAuthFailUserHandler customAuthFailUserHandler(){
-//        return new CustomAuthFailUserHandler();
-//    }
+    @Bean
+    public CustomAuthFailUserHandler customAuthFailUserHandler(){
+        System.out.println("사용자 정보 맞지 않을 때 동작하는 CustomAuthFailUserHandler");
+        return new CustomAuthFailUserHandler();
+    }
 //
 //    /**
 //     * 9. 사용자 요청시 수행되는 메소드
