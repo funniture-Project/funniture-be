@@ -56,6 +56,9 @@ public class ProductWithPriceEntity {
     private String productImageId;
 
     @Transient
+    private String storeName;
+
+    @Transient
     private String priceList;
 
     public List<Integer> getPriceListAsIntegers() {
