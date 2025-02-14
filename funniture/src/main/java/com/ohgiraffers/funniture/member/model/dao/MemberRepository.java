@@ -11,4 +11,5 @@ public interface MemberRepository extends JpaRepository<MemberEntity , String> {
             nativeQuery = true)
     String maxMemberNo();
 
+    MemberEntity findByMemberId(String memberId);
 }

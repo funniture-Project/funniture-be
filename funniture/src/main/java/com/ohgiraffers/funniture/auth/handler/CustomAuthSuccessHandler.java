@@ -48,7 +48,7 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
             String token = TokenUtils.generateJwtToken(member);
             // tokenDTO response
             TokenDTO tokenDTO = TokenDTO.builder()
-                                .memberName(member.getUserName())
+                                .memberName(member.getUsername())
                                 .accessToken(token)
                                 .grantType(AuthConstants.TOKEN_TYPE)
                                 .build();

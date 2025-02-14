@@ -28,6 +28,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = (String) loginToken.getCredentials();
 
         MemberDTO member = (MemberDTO) detailsService.loadUserByUsername(memberId);
+        System.out.println("CustomAuthenticationProvider에서  = " + member);
 
         if(!passwordEncoder.matches(password, member.getPassword())){
             throw new BadCredentialsException(password + "는 비밀번호가 아닙니다.");
