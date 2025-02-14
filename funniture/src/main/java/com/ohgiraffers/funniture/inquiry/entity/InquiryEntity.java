@@ -24,7 +24,7 @@ public class InquiryEntity {
 //    private String memberId;
 // 문의를 작성한 회원 (Member와 ManyToOne 관계)
 
-    //    @ManyToOne
+//    @ManyToOne
 //    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
 //    private MemberEntity member;
     @Column (name = "member_id")

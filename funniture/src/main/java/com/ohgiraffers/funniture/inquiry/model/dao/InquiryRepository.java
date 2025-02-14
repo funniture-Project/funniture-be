@@ -1,7 +1,7 @@
 package com.ohgiraffers.funniture.inquiry.model.dao;
 
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
-import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +13,7 @@ import java.util.List;
 public interface InquiryRepository extends JpaRepository<InquiryEntity, String> {
 
     @Query(value = "SELECT MAX(INQUIRY_NO) FROM TBL_INQUIRY",
-            nativeQuery = true)
+           nativeQuery = true)
     String maxInquiry();
 
     @Query(value = "SELECT * FROM TBL_INQUIRY WHERE PRODUCT_NO = :productNo", nativeQuery = true)
@@ -30,8 +30,8 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
 //            """, nativeQuery = true)
 //   List<InquiryEntity> findAllInquiryOwnerPage(String ownerNo);
 
-    @Query("""
-        SELECT new com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO(
+        @Query("""
+        SELECT new com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO(
             a.qnaWriteTime,
             b.userName,
             b.memberId,
@@ -45,6 +45,6 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
         JOIN MemberEntity b ON a.memberId = b.memberId
         WHERE c.ownerNo = :ownerNo
         """)
-    List<OwnerInquiryDTO> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
+    List<InquiryDTO> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
 
 }
