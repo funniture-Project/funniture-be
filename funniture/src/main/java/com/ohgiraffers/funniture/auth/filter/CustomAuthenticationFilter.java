@@ -2,6 +2,7 @@ package com.ohgiraffers.funniture.auth.filter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +40,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     // 사용자의 로그인 리소스 요청 시 요청 정보를 임시 토큰에 저장하는 메소드
     private UsernamePasswordAuthenticationToken getAuthRequest (HttpServletRequest request) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+
+        // ✅ JSR310 모듈 등록 (LocalDateTime 지원)
+        objectMapper.registerModule(new JavaTimeModule());
 
         objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 

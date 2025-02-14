@@ -46,6 +46,7 @@ dependencies {
     // jwt 관련
     implementation "io.jsonwebtoken:jjwt:0.9.1"
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1' // LocalDateTime 처리 의존성
 
     // 스웨거
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui

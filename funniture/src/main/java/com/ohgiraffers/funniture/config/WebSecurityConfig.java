@@ -12,17 +12,14 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @ComponentScan("com.ohgiraffers.funniture")
-public class webSecurityConfig {
+public class WebSecurityConfig {
 
     /**
      * 1. 정적 자원에 대한 인증된 사용자의 접근을 설정하는 메서드
@@ -55,19 +52,39 @@ public class webSecurityConfig {
 //        return http.build();
 //    }
 
+    // formLogin은 세션 방식일 때 사용, jwt 사용한다면 formLogin 필요 없음
+
     // 로그인 되지 않은 상태에서 회원가입 할 때 아래와 같이 csrf disable()로 해야 함.
     // 람다 식으로 변경되어 AbstractHttpConfigurer::disable가 아닌, csrf -> csrf.disable() 이렇게 해야 함.
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http
-                    .csrf(csrf -> csrf.disable())// CSRF 보안 비활성화 (Postman 테스트 가능)
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/v1/auth/signup","/api/v1/product/*","/api/v1/product","/api/v1/rental/*","/api/v1/rental").permitAll() // 회원가입 API는 인증 없이 허용
-                            .anyRequest().authenticated()
-                    );
+//        @Bean
+//        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//            http
+//                    .csrf(csrf -> csrf.disable())// CSRF 보안 비활성화 (Postman 테스트 가능)
+//                    .authorizeHttpRequests(auth -> auth
+//                            .requestMatchers("/api/v1/auth/signup","/api/v1/product/*","/api/v1/product","/api/v1/rental/*","/api/v1/rental", "/api/v1/auth/login").permitAll() // 회원가입 API는 인증 없이 허용
+//                            .anyRequest().authenticated()
+//                    );
+//
+//            return http.build();
+//        }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // ✅ 로그인 엔드포인트 설정
 
-            return http.build();
-        }
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/signup","/api/v1/product/*","/api/v1/product","/api/v1/rental/*","/api/v1/rental", "/api/v1/auth/login").permitAll() // ✅ 로그인 및 회원가입 허용
+                        .anyRequest().authenticated()
+                )
+                .addFilter(customAuthenticationFilter) // 🔥 커스텀 로그인 필터 추가
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // ✅ JWT 사용 시 세션 비활성화
+
+        return http.build();
+    }
+
+
 
     /**
      * 3. Authentization의 인증 메서드를 제공하는 매니저로 Provider의 인터페이스를 의미한다.
