@@ -28,8 +28,11 @@ public class MemberDTO {
 
     private int isConsulting;
 
+    private int hasImage;
+
     private String imageLink;
 
     private String imageId;
 
+    // asdsad
 }
