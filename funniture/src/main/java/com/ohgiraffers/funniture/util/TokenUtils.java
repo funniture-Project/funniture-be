@@ -123,7 +123,7 @@ public class TokenUtils {
     private static Map<String, Object> createClaims(MemberDTO member){
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put("memberName", member.getUserName());
+        claims.put("memberName", member.getUsername());
         claims.put("memberRole", member.getMemberRole());
         claims.put("memberEmail", member.getEmail());
 
