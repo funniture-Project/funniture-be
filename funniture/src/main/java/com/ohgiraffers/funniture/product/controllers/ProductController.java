@@ -239,10 +239,15 @@ public class ProductController {
     }
 
     // 카테고리별 제공자 리스트 조회
+    @Operation(summary = "카테고리별 제공자 리스트 조회",
+            description = "상위 카테고리별 및 카테고리별 해당 제품 등록한 제공자 리스트 조회 "
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "카테고리에 따른 제공자 정보 조회 성공"),
+            @ApiResponse(responseCode = "204", description = "카테고리에 따른 제공자 정보 조회 없음")
+    })
     @GetMapping(value = "/ownerlist")
     private ResponseEntity<ResponseMessage> getOwnerByCategory(@RequestParam(required = false) List<Integer> categoryCode){
-
-        System.out.println("categoryCode = " + categoryCode);
 
         List<Map<String, String>> result = productService.getOwnerByCategory(categoryCode);
 
