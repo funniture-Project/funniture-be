@@ -1,11 +1,7 @@
 package com.ohgiraffers.funniture.product.entity;
 
-import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,11 +10,11 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "tbl_product")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class ProductWithPriceEntity {
-
 
     @Id
     @Column(name = "product_no")
@@ -59,14 +55,17 @@ public class ProductWithPriceEntity {
     @Column(name = "product_image_id")
     private String productImageId;
 
-    //    private List<Integer> priceList;
+    @Transient
+    private String storeName;
+
+    @Transient
     private String priceList;
 
     public List<Integer> getPriceListAsIntegers() {
         if (priceList == null || priceList.isEmpty()) {
             return List.of();
         }
-        return Arrays.stream(priceList.split(",")) // 쉼표로 분할
+        return Arrays.stream(priceList.split(" ")) // 쉼표로 분할
                 .map(Integer::parseInt)     // 정수 변환
                 .collect(Collectors.toList());
     }

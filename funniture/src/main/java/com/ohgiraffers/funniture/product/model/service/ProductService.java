@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.model.service;
 
+import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.product.entity.CategoryEntity;
 import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
@@ -17,10 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,15 +33,12 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     // 전체 상품 조회, 카테고리별 상품 조회(상품 + 가격 리스트)
-    public List<ProductWithPriceDTO> getProductAll(List<Integer> categoryCode) {
+    public List<ProductWithPriceDTO> getProductAll(ProductSearchCondition condition) {
 
         List<ProductWithPriceEntity> productEntityList = new ArrayList<>();
 
-        if (categoryCode == null ){
-            productEntityList = ProductWithPriceRepository.findAllProductsList();
-        } else {
-            productEntityList = ProductWithPriceRepository.findAllProductsListByCategoryIn(categoryCode);
-        }
+        productEntityList = ProductWithPriceRepository.findSearchProductList(condition);
+
         return productEntityList.stream().map(product -> modelMapper.map(product, ProductWithPriceDTO.class))
                 .collect(Collectors.toList());
     }
@@ -51,8 +46,7 @@ public class ProductService {
     // 상품 번호에따른 상품 상세 조회
     public ProductDetailDTO getProductInfoByNo(String productNo) {
 
-        ProductDetailEntity product = productDetailRepository.findById(productNo)
-                .orElseThrow(IllegalArgumentException::new);
+        Optional<ProductDetailEntity> product = productDetailRepository.findById(productNo);
 
         // 값이 존재하면 DTO로 변환, 없으면 예외 발생 또는 기본 값 반환
         return modelMapper.map(product, ProductDetailDTO.class);
@@ -88,15 +82,45 @@ public class ProductService {
     public void registerProduct(ProductDTO product) {
         try {
             productRepository.save(modelMapper.map(product, ProductEntity.class));
-            System.out.println("상품 등록 성공!!");
         } catch (Exception e) {
+            System.out.println("e = " + e);
             System.out.println("error = " + e.getMessage());
         }
+
+        System.out.println("상품 등록 성공!!");
     }
 
     // 상품 현재 번호 확인
     public String findMaxNO() {
         return productRepository.findMaxNo();
+    }
+
+    // 카테고리별 제공자 정보 확인
+    public List<Map<String, String>> getOwnerByCategory(List<Integer> categoryCode) {
+
+        System.out.println("categoryCode = " + categoryCode);
+
+        List<Object[]> ownerList = new ArrayList<>();
+
+        if (categoryCode.contains(1) || categoryCode.contains(2)){
+            ownerList = productRepository.getOwnerByRefCategory(categoryCode);
+        } else {
+            ownerList = productRepository.getOwnerByCategory(categoryCode);
+        }
+
+        List<Map<String, String>> result = new ArrayList<>();
+
+        for (Object[] owner : ownerList){
+            Map<String, String> ownerInfo = new HashMap<>();
+
+            ownerInfo.put("store_name", (String) owner[0]);
+            ownerInfo.put("owner_no", (String) owner[1]);
+            result.add(ownerInfo);
+        }
+
+        System.out.println("result = " + result);
+
+        return result;
     }
 
 

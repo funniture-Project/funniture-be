@@ -1,13 +1,10 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
-import com.ohgiraffers.funniture.rental.entity.AdminRentalEntity;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
-import com.ohgiraffers.funniture.rental.model.dao.AdminRentalRepository;
-import com.ohgiraffers.funniture.rental.model.dao.RentalMapper;
-import com.ohgiraffers.funniture.rental.model.dao.RentalRepository;
-import com.ohgiraffers.funniture.rental.model.dao.UserRentalRepository;
+import com.ohgiraffers.funniture.rental.model.dao.*;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
 import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
+import com.ohgiraffers.funniture.rental.model.dto.AdminRentalSearchCriteria;
 import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,7 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +23,10 @@ public class RentalService {
     private final RentalMapper rentalMapper;
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
-    private final AdminRentalRepository adminRentalRepository;
-    private final UserRentalRepository userRentalRepository;
+    private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
+    private final UserRentalRepositoryCustom userRentalRepositoryCustom;
 
+    // 사용자 - 예약 등록
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
 
@@ -46,22 +43,29 @@ public class RentalService {
         String rentalNo = orderDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + String.format("%03d", count + 1);
         System.out.println("rentalNo = " + rentalNo);
 
+        String status = "예약대기";
+
         // DTO에 예약번호 & 주문일 설정 (Setter 사용)
         rentalDTO.setRentalNo(rentalNo);   // 예약번호 설정
         rentalDTO.setOrderDate(orderDate);  // 주문일 설정 (날짜 + 시간)
+        rentalDTO.setRentalState(status);   // 예약진행상태 예약대기로
         System.out.println("orderDate = " + orderDate);
 
         // JPA 저장
         rentalRepository.save(modelMapper.map(rentalDTO, RentalEntity.class));
     }
 
-
-    public List<AdminRentalViewDTO> findRentalAllListByAdmin() {
-
-        return adminRentalRepository.findRentalAllListByAdmin();
+    // 사용자 - 예약 조회(쿼리DSL)
+    public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
+        return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
 
-    public List<UserOrderViewDTO> findRentalOrderListByUser() {
-        return userRentalRepository.findRentalOrderListByUser();
+
+    // 관리자 - 예약 전체 조회(쿼리DSL)
+    public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
+        return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria);
     }
+
+
+
 }

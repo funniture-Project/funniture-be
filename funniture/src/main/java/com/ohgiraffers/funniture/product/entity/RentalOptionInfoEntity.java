@@ -2,14 +2,14 @@ package com.ohgiraffers.funniture.product.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Table(name = "tbl_rentaloptioninfo")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
+@Getter
 public class RentalOptionInfoEntity {
 
     @Id

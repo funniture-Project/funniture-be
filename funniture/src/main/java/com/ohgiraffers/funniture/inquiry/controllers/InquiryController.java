@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 // @Tag : 관련 있는 API 들의 그룹을 짓기 위한 어노테이션
-@Tag(name = "Product API")
+@Tag(name = "INQUIRY API")
 @RestController
 @RequestMapping("/api/v1/inquiry")
 @RequiredArgsConstructor
@@ -32,20 +32,22 @@ public class InquiryController {
         return headers;
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<ResponseMessage> findAllInquiry (){
+    // 문의 전체 조회
+//    @GetMapping
+//    public ResponseEntity<ResponseMessage> findAllInquiry (){
+//
+//        List<InquiryDTO> result = inquiryService.findAllInquiry();
+//
+//        Map<String , Object> map = new HashMap<>();
+//        map.put("result" , result);
+//
+//        return ResponseEntity.ok()
+//                .headers(headersMethod())
+//                .body(new ResponseMessage(200 , "조회 성공",map));
+//    }
 
-        List<InquiryDTO> result = inquiryService.findAllInquiry();
-
-        Map<String , Object> map = new HashMap<>();
-        map.put("result" , result);
-
-        return ResponseEntity.ok()
-                .headers(headersMethod())
-                .body(new ResponseMessage(200 , "조회 성공",map));
-    }
-
-    @GetMapping("/list/{inquiryNo}")
+    // 문의 번호로 조회
+    @GetMapping("/{inquiryNo}")
     public ResponseEntity<ResponseMessage> findByInquiryNo(@PathVariable String inquiryNo){
 
         InquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
@@ -58,13 +60,28 @@ public class InquiryController {
                 .body(new ResponseMessage(200, "조회 성공", map));
     }
 
+    // 상세 페이지에 해당 상품에 대한 전체 문의
+    @GetMapping ("/product/{productNo}")
+    public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
+        System.out.println("컨트롤러 productNo = " + productNo);
+        List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
+
+        Map <String , Object> map = new HashMap<>();
+        map.put("map", result);
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(200, "조회 성공", map));
+    }
+
+    // 문의 등록
     @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
 
-        System.out.println("json에서 들어온 inquiryDTO = " + inquiryDTO);
+        System.out.println("살인마 json에서 들어온 inquiryDTO = " + inquiryDTO);
 
         String maxInquiry = inquiryService.getMaxInquiry();
-        System.out.println("컨트롤러 maxInquiry = " + maxInquiry);
+        System.out.println("유어 마인드 컨트롤러 maxInquiry = " + maxInquiry);
 
         String newNo = returnInquiryNo(maxInquiry);
         inquiryDTO.setInquiryNo(newNo);
@@ -87,9 +104,43 @@ public class InquiryController {
         }
     }
 
+    // 문의 번호로 삭제하기
+    @DeleteMapping("/delete/{inquiryNo}")
+    public ResponseEntity<ResponseMessage> inquiryDelete(@PathVariable String inquiryNo){
+        System.out.println("화면에서 inquiryNo 잘 받아오나 = " + inquiryNo);
+
+        inquiryService.deleteByInquiryNo(inquiryNo);
+
+        Map<String , Object> map = new HashMap<>();
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(201, "삭제 성공", map));
+    }
+
+
+
+
+    // member_id에 따른 제공자 페이지의 전체 문의들
+    @GetMapping("/owner/{ownerNo}")
+    public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry (@PathVariable String ownerNo) {
+
+        System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
+        List<InquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
+
+        System.out.println("서비스에서 넘어온 result = " + result);
+        Map <String , Object> map = new HashMap<>();
+        map.put("result", result);
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(200, "조회 성공", map));
+    }
+
+    // 문의 답변 수정하기
     @PutMapping("/modify/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
-                                                        ,@RequestBody InquiryDTO inquiryDTO){
+            ,@RequestBody InquiryDTO inquiryDTO){
 
         System.out.println("컨트롤러 : 화면에서 inquiryNo 받아오나 = " + inquiryNo);
 
@@ -102,17 +153,18 @@ public class InquiryController {
                 .body(new ResponseMessage(201, "수정 성공", map));
     }
 
-    @DeleteMapping("/delete/{inquiryNo}")
-    public ResponseEntity<ResponseMessage> inquiryDelete(@PathVariable String inquiryNo){
-        System.out.println("화면에서 inquiryNo 잘 받아오나 = " + inquiryNo);
+    // 답변하지 않은 문의들
+    @GetMapping ("/wait")
+    public ResponseEntity<ResponseMessage> findWaitOwnerPageInquiry () {
 
-        inquiryService.deleteByInquiryNo(inquiryNo);
+        return null;
+    }
 
-        Map<String , Object> map = new HashMap<>();
+    // 답변하지 않은 문의들
+    @GetMapping ("/complete")
+    public ResponseEntity<ResponseMessage> findCompleteOwnerPageInquiry () {
 
-        return ResponseEntity.ok()
-                .headers(headersMethod())
-                .body(new ResponseMessage(201, "삭제 성공", map));
+        return null;
     }
 
 }
