@@ -89,6 +89,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
         customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
+        System.out.println(" SecurityFilterChain 설정 시작");
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -100,6 +101,7 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT 사용 시 세션 비활성화
 
+        System.out.println(" SecurityFilterChain 설정 완료");
         return http.build();
     }
 
