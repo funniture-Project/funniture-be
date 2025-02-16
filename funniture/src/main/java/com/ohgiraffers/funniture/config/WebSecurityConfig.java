@@ -87,6 +87,7 @@ public class WebSecurityConfig {
 //    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
         customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
         System.out.println(" SecurityFilterChain 설정 시작");
@@ -143,7 +144,7 @@ public class WebSecurityConfig {
     public CustomAuthenticationFilter customAuthenticationFilter(){
                                                                                         // 3번 authenticationManager 전달
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-        customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login");
                                                                 // 7번 customAuthLoginSuccessHandler 전달
         customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthLoginSuccessHandler());
                                                                 // 8번 customAuthFailUserHandler 전달

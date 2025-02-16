@@ -32,6 +32,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
         MemberEntity member = memberRepository.findByMemberId(memberId);
 
+        System.out.println("입력된 회원 정보");
+        System.out.println(member);
         if (member == null) {
             throw new UsernameNotFoundException("해당 ID의 사용자를 찾을 수 없습니다: " + memberId);
         }
@@ -43,6 +45,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         // String 컬럼을 이용해 권한을 GrantedAuthority 리스트로 변환
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole().toUpperCase()));
+        System.out.println("권한 : ");
+        System.out.println(authorities);
 
         memberDTO.setAuthorities(authorities);
 
