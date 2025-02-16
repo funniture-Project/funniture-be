@@ -39,15 +39,29 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         * */
 
         List<String> roleLeessList = Arrays.asList(
-                "/api/v1/products/\\d+",
-                "/api/v1/products/\\w+",
-                "/api/v1/products",
-                "/api/v1/reviews/product/\\d+",
-                "/api/v1/products/search?s=\\w+",
-                "/auth/signup","/auth/login",
-                "/api/v1/reviews",
-                "/api/v1/reviews/\\d++",
-                "/api/v1/reviews/(\\d+)?offset=\\d+",
+                "/api/v1/product/\\d+",
+                "/api/v1/product/\\w+",
+                "/api/v1/product",
+                "/api/product",
+                "/api/v1/auth/login",
+                "/api/v1/auth/signup",
+                "/api/v1/inquiry",
+                "/api/v1/inquiry/product",
+                "/api/v1/inquiry/regist",
+                "/api/v1/inquiry/delete",
+                "/api/v1/inquiry/owner",
+                "/api/v1/inquiry/modify",
+                "/api/v1/inquiry/wait",
+                "/api/v1/inquiry/complete",
+                "/api/v1/rental",
+                "/api/v1/rental/user",
+                "/api/v1/rental/admin",
+                "/api/v1/rental/owner",
+                "/api/v1/review/product/\\d+",
+                "/api/v1/product/search?s=\\w+",
+                "/api/v1/review",
+                "/api/v1/review/\\d++",
+                "/api/v1/review/(\\d+)?offset=\\d+",
                 "/swagger-ui/(.*)",        //swagger 설정
                 "/swagger-ui/index.html",  //swagger 설정
                 "/v3/api-docs",              //swagger 설정
