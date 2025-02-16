@@ -28,6 +28,7 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
         HashMap<String, Object> responseMap = new HashMap<>();
         JSONObject jsonValue = null;
         JSONObject jsonObject;
+
         if(member.getMemberRole().equals("LIMIT")){
             responseMap.put("userInfo", jsonValue);
             responseMap.put("status", 500);

@@ -37,20 +37,23 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         return this.getAuthenticationManager().authenticate(authRequest); // 인증 수행
     }
 
     // 사용자의 로그인 리소스 요청 시 요청 정보를 임시 토큰에 저장하는 메소드
     private UsernamePasswordAuthenticationToken getAuthRequest (HttpServletRequest request) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-
         //  JSR310 모듈 등록 (LocalDateTime 지원)
         objectMapper.registerModule(new JavaTimeModule());
-
         objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
-
         MemberDTO member = objectMapper.readValue(request.getInputStream(), MemberDTO.class);
+        System.out.println("✅ request.getInputStream()");
+        System.out.println(request.getInputStream());
+        System.out.println("✅ MemberDTO.class");
+        System.out.println(MemberDTO.class);
+
+        System.out.println("✅ member");
+        System.out.println(member);
 
         return new UsernamePasswordAuthenticationToken(member.getMemberId(), member.getPassword());
     }

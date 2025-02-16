@@ -77,10 +77,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String header = request.getHeader(AuthConstants.AUTH_HEADER);
+        System.out.println("✅ request");
+        System.out.println(request);
 
+        System.out.println("✅ header");
+        System.out.println(header); // null
         try {
             if(header != null && !header.equalsIgnoreCase("")){
                 String token = TokenUtils.splitHeader(header);
+
+                System.out.println("✅ token");
+                System.out.println(token);
 
                 if(TokenUtils.isValidToken(token)){
                     Claims claims = TokenUtils.getClaimsFromToken(token);
