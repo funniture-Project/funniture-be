@@ -41,7 +41,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     private UsernamePasswordAuthenticationToken getAuthRequest (HttpServletRequest request) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // ✅ JSR310 모듈 등록 (LocalDateTime 지원)
+        //  JSR310 모듈 등록 (LocalDateTime 지원)
         objectMapper.registerModule(new JavaTimeModule());
 
         objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
