@@ -47,13 +47,13 @@ public class TokenUtils {
     }
 
     /**
-     * 유요한 토큰인지 확인하는 메서드
+     * 유요한 토큰인지 확인하는 메서드funniture
      * @param token : 토큰
      * @return boolean : 유효 여부
      * @throws ExpiredJwtException, {@link JwtException} {@link NullPointerException}
      * */
     public static boolean isValidToken(String token){
-
+        System.out.println("TokenUtils에서 받아온 token = " + token);
         try{
             Claims claims = getClaimsFromToken(token);
             System.out.println("✅ claims : " + claims);
@@ -77,7 +77,7 @@ public class TokenUtils {
      * */
     public static Claims getClaimsFromToken(String token){
         System.out.println("✅ 토큰 복호화 메소드 getClaimsFromToken ~~");
-        System.out.println("✅ token1 : " + token);
+        System.out.println("✅ token1 : " + token); // {{accessToken}
         System.out.println("✅ token2 : " + Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
                 .parseClaimsJws(token).getBody());
         return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
