@@ -56,6 +56,7 @@ public class TokenUtils {
 
         try{
             Claims claims = getClaimsFromToken(token);
+            System.out.println("✅ claims : " + claims);
             return true;
         }catch (ExpiredJwtException e){
             e.printStackTrace();
@@ -75,6 +76,10 @@ public class TokenUtils {
      * @return Claims
      * */
     public static Claims getClaimsFromToken(String token){
+        System.out.println("✅ 토큰 복호화 메소드 getClaimsFromToken ~~");
+        System.out.println("✅ token1 : " + token);
+        System.out.println("✅ token2 : " + Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
+                .parseClaimsJws(token).getBody());
         return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
                 .parseClaimsJws(token).getBody();
     }
@@ -96,6 +101,7 @@ public class TokenUtils {
                 .signWith(SignatureAlgorithm.HS256, createSignature())
                 .setExpiration(expireTime);
 
+        System.out.println("토큰 생성 메소드  = " + builder);
 
         return builder.compact();
     }

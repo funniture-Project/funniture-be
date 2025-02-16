@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.config;
 
 import com.ohgiraffers.funniture.auth.filter.CustomAuthenticationFilter;
+import com.ohgiraffers.funniture.auth.filter.JwtAuthorizationFilter;
 import com.ohgiraffers.funniture.auth.handler.CustomAuthFailUserHandler;
 import com.ohgiraffers.funniture.auth.handler.CustomAuthSuccessHandler;
 import com.ohgiraffers.funniture.auth.handler.CustomAuthenticationProvider;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -67,23 +69,42 @@ public class WebSecurityConfig {
 //
 //            return http.build();
 //        }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+//        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
+//
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/v1/auth/signup","/api/v1/product/*","/api/v1/product","/api/v1/rental/*","/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
+//                        .anyRequest().authenticated()
+//                )
+//                .addFilter(customAuthenticationFilter) // 커스텀 로그인 필터 추가
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT 사용 시 세션 비활성화
+//
+//        return http.build();
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // ✅ 로그인 엔드포인트 설정
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
+        System.out.println(" SecurityFilterChain 설정 시작");
 
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/signup","/api/v1/product/*","/api/v1/product","/api/v1/rental/*","/api/v1/rental", "/api/v1/auth/login").permitAll() // ✅ 로그인 및 회원가입 허용
+                        .requestMatchers("/api/v1/auth/signup", "/api/v1/product/*", "/api/v1/product", "/api/v1/rental/*", "/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
                         .anyRequest().authenticated()
                 )
-                .addFilter(customAuthenticationFilter) // 🔥 커스텀 로그인 필터 추가
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // ✅ JWT 사용 시 세션 비활성화
+                .addFilter(customAuthenticationFilter) // 커스텀 로그인 필터 추가
+                .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT 사용 시 세션 비활성화
 
+        System.out.println(" SecurityFilterChain 설정 완료");
         return http.build();
     }
-
 
 
     /**
@@ -123,7 +144,7 @@ public class WebSecurityConfig {
     public CustomAuthenticationFilter customAuthenticationFilter(){
                                                                                         // 3번 authenticationManager 전달
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-        customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login");
                                                                 // 7번 customAuthLoginSuccessHandler 전달
         customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthLoginSuccessHandler());
                                                                 // 8번 customAuthFailUserHandler 전달
@@ -159,9 +180,9 @@ public class WebSecurityConfig {
 //     * 9. 사용자 요청시 수행되는 메소드
 //     * @return JwtAuthorizationFilter
 //     * */
-//    public JwtAuthorizationFilter jwtAuthorizationFilter(){
-//        return new JwtAuthorizationFilter(authenticationManager());
-//    }
+    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+        return new JwtAuthorizationFilter(authenticationManager());
+    }
 
 
 }

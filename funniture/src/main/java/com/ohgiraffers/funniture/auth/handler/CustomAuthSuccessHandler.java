@@ -22,30 +22,23 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
+        System.out.println(" 로그인 성공 - JWT 토큰 생성 중...");
         MemberDTO member  = ((MemberDTO) authentication.getPrincipal());
 
         HashMap<String, Object> responseMap = new HashMap<>();
         JSONObject jsonValue = null;
         JSONObject jsonObject;
+
         if(member.getMemberRole().equals("LIMIT")){
             responseMap.put("userInfo", jsonValue);
             responseMap.put("status", 500);
             responseMap.put("message","휴먼상태인 계정입니다.");
-        } else if (member.getMemberRole().equals("USER")) {
-            responseMap.put("userInfo", jsonValue);
-            responseMap.put("status", 200);
-            responseMap.put("message", "일반 회원인 계정입니다.");
-        } else if (member.getMemberRole().equals("OWNER")) {
-            responseMap.put("userInfo", jsonValue);
-            responseMap.put("status", 200);
-            responseMap.put("message", "제공자 회원인 계정입니다.");
-        } else if (member.getMemberRole().equals("ADMIN")) {
-            responseMap.put("userInfo", jsonValue);
-            responseMap.put("status", 200);
-            responseMap.put("message", "관리자 계정입니다.");
-        } else{
+        }
+
+        else{
 
             String token = TokenUtils.generateJwtToken(member);
+            System.out.println("CustomAuthSuccessHandler 에서 토큰 생성 됐나? = " + token);
             // tokenDTO response
             TokenDTO tokenDTO = TokenDTO.builder()
                                 .memberName(member.getUsername())
@@ -54,7 +47,7 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
                                 .build();
 
             jsonValue = (JSONObject) ConvertUtil.convertObjectToJsonObject(tokenDTO);
-
+            System.out.println("userInfo에 담기는 jsonValue = " + jsonValue);
             responseMap.put("userInfo", jsonValue);
             responseMap.put("status", 200);
             responseMap.put("message", "로그인 성공");
