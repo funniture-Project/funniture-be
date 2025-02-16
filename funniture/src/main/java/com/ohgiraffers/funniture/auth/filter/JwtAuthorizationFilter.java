@@ -34,6 +34,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("✅ jwtAuthorizationFilter - 요청 처리 중: " + request.getRequestURI());
         /*
         * 권한이 필요없는 리소스 (여기에 로그인 필요 없는 rest-api url 넣어야 함)
         * */

@@ -33,19 +33,7 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
             responseMap.put("status", 500);
             responseMap.put("message","휴먼상태인 계정입니다.");
         }
-//        else if (member.getMemberRole().equals("USER")) {
-//            responseMap.put("userInfo", jsonValue);
-//            responseMap.put("status", 200);
-//            responseMap.put("message", "일반 회원인 계정입니다.");
-//        } else if (member.getMemberRole().equals("OWNER")) {
-//            responseMap.put("userInfo", jsonValue);
-//            responseMap.put("status", 200);
-//            responseMap.put("message", "제공자 회원인 계정입니다.");
-//        } else if (member.getMemberRole().equals("ADMIN")) {
-//            responseMap.put("userInfo", jsonValue);
-//            responseMap.put("status", 200);
-//            responseMap.put("message", "관리자 계정입니다.");
-//        }
+
         else{
 
             String token = TokenUtils.generateJwtToken(member);
@@ -58,7 +46,7 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
                                 .build();
 
             jsonValue = (JSONObject) ConvertUtil.convertObjectToJsonObject(tokenDTO);
-
+            System.out.println("userInfo에 담기는 jsonValue = " + jsonValue);
             responseMap.put("userInfo", jsonValue);
             responseMap.put("status", 200);
             responseMap.put("message", "로그인 성공");

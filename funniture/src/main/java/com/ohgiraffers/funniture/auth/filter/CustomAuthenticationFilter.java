@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,8 +23,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     // 지정된 url 요청 시, 요청 가로채서 검증 로직 수행 메소드
     @Override
+    @Bean
     public Authentication attemptAuthentication (HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
+
+        System.out.println("✅ CustomAuthenticationFilter - attemptAuthentication 시작");
         // 토큰 생성
         UsernamePasswordAuthenticationToken authRequest;
 
