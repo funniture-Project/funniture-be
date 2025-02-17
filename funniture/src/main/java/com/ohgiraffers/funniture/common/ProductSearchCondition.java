@@ -15,6 +15,8 @@ public class ProductSearchCondition {
 
     private List<String> ownerNo;
 
+    private String productStatus;
+
     private String searchText;
 
 }

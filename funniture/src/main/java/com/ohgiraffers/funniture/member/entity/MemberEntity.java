@@ -60,8 +60,6 @@ public class MemberEntity {
         return new MemberEntity(memberId, email,password,userName,phoneNumber,signupDate,memberRole,isConsulting,hasImage,imageId,imageLink);
     }
 
-
-
 //    // 연관관계 설정 (한 명의 회원이 여러 개의 상품을 소유할 수 있음)
 //    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
 //    private List<ProductEntity> products = new ArrayList<>();

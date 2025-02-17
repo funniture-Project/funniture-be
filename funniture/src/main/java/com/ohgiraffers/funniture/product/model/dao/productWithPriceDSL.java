@@ -45,6 +45,11 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
             builder.and(productPrice.productName.contains(condition.getSearchText()));
         }
 
+        // 판매상태
+        if (condition.getProductStatus() != null){
+            builder.and(productPrice.productStatus.eq(condition.getProductStatus()));
+        }
+
         // 제공사 정보
         if (condition.getOwnerNo() != null){
             builder.and(productPrice.ownerNo.in(condition.getOwnerNo()));
