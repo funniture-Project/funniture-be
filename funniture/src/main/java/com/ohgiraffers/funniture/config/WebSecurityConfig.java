@@ -113,6 +113,7 @@ public class WebSecurityConfig {
      * */
     @Bean
     public AuthenticationManager authenticationManager(){
+        System.out.println("Authentization의 인증 메서드를 제공하는 매니저 authenticationManager ");
         return new ProviderManager(customAuthenticationProvider());
     }
 //
@@ -133,6 +134,7 @@ public class WebSecurityConfig {
      * */
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        System.out.println("비밀번호를 암호화 하는 인코더 bCryptPasswordEncoder = ");
         return new BCryptPasswordEncoder();
     }
 
@@ -142,6 +144,7 @@ public class WebSecurityConfig {
      * */
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter(){
+        System.out.println("사용자의 인증 요청을 가로채서 로그인 로직을 수행하는 필터  CustomAuthenticationFilter = ");
                                                                                         // 3번 authenticationManager 전달
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
         customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login");
@@ -181,6 +184,7 @@ public class WebSecurityConfig {
 //     * @return JwtAuthorizationFilter
 //     * */
     public JwtAuthorizationFilter jwtAuthorizationFilter(){
+        System.out.println("사용자 요청시 수행되는 메소드 jwtAuthorizationFilter");
         return new JwtAuthorizationFilter(authenticationManager());
     }
 

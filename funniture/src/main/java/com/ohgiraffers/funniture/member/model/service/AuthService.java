@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
 
@@ -28,7 +30,8 @@ public class AuthService {
 
         System.out.println("서비스 : 컨트롤러에서 온 memberDTO = " + memberDTO);
 
-
+        memberDTO.setMemberRole("USER");
+        memberDTO.setSignupDate(LocalDateTime.now());
 
         // DTO에 담아온 값 엔티티화.
         MemberEntity registMember = modelMapper.map(memberDTO , MemberEntity.class);

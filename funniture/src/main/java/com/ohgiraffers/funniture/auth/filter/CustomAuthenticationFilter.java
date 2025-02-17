@@ -47,12 +47,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
         MemberDTO member = objectMapper.readValue(request.getInputStream(), MemberDTO.class);
-        System.out.println("✅ request.getInputStream()");
+        System.out.println("✅ getAuthRequest의 request.getInputStream()");
         System.out.println(request.getInputStream());
-        System.out.println("✅ MemberDTO.class");
+        System.out.println("✅ getAuthRequest의 MemberDTO.class");
         System.out.println(MemberDTO.class);
 
-        System.out.println("✅ member");
+        System.out.println("✅ getAuthRequest의 member");
         System.out.println(member);
 
         return new UsernamePasswordAuthenticationToken(member.getMemberId(), member.getPassword());
