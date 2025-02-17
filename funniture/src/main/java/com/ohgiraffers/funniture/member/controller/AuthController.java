@@ -48,7 +48,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .headers(headersMethod())
-                .body(new ResponseMessage(200, "회원가입 성공",result));
+                .body(new ResponseMessage(201, "회원가입 성공",result));
     }
 
     public String returnMemberNo(String maxMember){
