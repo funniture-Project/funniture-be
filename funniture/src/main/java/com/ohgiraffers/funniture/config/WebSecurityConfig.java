@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -92,7 +93,8 @@ public class WebSecurityConfig {
 //        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
         System.out.println(" SecurityFilterChain 설정 시작");
 
-        http
+        http.cors(Customizer.withDefaults()) // cors 관련 설정 추가해야 프론트에서 보낼 때 받을 수 있다.
+                // ☆ 지금까지 토큰 반환 안 됐던 이유! : doFilterInternal에서 url에 대해 설정하고 있는데 여기서 추가로 설정하고 있으므로 로직이 안 돌아감.
                 .csrf(csrf -> csrf.disable())
 //                .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/api/v1/auth/signup", "/api/v1/product/*", "/api/v1/product", "/api/v1/rental/*", "/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
