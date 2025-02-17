@@ -14,6 +14,8 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String header = request.getHeader(AuthConstants.AUTH_HEADER); // 수정
         String token = TokenUtils.splitHeader(header);
+        System.out.println("preHandle의 token = " + token);
+        System.out.println("preHandle의 header = " + header);
 
         if(token != null){
             if(TokenUtils.isValidToken(token)){
