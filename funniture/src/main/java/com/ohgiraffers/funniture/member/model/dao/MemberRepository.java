@@ -4,6 +4,8 @@ import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity , String> {
     // 마지막 멤버 넘버 가져오는 애
@@ -12,4 +14,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity , String> {
     String maxMemberNo();
 
     MemberEntity findByMemberId(String memberId);
+
+    MemberEntity findByEmail(String email);
 }

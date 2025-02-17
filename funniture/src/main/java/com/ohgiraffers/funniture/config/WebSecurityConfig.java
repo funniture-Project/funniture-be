@@ -89,15 +89,15 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
+//        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
         System.out.println(" SecurityFilterChain 설정 시작");
 
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/signup", "/api/v1/product/*", "/api/v1/product", "/api/v1/rental/*", "/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
-                        .anyRequest().authenticated()
-                )
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/v1/auth/signup", "/api/v1/product/*", "/api/v1/product", "/api/v1/rental/*", "/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
+//                        .anyRequest().authenticated()
+//                )
                 .addFilter(customAuthenticationFilter) // 커스텀 로그인 필터 추가
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT 사용 시 세션 비활성화

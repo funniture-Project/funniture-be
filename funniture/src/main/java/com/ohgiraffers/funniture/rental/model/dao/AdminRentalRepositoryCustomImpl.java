@@ -59,8 +59,8 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
                     .and(rental.rentalEndDate.goe(startOfDay)); // rentalEndDate >= 2025-02-01 00:00:00
         }
 
-        if(criteria.getRentalNo() != null){
-            builder.and(rental.rentalNo.eq(criteria.getRentalNo()));
+        if (criteria.getRentalNo() != null) {
+            builder.and(rental.rentalNo.like("%" + criteria.getRentalNo() + "%"));
         }
 
         // 쿼리실행
