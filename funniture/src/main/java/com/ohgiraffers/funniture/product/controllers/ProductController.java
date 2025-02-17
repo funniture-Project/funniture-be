@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.product.controllers;
 
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
+import com.ohgiraffers.funniture.member.model.service.CustomUserDetailsService;
 import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
@@ -22,6 +23,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     // ?categoryCode=10로 작성 시 해당 카테고리 상품만 출력, 없으면 전체
     // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
@@ -45,7 +48,8 @@ public class ProductController {
             parameters = {
                     @Parameter(name = "categoryCode", description = "조회할 카테고리 코드 리스트 (선택)"),
                     @Parameter(name = "ownerNo", description = "상품 제공자의 번호 리스트 (선택)"),
-                    @Parameter(name = "searchText", description = "상품 검색명 (선택)")
+                    @Parameter(name = "searchText", description = "상품 검색명 (선택)"),
+                    @Parameter(name = "productStatus", description = "판매 상태 (선택)")
             }
     )
     @ApiResponses({
@@ -217,7 +221,6 @@ public class ProductController {
     })
     @GetMapping("/category")
     private ResponseEntity<ResponseMessage> getCategoryList(@RequestParam(required = false) Integer refCategoryCode){
-
         List<CategoryDTO> categoryList = productService.getCategoryList(refCategoryCode);
 
         HttpHeaders headers = new HttpHeaders();
@@ -249,7 +252,13 @@ public class ProductController {
     @GetMapping(value = "/ownerlist")
     private ResponseEntity<ResponseMessage> getOwnerByCategory(@RequestParam(required = false) List<Integer> categoryCode){
 
-        List<Map<String, String>> result = productService.getOwnerByCategory(categoryCode);
+        List<Map<String, String>> result = new ArrayList<>();
+
+        if (categoryCode != null){
+            result = productService.getOwnerByCategory(categoryCode);
+        }else {
+            result = customUserDetailsService.findAllOwner();
+        }
 
         Map<String, Object> map = new HashMap<>();
 
@@ -266,7 +275,7 @@ public class ProductController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new ResponseMessage(200, "카테고리에 따른 제공자 정보 조회 성공", map));
+                .body(new ResponseMessage(200, "제공자 정보 조회 성공", map));
     }
 
 }
