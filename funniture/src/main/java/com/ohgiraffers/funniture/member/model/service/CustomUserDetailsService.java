@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -54,4 +56,20 @@ public class CustomUserDetailsService implements UserDetailsService {
         return memberDTO;
     }
 
+    public List<Map<String, String>> findAllOwner() {
+        List<Map<String, String>> result = new ArrayList<>();
+
+        List<Object[]> ownerList = memberRepository.findAllOwner();
+
+        for (Object[] owner : ownerList){
+            Map<String, String> ownerInfo = new HashMap<>();
+
+            ownerInfo.put("store_name", (String) owner[0]);
+            ownerInfo.put("owner_no", (String) owner[1]);
+
+            result.add(ownerInfo);
+        }
+
+        return result;
+    }
 }
