@@ -114,6 +114,11 @@ public class RentalController {
                                                                     @RequestParam(required = false) String rentalNo
     ) {
 
+        System.out.println("rentalState = " + rentalState);
+        System.out.println("storeName = " + storeName);
+        System.out.println("categoryName = " + categoryName);
+        System.out.println("searchDate = " + searchDate);
+        System.out.println("rentalNo = " + rentalNo);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 

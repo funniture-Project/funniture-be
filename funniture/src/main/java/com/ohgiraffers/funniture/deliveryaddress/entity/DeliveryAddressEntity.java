@@ -28,6 +28,7 @@ public class DeliveryAddressEntity {
     @Column(name = "destination_phone")
     private String destinationPhone;    // 배송지 전화번호
 
+
     @Column(name = "destination_address")
     private String destinationAddress;  // 배송지
 
