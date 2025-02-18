@@ -40,8 +40,10 @@ public class MemberEntity {
     @Column(name = "is_consulting")
     private int isConsulting;
 
-    @Column (name = "has_image")
-    private int hasImage;
+    // hasImage에 null도 들어가 있을 때 조회하면 에러 발생하므로
+    // nullable = true 추가하였고, Integer로 변경 (250218)
+    @Column (name = "has_image", nullable = true)
+    private Integer hasImage;
 
     @Column(name = "image_id")
     private String imageId;
