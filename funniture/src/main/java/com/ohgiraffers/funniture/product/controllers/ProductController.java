@@ -305,4 +305,10 @@ public class ProductController {
                 .body(new ResponseMessage(code, msg, null));
     }
 
+    @DeleteMapping(value = "/deleteproduct")
+    private void deleteProduct(@RequestBody List<String> productList){
+
+        productService.deleteProduct(productList);
+
+    }
 }

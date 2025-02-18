@@ -5,10 +5,7 @@ import com.ohgiraffers.funniture.product.entity.CategoryEntity;
 import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import com.ohgiraffers.funniture.product.entity.ProductWithPriceEntity;
-import com.ohgiraffers.funniture.product.model.dao.CategoryRepository;
-import com.ohgiraffers.funniture.product.model.dao.ProductDetailRepository;
-import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
-import com.ohgiraffers.funniture.product.model.dao.ProductWithPriceRepository;
+import com.ohgiraffers.funniture.product.model.dao.*;
 import com.ohgiraffers.funniture.product.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.javassist.NotFoundException;
@@ -148,6 +145,12 @@ public class ProductService {
         return response;
     }
 
+    @Transactional
+    public void deleteProduct(List<String> productList) {
+        System.out.println("productList = " + productList);
+
+    }
+
 
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
@@ -156,5 +159,4 @@ public class ProductService {
 //                .map(ProductWithPriceDTO::fromQueryResult)
 //                .toList();
 //    }
-
 }
