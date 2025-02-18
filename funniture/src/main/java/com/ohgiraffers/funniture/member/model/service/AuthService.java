@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.member.model.service;
 
+import com.ohgiraffers.funniture.exception.DuplicatedMemberEmailException;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
@@ -32,6 +33,11 @@ public class AuthService {
 
         memberDTO.setMemberRole("USER");
         memberDTO.setSignupDate(LocalDateTime.now());
+
+        // 이메일 중복 유효성 검사
+        if (memberRepository.existsByEmail(memberDTO.getEmail())) {
+            throw new DuplicatedMemberEmailException("이메일이 중복됩니다.");
+        }
 
         // DTO에 담아온 값 엔티티화.
         MemberEntity registMember = modelMapper.map(memberDTO , MemberEntity.class);

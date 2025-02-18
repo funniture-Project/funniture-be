@@ -21,7 +21,7 @@ public class HeaderFilter implements Filter {
         res.setHeader("Access-Control-Allow-Headers",
                 "Access-Control-Allow-Origin, Access-Control-Allow-Headers, X-Requested-With, Content-Type, Authorization, X-XSRF-token"
         );
-        res.setHeader("Access-Control-Allow-Credentials", "false");
+        res.setHeader("Access-Control-Allow-Credentials", "true");
         chain.doFilter(request,response);
     }
 }

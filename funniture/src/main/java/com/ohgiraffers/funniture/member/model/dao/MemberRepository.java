@@ -14,7 +14,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity , String> {
             nativeQuery = true)
     String maxMemberNo();
 
-    MemberEntity findByMemberId(String memberId);
+//    MemberEntity findByMemberId(String memberId);
 
     MemberEntity findByEmail(String email);
 
@@ -27,4 +27,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity , String> {
         ORDER BY m.member_id
         """, nativeQuery = true)
     List<Object[]> findAllOwner();
+
+    boolean existsByEmail(String email);
 }
