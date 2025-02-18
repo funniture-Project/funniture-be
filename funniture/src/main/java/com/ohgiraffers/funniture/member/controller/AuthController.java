@@ -23,7 +23,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    private HttpHeaders headersMethod () {
+    public HttpHeaders headersMethod () {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
