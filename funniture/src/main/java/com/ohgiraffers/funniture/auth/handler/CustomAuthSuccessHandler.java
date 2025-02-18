@@ -45,6 +45,8 @@ public class CustomAuthSuccessHandler extends SavedRequestAwareAuthenticationSuc
                                 .memberName(member.getUsername())
                                 .accessToken(token)
                                 .grantType(AuthConstants.TOKEN_TYPE)
+                                .memberRole(member.getMemberRole())
+                                .memberId(member.getMemberId())
                                 .build();
 
             jsonValue = (JSONObject) ConvertUtil.convertObjectToJsonObject(tokenDTO);
