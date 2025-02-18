@@ -9,11 +9,9 @@ import com.ohgiraffers.funniture.product.model.dao.CategoryRepository;
 import com.ohgiraffers.funniture.product.model.dao.ProductDetailRepository;
 import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
 import com.ohgiraffers.funniture.product.model.dao.ProductWithPriceRepository;
-import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
+import com.ohgiraffers.funniture.product.model.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +119,33 @@ public class ProductService {
         System.out.println("result = " + result);
 
         return result;
+    }
+
+    @Transactional
+    public Map<Integer, String> modifyProductStatus(ChangeStatusDTO changeStatusList) {
+
+        Map<Integer, String> response = new HashMap<>();
+
+        if (!changeStatusList.getProductList().isEmpty() && changeStatusList.getChangeStatus() != null && changeStatusList.getChangeStatus().trim() != ""){
+
+            for (String product : changeStatusList.getProductList()){
+                ProductEntity foundProduct = productRepository.findById(product).orElse(null);
+
+                if (foundProduct == null ){
+                    response.put(404,"찾을 수 없는 상품의 정보가 포함되어 있습니다.");
+                    return response;
+                }
+
+                foundProduct = foundProduct.toBuilder().productStatus(changeStatusList.getChangeStatus()).build();
+
+                productRepository.save(foundProduct);
+            }
+
+            response.put(204,"제품 상태 변경 완료");
+        } else {
+            response.put(400,"잘못된 요청입니다.");
+        }
+        return response;
     }
 
 

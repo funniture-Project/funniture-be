@@ -2,10 +2,7 @@ package com.ohgiraffers.funniture.product.controllers;
 
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.member.model.service.CustomUserDetailsService;
-import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
+import com.ohgiraffers.funniture.product.model.dto.*;
 import com.ohgiraffers.funniture.product.model.service.ProductService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -276,6 +273,36 @@ public class ProductController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "제공자 정보 조회 성공", map));
+    }
+
+
+    // 상품 상태 변경
+    @Operation(summary = "상품 상태 변경",
+            description = "관리자 페이지, 제공자 페이지에서 사용하는 상품별 상태 변경"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "제품 상태 변경 완료"),
+            @ApiResponse(responseCode = "404", description = "찾을 수 없는 상품의 정보가 포함되어 있습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    })
+    @PutMapping(value = "/changestatus")
+    private ResponseEntity<ResponseMessage> modifyProductStatus(@RequestBody ChangeStatusDTO changeStatusList ){
+        System.out.println("changeStatusList = " + changeStatusList);
+
+        Map<Integer, String> result = productService.modifyProductStatus(changeStatusList);
+
+        Integer code = result.keySet().stream().findFirst().orElse(500);
+        String msg = "내부적인 오류 발생";
+        if (code != null){
+            msg = result.get(code);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(code, msg, null));
     }
 
 }
