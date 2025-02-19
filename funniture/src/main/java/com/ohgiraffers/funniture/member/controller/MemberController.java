@@ -41,6 +41,8 @@ public class MemberController {
 
         MemberDTO memberDTO = memberService.getMemberList(memberId);
         System.out.println("✅ 서비스에서 넘어온 로그인 회원 목록 = " + memberDTO);
+
+        memberDTO.setPassword(null);
         Map<String , Object> result = new HashMap<>();
         result.put("result" , memberDTO);
 
