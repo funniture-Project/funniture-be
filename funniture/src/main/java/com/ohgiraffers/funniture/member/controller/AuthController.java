@@ -36,10 +36,7 @@ public class AuthController {
     }
 
     @Operation(summary = "회원 가입",
-            description = "회원 가입 시, 회원 등록",
-            parameters = {
-                    @Parameter(name = "memberDTO", description = "이메일 , 이름 , 패스워드 정보"),
-            }
+            description = "회원 가입 시, 회원 등록"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
@@ -61,7 +58,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .headers(headersMethod())
-                .body(new ResponseMessage(201, "회원가입 성공",result));
+                .body(new ResponseMessage(200, "회원가입 성공",result));
     }
 
     public String returnMemberNo(String maxMember){

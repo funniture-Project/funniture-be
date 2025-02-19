@@ -32,7 +32,7 @@ public class MemberController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공"),
-            @ApiResponse(responseCode = "204", description = "회원 정보 조회 실패")
+            @ApiResponse(responseCode = "404", description = "회원 정보 조회 실패")
     })
     @GetMapping("/{memberId}")
     public ResponseEntity<ResponseMessage> memberList (@PathVariable String memberId) {
@@ -47,7 +47,7 @@ public class MemberController {
         if (memberDTO == null) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(204, "회원 정보가 존재하지 않습니다.", null));
+                    .body(new ResponseMessage(404, "회원 정보가 존재하지 않습니다.", null));
         }
 
         return ResponseEntity.ok()
