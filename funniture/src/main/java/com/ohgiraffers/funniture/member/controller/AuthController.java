@@ -3,6 +3,10 @@ package com.ohgiraffers.funniture.member.controller;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import com.ohgiraffers.funniture.member.model.service.AuthService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,6 +35,15 @@ public class AuthController {
         return headers;
     }
 
+    @Operation(summary = "회원 가입",
+            description = "회원 가입 시, 회원 등록",
+            parameters = {
+                    @Parameter(name = "memberDTO", description = "이메일 , 이름 , 패스워드 정보"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
+    })
     @PostMapping("/signup")
     public ResponseEntity<ResponseMessage> signup (@RequestBody MemberDTO memberDTO) {
 
