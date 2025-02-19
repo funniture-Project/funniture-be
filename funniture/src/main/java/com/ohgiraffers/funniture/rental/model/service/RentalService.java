@@ -36,6 +36,7 @@ public class RentalService {
 
         // 해당 날짜의 기존 예약 개수 조회
         int count = rentalRepository.countByOrderDate(orderDateOnly);
+        System.out.println("count = " + count);
 
         // 새로운 예약번호 생성 (YYYYMMDD + 3자리 숫자)
         String rentalNo = orderDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + String.format("%03d", count + 1);
