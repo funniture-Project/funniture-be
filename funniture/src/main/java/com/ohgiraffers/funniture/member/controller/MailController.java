@@ -26,7 +26,7 @@ public class MailController {
     public ResponseEntity<ResponseMessage> sendEmail(@PathVariable String email) throws MessagingException {
 
         System.out.println("이메일 잘 들어왔는지 email = " + email);
-        boolean isSend = mailService.sendSimpleMessage(email);
+        String isSend = mailService.sendSimpleMessage(email);
 
         System.out.println("이메일 서비스 잘 다녀 왔는지 isSend = " + isSend);
         HttpHeaders headers = new HttpHeaders();
@@ -35,7 +35,7 @@ public class MailController {
         Map<String , Object> map = new HashMap<>();
         map.put("result",isSend);
 
-        if (isSend){
+        if (isSend != null){
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(new ResponseMessage(200 , "이메일 전송 성공",map));
