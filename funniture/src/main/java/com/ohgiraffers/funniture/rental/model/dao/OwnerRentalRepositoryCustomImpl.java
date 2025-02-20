@@ -1,7 +1,7 @@
 package com.ohgiraffers.funniture.rental.model.dao;
 
+import com.ohgiraffers.funniture.product.entity.QProductEntity;
 import com.ohgiraffers.funniture.product.entity.QRentalOptionInfoEntity;
-import com.ohgiraffers.funniture.rental.entity.QUserProductEntity;
 import com.ohgiraffers.funniture.rental.entity.QUserRentalEntity;
 import com.ohgiraffers.funniture.rental.model.dto.OwnerRentalViewDTO;
 import com.querydsl.core.BooleanBuilder;
@@ -30,7 +30,7 @@ public class OwnerRentalRepositoryCustomImpl implements OwnerRentalRepositoryCus
 
         // User 쪽과 조인이 같아서 재사용!
         QUserRentalEntity rental = QUserRentalEntity.userRentalEntity;
-        QUserProductEntity product = QUserProductEntity.userProductEntity;
+        QProductEntity product = QProductEntity.productEntity;
         QRentalOptionInfoEntity optionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
 
         // 기본적으로 전체 데이터를 조회할 때는 기간 필터를 추가하지 않음

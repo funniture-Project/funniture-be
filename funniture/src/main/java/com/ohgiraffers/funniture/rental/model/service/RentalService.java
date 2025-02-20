@@ -23,6 +23,7 @@ public class RentalService {
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
     private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
+    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
 
     // 사용자 - 예약 등록
     @Transactional
@@ -59,10 +60,10 @@ public class RentalService {
         return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
 
-//    // 사용자,제공자 예약 상세페이지
-//    public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
-//        return
-//    }
+    // 사용자,제공자 예약 상세페이지
+    public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
+        return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
+    }
 
 
     // 관리자 - 예약 조회(쿼리 DSL)
