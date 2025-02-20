@@ -1,9 +1,8 @@
 package com.ohgiraffers.funniture.product.model.dao;
 
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
+import com.ohgiraffers.funniture.member.entity.QOwnerInfoEntity;
 import com.ohgiraffers.funniture.product.entity.*;
-import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
-import com.ohgiraffers.funniture.rental.entity.QAdminOwnerInfoEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -26,7 +25,7 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
 
         QProductWithPriceEntity productPrice = QProductWithPriceEntity.productWithPriceEntity;
         QRentalOptionInfoEntity rentalOption = QRentalOptionInfoEntity.rentalOptionInfoEntity;
-        QAdminOwnerInfoEntity ownerInfo = QAdminOwnerInfoEntity.adminOwnerInfoEntity;
+        QOwnerInfoEntity ownerInfo = QOwnerInfoEntity.ownerInfoEntity;
         QCategoryEntity category = QCategoryEntity.categoryEntity;
 
         BooleanBuilder builder = new BooleanBuilder();

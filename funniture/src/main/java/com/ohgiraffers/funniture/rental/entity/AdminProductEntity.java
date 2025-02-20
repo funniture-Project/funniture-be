@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.rental.entity;
 
+import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,5 +53,5 @@ public class AdminProductEntity {
 
     @ManyToOne
     @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
-    private AdminOwnerInfoEntity adminOwnerInfo;
+    private OwnerInfoEntity adminOwnerInfo;
 }

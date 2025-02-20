@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -89,6 +90,20 @@ public class RentalController {
     }
 
     // 예약 상세 조회(사용자, 제공자 동일) /{rentalNo}
+//    @GetMapping("/{rentalNo}")
+//    public ResponseEntity<ResponseMessage> findRentalDetail(@PathVariable String rentalNo){
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+//
+//        List<RentalDetailDTO> rentalDetail = rentalService.findRentalDetail(rentalNo);
+//
+//        if (rentalDetail.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .headers(headers)
+//                    .body(new ResponseMessage(404, "해당 예약을 찾을 수 없습니다.", null));
+//        }
+//
+//    }
 
     /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
 
