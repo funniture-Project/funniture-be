@@ -59,6 +59,11 @@ public class RentalService {
         return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
 
+//    // 사용자,제공자 예약 상세페이지
+//    public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
+//        return
+//    }
+
 
     // 관리자 - 예약 조회(쿼리 DSL)
     public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
@@ -69,4 +74,6 @@ public class RentalService {
     public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period) {
         return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo,period);
     }
+
+
 }
