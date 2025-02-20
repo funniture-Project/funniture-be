@@ -40,6 +40,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         * */
 
         List<String> roleLeessList = Arrays.asList(
+                "api/v1/email",
+                "api/v1/email(/\\w+)?",
                 "/api/v1/member(/\\w+)?",
                 "/api/v1/member",
                 "/api/v1/product/\\d+",
