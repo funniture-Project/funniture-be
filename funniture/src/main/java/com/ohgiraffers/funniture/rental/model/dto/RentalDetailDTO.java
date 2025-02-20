@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.rental.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import lombok.*;
 
@@ -14,6 +15,7 @@ public class RentalDetailDTO {
 
     private String rentalNo;        // 예약번호 (pk)
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime orderDate;         // 주문일
 
     private int rentalNumber;       // 대여갯수

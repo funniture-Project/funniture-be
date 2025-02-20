@@ -63,6 +63,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/rental/admin",
                 "/api/v1/rental/owner",
                 "/api/v1/rental/regist",
+                "/api/v1/rental/\\d+",
+                "/api/v1/rental/\\w+",
                 "/api/v1/review/product/\\d+",
                 "/api/v1/product/search?s=\\w+",
                 "/api/v1/review",

@@ -1,5 +1,7 @@
 package com.ohgiraffers.funniture.rental.entity;
 
+import com.ohgiraffers.funniture.deliveryaddress.entity.DeliveryAddressEntity;
+import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
 import jakarta.persistence.*;
@@ -7,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @ToString
-public class UserRentalEntity {
+public class DetailRentalEntity {
 
     @Id
     @Column(name = "rental_no")
@@ -49,18 +52,19 @@ public class UserRentalEntity {
     @Column(name = "member_id")
     private String memberId;        // 대여자 회원번호 (fk)
 
-    @Column(name = "owner_no")
-    private String ownerNo;         // 제공자 회원번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
+    private OwnerInfoEntity ownerInfoEntity;         // 제공자 회원번호 (fk)
 
     @OneToOne
     @JoinColumn(name = "rental_info_no")
     private RentalOptionInfoEntity rentalOptionInfoEntity;       // 대여조건정보 (fk)
 
-    @Column(name = "destination_no")
-    private int destinationNo;      // 배송지 식별번호 (fk)
+    @OneToOne
+    @JoinColumn(name = "destination_no")
+    private DeliveryAddressEntity deliveryAddressEntity;      // 배송지 식별번호 (fk)
 
     @ManyToOne
     @JoinColumn(name = "product_no")
     private ProductEntity productEntity;       // 상품번호 (fk)
-
 }
