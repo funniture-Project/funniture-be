@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.entity;
 
+import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class ProductDetailEntity {
     @Column(name = "product_name")
     private String productName;
 
-    @Column(name = "owner_no")
-    private String ownerNo;
+    @ManyToOne
+    @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
+    private OwnerInfoEntity ownerInfo;
 
     @Column(name = "total_stock")
     private int totalStock;

@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface ProductDetailRepository extends JpaRepository<ProductDetailEntity, String> {
-    List<ProductDetailEntity> findAllByOwnerNo(String ownerNo);
+
+    List<ProductDetailEntity> findAllByOwnerInfo_memberId(String ownerNo);
 }
