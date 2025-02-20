@@ -50,7 +50,7 @@ public class ProductService {
     // 제공자별 상품 조회
     public List<ProductDetailDTO> getProductInfoByOwner(String ownerNo){
 
-        List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerNo(ownerNo);
+        List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerInfo_memberId(ownerNo);
 
         return productList.stream().map(product -> modelMapper.map(product, ProductDetailDTO.class))
                 .collect(Collectors.toList());

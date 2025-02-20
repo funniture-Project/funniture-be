@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.model.dto;
 
+import com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO;
 import lombok.*;
 
 import java.util.List;
@@ -13,7 +14,8 @@ public class ProductDetailDTO {
 
     private String productNo;
     private String productName;
-    private String ownerNo;
+    private OwnerInfoDTO ownerInfo;
+
     private int totalStock;
     private Integer usedStock;
 

@@ -134,7 +134,7 @@ public class ProductController {
 
             // 결과가 없을 경우 처리 (상품을 찾지 못한 경우)
             if (result == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                return ResponseEntity.ok()
                         .headers(headers)
                         .body(new ResponseMessage(404, "상품을 찾을 수 없습니다", null));
             }
