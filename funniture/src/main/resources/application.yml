@@ -19,6 +19,23 @@ spring:
     hibernate:
       ddl-auto: update
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kimkunam06@gmail.com
+    password: tflrntthtvyqatzt
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+  auth-code-expiration-millis: 1800000
+
 mybatis:
   mapper-locations: mappers/**/*.xml
   configuration:
@@ -27,3 +44,4 @@ mybatis:
 jwt:
   key: wERjtIdxQ8lNjF0w/AAiN6HqTASaCAUzSq6nbKefMwf5CbPE8GvwLsClz94uVt9Q1esxYwwXVU+BYn7/mR01Qg==
   time: 1800000
+
