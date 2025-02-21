@@ -64,6 +64,9 @@ dependencies {
 
     // 이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Cloudinary 의존성 추가
+    implementation 'com.cloudinary:cloudinary-http44:1.39.0'
 }
 
 clean {

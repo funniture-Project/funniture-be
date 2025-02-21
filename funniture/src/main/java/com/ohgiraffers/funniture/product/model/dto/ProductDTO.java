@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class ProductDTO {
     private String productNo;
 
     @NotNull(message = "상품명은 필수입니다.")
-    @Size(min = 1, max = 255, message = "상품명은 1자 이상 255자 이내여야 합니다.")
+    @Size(min = 1, max = 30, message = "상품명은 1자 이상 30자 이내여야 합니다.")
     private String productName;
 
     @NotNull(message = "제공자 번호는 필수입니다.")

@@ -76,7 +76,10 @@ public class ProductService {
     @Transactional
     public void registerProduct(ProductDTO product) {
         try {
-            productRepository.save(modelMapper.map(product, ProductEntity.class));
+            ProductEntity productEntity = modelMapper.map(product, ProductEntity.class);
+            System.out.println("변환된 productEntity = " + productEntity);
+            productRepository.save(productEntity);
+//            productRepository.save(modelMapper.map(product, ProductEntity.class));
         } catch (Exception e) {
             System.out.println("e = " + e);
             System.out.println("error = " + e.getMessage());
