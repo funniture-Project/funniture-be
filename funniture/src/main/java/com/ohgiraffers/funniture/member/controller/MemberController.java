@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.member.controller;
 
+import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import com.ohgiraffers.funniture.member.model.service.MemberService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -57,5 +58,34 @@ public class MemberController {
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(200, "로그인 한 회원 목록 조회 성공", result));
+    }
+
+    @Operation(summary = "로그인 페이지 비밀번호 변경",
+            description = "로그인 페이지에서 비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "비밀번호 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 변경 실패")
+    })
+    @PostMapping ("/findPass")
+    public ResponseEntity<ResponseMessage> changePasswordByLogin (@RequestBody MemberDTO memberDTO) {
+
+        System.out.println("프론트에서 패스워드 변경 요청 잘 들어 왔나? email = " + memberDTO.getEmail());
+        System.out.println("프론트에서 패스워드 변경 요청 잘 들어 왔나? password = " + memberDTO.getPassword());
+
+        MemberEntity memberEntity = memberService.findByEmail(memberDTO.getEmail());
+        System.out.println("이메일에 해당하는 값이 있나? memberEntity = " + memberEntity);
+
+        // 서비스로 비밀번호 바꿀 정보 넘겨주기
+        MemberEntity result = memberService.changePassword(memberEntity, memberDTO.getPassword());
+
+        if(result.getPassword() != null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201 , "비밀번호 변경 완료", null));
+        } else {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404 , "비밀번호 변경 실패", null));
+        }
     }
 }

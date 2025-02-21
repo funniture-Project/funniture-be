@@ -1,10 +1,7 @@
 package com.ohgiraffers.funniture.member.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @Table (name = "tbl_member")
 @Getter
 @AllArgsConstructor
+@Setter
 @ToString
 public class MemberEntity {
 
