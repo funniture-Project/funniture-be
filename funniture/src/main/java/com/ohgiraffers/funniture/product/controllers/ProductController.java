@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.controllers;
 
+import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.member.model.service.CustomUserDetailsService;
 import com.ohgiraffers.funniture.product.model.dto.*;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CloudinaryService cloudinaryService;
 
     // ?categoryCode=10로 작성 시 해당 카테고리 상품만 출력, 없으면 전체
     // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
@@ -160,14 +163,32 @@ public class ProductController {
             @ApiResponse(responseCode = "400",description = "상품 등록에 실패."),
             @ApiResponse(responseCode = "201", description = "상품 등록 성공")
     })
-    @PostMapping("/register")
-    public ResponseEntity<ResponseMessage> registerProduct(@Valid @RequestBody ProductDTO product, BindingResult bindingResult){
+    @PostMapping(value = "/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ResponseMessage> registerProduct(@Valid @RequestPart(value = "formData") ProductDTO product,
+                                @RequestPart(value = "rentalOptions") List<RentalOptionInfoDTO> rentalOptionList,
+                                @RequestPart(value = "productImage", required = false) MultipartFile file,
+                                BindingResult bindingResult) {
+
+        System.out.println("rentalOptionList = " + rentalOptionList);
+
+        if (file != null && !file.isEmpty()) {
+            System.out.println("파일명: " + file.getOriginalFilename());
+            // cloudinary 에 파일올리고 url 받아오기
+            Map<String, Object> response = cloudinaryService.uploadFile(file);
+            if (response != null){
+                product.setProductImageLink(response.get("url").toString());
+                product.setProductImageId(response.get("id").toString());
+            }
+        } else {
+            System.out.println("파일이 없습니다.");
+        }
 
         Map<String, Object> responseMap = new HashMap<>();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
+        // 예외처리 확인 validation
         if (bindingResult.hasErrors()){
             System.out.println("bindingResult = " + bindingResult);
 
@@ -190,6 +211,7 @@ public class ProductController {
                 product.setProductNo(newNo);
             }
 
+            System.out.println("저장 전 product = " + product);
             productService.registerProduct(product);
 
             String checkNo = productService.findMaxNO();
