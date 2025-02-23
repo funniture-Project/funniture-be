@@ -1,17 +1,16 @@
 package com.ohgiraffers.funniture.deliveryaddress.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "tbl_postaddress")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @ToString
+@Builder(toBuilder = true)
 public class DeliveryAddressEntity {
 
     @Id

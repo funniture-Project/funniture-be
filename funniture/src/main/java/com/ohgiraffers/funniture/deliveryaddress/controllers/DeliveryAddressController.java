@@ -75,6 +75,17 @@ public class DeliveryAddressController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "신규배송지 등록이 완료되었습니다.", null));
     }
 
+    // 배송지 수정
+    @PutMapping("/update")
+    public ResponseEntity<ResponseMessage> deliveryAddressUpdate(@RequestBody DeliveryAddressDTO deliveryAddressDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        deliveryAddressService.deliveryAddressUpdate(deliveryAddressDTO);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "신규배송지 수정이 완료되었습니다.", null));
+    }
+
 
 
 

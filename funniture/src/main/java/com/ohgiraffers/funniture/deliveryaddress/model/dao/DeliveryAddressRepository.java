@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddressEntity, Integer> {
 
     @Query("SELECT d FROM DeliveryAddressEntity d WHERE d.memberId = :memberId")
     List<DeliveryAddressEntity> findDeliveryAddressByUser(String memberId);
+
+    Optional<DeliveryAddressEntity> findByMemberIdAndIsDefaultTrue(String memberId);
 }
