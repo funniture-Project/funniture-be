@@ -2,6 +2,9 @@ package com.ohgiraffers.funniture.deliveryaddress.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tbl_postaddress")
@@ -36,4 +39,12 @@ public class DeliveryAddressEntity {
 
     @Column(name = "is_default")
     private boolean isDefault;          // 기본배송지 여부
+
+    @CreationTimestamp
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;    // 생성일시
+
+    @Column(name = "destination_status")
+    private String destinationStatus;              // 배송지 상태 (활성화, 비활성화)
+
 }

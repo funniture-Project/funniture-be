@@ -92,6 +92,24 @@ public class DeliveryAddressController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 수정이 완료되었습니다.", null));
     }
 
+    @Operation(summary = "배송지 비활성화",
+            description = "예약 등록 페이지, 마이페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "배송지가 비활성화되었습니다.")
+    })
+    // 사용자 배송지 삭제(사용자 입장에서 안보이게하기 -> 과거 예약에서 배송지가 확인 되어야하기때문에)
+    @PutMapping("/delete/{destinationNo}")
+    public ResponseEntity<ResponseMessage> deliveryAddressDelete(@PathVariable int destinationNo){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        // 서비스에서 배송지 상태를 '비활성화'로 변경
+        deliveryAddressService.deliveryAddressDelete(destinationNo);
+
+        return ResponseEntity.ok(new ResponseMessage(200, "배송지가 비활성화되었습니다.", null));
+    }
+
 
 
 
