@@ -22,7 +22,9 @@ public class DeliveryAddressDTO {
 
     private String receiver;            // 받는 이
 
-    private Integer isDefault;       // 기본배송지 여부
+    private Integer isDefault;          // 기본배송지 여부
+
+    private String destinationStatus;   // 배송지 상태 (활성화 , 비활성화)
 
 
 }

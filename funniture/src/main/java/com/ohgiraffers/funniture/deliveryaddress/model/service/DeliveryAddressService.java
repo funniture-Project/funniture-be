@@ -23,6 +23,7 @@ public class DeliveryAddressService {
     private final DeliveryAddressRepository deliveryAddressRepository;
     private final ModelMapper modelMapper;
 
+    // 사용자별 배송지 조회
     public List<DeliveryAddressDTO> findDeliveryAddressByUser(String memberId) {
 
         List<DeliveryAddressEntity> addressList = deliveryAddressRepository.findDeliveryAddressByUser(memberId);
@@ -30,9 +31,13 @@ public class DeliveryAddressService {
         return addressList.stream().map(address -> modelMapper.map(address, DeliveryAddressDTO.class)).collect(Collectors.toList());
     }
 
+    // 신규 배송지 등록
     @Transactional
     public void deliveryAddressRegist(DeliveryAddressDTO deliveryAddressDTO) {
 
+        String status = "활성화";
+
+        deliveryAddressDTO.setDestinationStatus(status);
         // Entity 변환
         DeliveryAddressEntity deliveryAddressEntity = modelMapper.map(deliveryAddressDTO, DeliveryAddressEntity.class);
 
@@ -56,6 +61,7 @@ public class DeliveryAddressService {
         deliveryAddressRepository.save(modelMapper.map(deliveryAddressDTO, DeliveryAddressEntity.class));
     }
 
+    // 배송지 수정
     @Transactional
     public void deliveryAddressUpdate(DeliveryAddressDTO deliveryAddressDTO) {
 
@@ -75,8 +81,6 @@ public class DeliveryAddressService {
                 DeliveryAddressEntity updatedOldDefault = address.toBuilder().isDefault(false).build();
                 deliveryAddressRepository.save(updatedOldDefault);
             });
-
-
         }
 
         // 새로운 수정된 배송지 생성 및 저장
@@ -89,5 +93,38 @@ public class DeliveryAddressService {
                 .build();
 
         deliveryAddressRepository.save(updateDeliveryAddress);
+    }
+
+    // 배송지 삭제
+    @Transactional
+    public void deliveryAddressDelete(int destinationNo) {
+        // 배송지 조회
+        DeliveryAddressEntity deliveryAddressEntity = deliveryAddressRepository.findById(destinationNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 배송지가 존재하지 않습니다."));
+
+        // 삭제되기 전에 기본 배송지였는지 체크
+        boolean wasDefaultAddress = deliveryAddressEntity.isDefault();
+
+        // 배송지 상태를 '비활성화'로 변경 및 기본배송지 아니게 설정
+        DeliveryAddressEntity deleteDeliveryAddress = deliveryAddressEntity.toBuilder()
+                .destinationStatus("비활성화")
+                .isDefault(false)  // 기본 배송지 아니게 설정
+                .build();
+
+        // 상태 업데이트
+        deliveryAddressRepository.save(deleteDeliveryAddress);
+
+        // 삭제된 배송지가 기본 배송지였으면, 새로운 기본 배송지 설정
+        if (wasDefaultAddress) {
+            // 사용자의 다른 활성화된 배송지 중 가장 최근 등록된 배송지를 기본 배송지로 설정
+            Optional<DeliveryAddressEntity> newDefaultAddress = deliveryAddressRepository
+                    .findTopByMemberIdAndDestinationStatusOrderByCreatedAtDesc(deliveryAddressEntity.getMemberId(), "활성화");
+
+            // 새로운 기본 배송지가 있다면 해당 배송지를 기본 배송지로 설정
+            newDefaultAddress.ifPresent(newDefault -> {
+                newDefault.setDefault(true);  // 새로운 기본 배송지로 설정
+                deliveryAddressRepository.save(newDefault);
+            });
+        }
     }
 }

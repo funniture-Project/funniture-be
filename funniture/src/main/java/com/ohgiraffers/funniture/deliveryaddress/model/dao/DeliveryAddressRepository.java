@@ -11,8 +11,12 @@ import java.util.Optional;
 @Repository
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddressEntity, Integer> {
 
-    @Query("SELECT d FROM DeliveryAddressEntity d WHERE d.memberId = :memberId")
+    @Query("SELECT d FROM DeliveryAddressEntity d WHERE d.memberId = :memberId and d.destinationStatus = '활성화'")
     List<DeliveryAddressEntity> findDeliveryAddressByUser(String memberId);
 
     Optional<DeliveryAddressEntity> findByMemberIdAndIsDefaultTrue(String memberId);
+
+    Optional<DeliveryAddressEntity> findTopByMemberIdAndDestinationStatusOrderByCreatedAtDesc(
+            String memberId, String destinationStatus);
+
 }
