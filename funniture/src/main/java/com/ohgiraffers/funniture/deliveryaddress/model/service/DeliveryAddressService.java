@@ -27,4 +27,9 @@ public class DeliveryAddressService {
 
         return addressList.stream().map(address -> modelMapper.map(address, DeliveryAddressDTO.class)).collect(Collectors.toList());
     }
+
+    public void deliveryAddressRegist(DeliveryAddressDTO deliveryAddressDTO) {
+
+        deliveryAddressRepository.save(modelMapper.map(deliveryAddressDTO, DeliveryAddressEntity.class));
+    }
 }

@@ -1,5 +1,5 @@
 ---
-name: "\U0001F3B8ETC-Template\U0001F3B8"
+name: ETC-Template
 about: 기타 작업에 대해 기록해주세요.
 title: ''
 labels: ''
