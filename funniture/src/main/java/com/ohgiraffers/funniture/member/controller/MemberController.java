@@ -109,7 +109,7 @@ public class MemberController {
         if (result) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(201,"인증 성공", null));
+                    .body(new ResponseMessage(200,"인증 성공", null));
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
@@ -117,18 +117,56 @@ public class MemberController {
         }
     }
 
+    @Operation(summary = "사용자 휴대전화 번호 변경",
+            description = "사용자 마이페이지에서 휴대전화 번호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "휴대전화 번호 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "휴대전화 번호 변경 실패")
+    })
     @PutMapping("modify/phone")
     public ResponseEntity<ResponseMessage> modifyPhoneNumber (@RequestBody MemberDTO memberDTO) {
         System.out.println("전화번호 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
 
-        if (true) {
+        String memberId = memberDTO.getMemberId();
+        String phoneNumber = memberDTO.getPhoneNumber();
+        MemberEntity memberEntity = memberService.changePhoneNumber(memberId, phoneNumber);
+
+        if (memberEntity != null) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(201,"인증 성공", null));
+                    .body(new ResponseMessage(201,"휴대전화 번호 변경 성공", null));
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404,"인증 실패", null));
+                    .body(new ResponseMessage(404,"휴대전화 번호 변경 실패", null));
         }
     }
+
+    @Operation(summary = "사용자 비밀번호 변경",
+            description = "사용자 마이페이지에서 비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "비밀번호 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 변경 실패")
+    })
+    @PutMapping("modify/password")
+    public ResponseEntity<ResponseMessage> modifyPassword (@RequestBody MemberDTO memberDTO) {
+        System.out.println("비밀번호 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
+
+        String memberId = memberDTO.getMemberId();
+        String password = memberDTO.getPassword();
+
+        MemberEntity memberEntity = memberService.findByMemberId(memberId);
+        MemberEntity result = memberService.changePasswordByMypage(memberEntity, password);
+
+        if(result.getPassword() != null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201 , "비밀번호 변경 완료", null));
+        } else {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404 , "비밀번호 변경 실패", null));
+        }
+    }
+
 }

@@ -76,4 +76,44 @@ public class MemberService {
             return false;
         }
     }
+
+    // 마이페이지 비번 변경 전 해당 id에 해당하는 엔티티 찾아오는 로직
+    public MemberEntity findByMemberId(String memberId) {
+        System.out.println("비밀번호 변경 전, 서비스로 memberId 넘어 왔나 = " + memberId);
+
+        MemberEntity memberEntity = memberRepository.findByMemberId(memberId);
+        System.out.println("서비스에서 아이디에 해당하는 memberEntity 잘 찾았나 = " + memberEntity);
+        return memberEntity;
+
+    }
+
+    // 마이페이지에서 전화번호 변경 로직
+    @Transactional
+    public MemberEntity changePhoneNumber(String memberId, String phoneNumber) {
+        System.out.println("서비스 memberId = " + memberId);
+        System.out.println("서비스 phoneNumber = " + phoneNumber);
+
+        MemberEntity memberEntity = memberRepository.findByMemberId(memberId);
+        memberEntity.setPhoneNumber(phoneNumber);
+
+        MemberEntity result =  memberRepository.save(memberEntity);
+        return result;
+    }
+
+    public MemberEntity changePasswordByMypage(MemberEntity memberEntity, String newPassword) {
+        System.out.println("서비스 memberEntity = " + memberEntity);
+        System.out.println("서비스 newPassword = " + newPassword);
+
+        // 패스워드 인코딩
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        System.out.println("인코딩된 비밀번호 = " + encodedPassword);
+
+        // 기존 회원 엔티티에 새로운 비밀번호 설정
+        memberEntity.setPassword(encodedPassword);
+
+        // DB에 저장
+        MemberEntity result = memberRepository.save(memberEntity);
+        System.out.println("비밀번호 변경 완료. : " + result);
+        return result;
+    }
 }
