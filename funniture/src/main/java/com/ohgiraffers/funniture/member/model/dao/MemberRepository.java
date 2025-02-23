@@ -29,4 +29,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity , String> {
     List<Object[]> findAllOwner();
 
     boolean existsByEmail(String email);
+
+    MemberEntity findByMemberId(String memberId);
 }

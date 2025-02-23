@@ -55,4 +55,25 @@ public class MemberService {
         System.out.println("비밀번호 변경 완료. : " + result);
         return result;
     }
+
+    public boolean comparePassword(String memberId, String password) {
+
+        System.out.println("서비스에 아이디 비번 잘 넘어 왔는지 memberId = " + memberId + password);
+
+        // 받아온 id 값을 가지고 정보 찾아오기
+        MemberEntity memberEntity = memberRepository.findByMemberId(memberId);
+        System.out.println("memberId로 memberEntity 잘 찾아왔는지 = " + memberEntity);
+
+        // 이미 저장돼있던 인코딩 패스워드
+        String encodedPassword = memberEntity.getPassword();
+
+        // passwordEncoder.matches는 사용자 입력 패스워드(암호화x)와 저장된 암호화 패스워드를 비교해줌
+        if (passwordEncoder.matches(password, encodedPassword)){
+            System.out.println(" 비밀번호 일치 ");
+            return true;
+        } else{
+            System.out.println("비밀번호 불일치");
+            return false;
+        }
+    }
 }

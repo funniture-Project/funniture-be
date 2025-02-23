@@ -88,4 +88,33 @@ public class MemberController {
                     .body(new ResponseMessage(404 , "비밀번호 변경 실패", null));
         }
     }
+
+    @Operation(summary = "사용자 본인 인증",
+            description = "사용자 마이페이지에서 비밀번호 인증")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "성공"),
+            @ApiResponse(responseCode = "404", description = "실패")
+    })
+    @PostMapping("/conform")
+    public ResponseEntity<ResponseMessage> confirmToMyPage (@RequestBody MemberDTO memberDTO) {
+        System.out.println(" 서버에 잘 들어왔나 memberDTO = " + memberDTO);
+
+        String memberId = memberDTO.getMemberId();
+        String password = memberDTO.getPassword();
+        System.out.println("memberId = " + memberId);
+        System.out.println("password = " + password);
+
+        boolean result = memberService.comparePassword(memberId, password);
+
+        if (result) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201,"인증 성공", null));
+        } else {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404,"인증 실패", null));
+        }
+    }
+
 }
