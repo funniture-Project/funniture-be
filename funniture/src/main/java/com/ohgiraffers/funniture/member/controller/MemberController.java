@@ -117,4 +117,18 @@ public class MemberController {
         }
     }
 
+    @PutMapping("modify/phone")
+    public ResponseEntity<ResponseMessage> modifyPhoneNumber (@RequestBody MemberDTO memberDTO) {
+        System.out.println("전화번호 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
+
+        if (true) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201,"인증 성공", null));
+        } else {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404,"인증 실패", null));
+        }
+    }
 }
