@@ -75,6 +75,23 @@ public class DeliveryAddressController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "신규배송지 등록이 완료되었습니다.", null));
     }
 
+    @Operation(summary = "사용자 배송지 수정",
+            description = "예약 등록 페이지, 마이페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "배송지 수정이 완료되었습니다.")
+    })
+    // 배송지 수정
+    @PutMapping("/update")
+    public ResponseEntity<ResponseMessage> deliveryAddressUpdate(@RequestBody DeliveryAddressDTO deliveryAddressDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        deliveryAddressService.deliveryAddressUpdate(deliveryAddressDTO);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 수정이 완료되었습니다.", null));
+    }
+
 
 
 
