@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -87,19 +88,23 @@ public class WebSecurityConfig {
 //    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
 
-        http
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+//        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login"); // 로그인 엔드포인트 설정
+        System.out.println(" SecurityFilterChain 설정 시작");
+
+        http.cors(Customizer.withDefaults()) // cors 관련 설정 추가해야 프론트에서 보낼 때 받을 수 있다.
+                // ☆ 지금까지 토큰 반환 안 됐던 이유! : doFilterInternal에서 url에 대해 설정하고 있는데 여기서 추가로 설정하고 있으므로 로직이 안 돌아감.
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/signup", "/api/v1/product/*", "/api/v1/product", "/api/v1/rental/*", "/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
-                        .anyRequest().authenticated()
-                )
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/v1/auth/signup", "/api/v1/product/*", "/api/v1/product", "/api/v1/rental/*", "/api/v1/rental", "/api/v1/auth/login").permitAll() // 로그인 및 회원가입 허용
+//                        .anyRequest().authenticated()
+//                )
                 .addFilter(customAuthenticationFilter) // 커스텀 로그인 필터 추가
                 .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT 사용 시 세션 비활성화
 
+        System.out.println(" SecurityFilterChain 설정 완료");
         return http.build();
     }
 
@@ -110,6 +115,7 @@ public class WebSecurityConfig {
      * */
     @Bean
     public AuthenticationManager authenticationManager(){
+        System.out.println("Authentization의 인증 메서드를 제공하는 매니저 authenticationManager ");
         return new ProviderManager(customAuthenticationProvider());
     }
 //
@@ -130,6 +136,7 @@ public class WebSecurityConfig {
      * */
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        System.out.println("비밀번호를 암호화 하는 인코더 bCryptPasswordEncoder = ");
         return new BCryptPasswordEncoder();
     }
 
@@ -139,9 +146,10 @@ public class WebSecurityConfig {
      * */
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter(){
+        System.out.println("사용자의 인증 요청을 가로채서 로그인 로직을 수행하는 필터  CustomAuthenticationFilter = ");
                                                                                         // 3번 authenticationManager 전달
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
-        customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+        customAuthenticationFilter.setFilterProcessesUrl("/api/v1/auth/login");
                                                                 // 7번 customAuthLoginSuccessHandler 전달
         customAuthenticationFilter.setAuthenticationSuccessHandler(customAuthLoginSuccessHandler());
                                                                 // 8번 customAuthFailUserHandler 전달
@@ -178,6 +186,7 @@ public class WebSecurityConfig {
 //     * @return JwtAuthorizationFilter
 //     * */
     public JwtAuthorizationFilter jwtAuthorizationFilter(){
+        System.out.println("사용자 요청시 수행되는 메소드 jwtAuthorizationFilter");
         return new JwtAuthorizationFilter(authenticationManager());
     }
 

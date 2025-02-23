@@ -3,6 +3,11 @@ package com.ohgiraffers.funniture.member.controller;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import com.ohgiraffers.funniture.member.model.service.AuthService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+@Tag(name="SIGNUP API")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -23,7 +29,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    private HttpHeaders headersMethod () {
+    public HttpHeaders headersMethod () {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
@@ -31,6 +37,12 @@ public class AuthController {
         return headers;
     }
 
+    @Operation(summary = "회원 가입",
+            description = "회원 가입 시, 회원 등록"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 등록 성공"),
+    })
     @PostMapping("/signup")
     public ResponseEntity<ResponseMessage> signup (@RequestBody MemberDTO memberDTO) {
 

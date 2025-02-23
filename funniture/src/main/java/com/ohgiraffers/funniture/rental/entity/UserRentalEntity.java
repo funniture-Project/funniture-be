@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.rental.entity;
 
+import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,6 +61,6 @@ public class UserRentalEntity {
 
     @ManyToOne
     @JoinColumn(name = "product_no")
-    private UserProductEntity productEntity;       // 상품번호 (fk)
+    private ProductEntity productEntity;       // 상품번호 (fk)
 
 }

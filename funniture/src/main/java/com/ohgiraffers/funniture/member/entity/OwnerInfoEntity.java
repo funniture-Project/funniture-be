@@ -1,4 +1,4 @@
-package com.ohgiraffers.funniture.rental.entity;
+package com.ohgiraffers.funniture.member.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AdminOwnerInfoEntity {
+public class OwnerInfoEntity {
 
     @Id
     @Column(name = "store_no")

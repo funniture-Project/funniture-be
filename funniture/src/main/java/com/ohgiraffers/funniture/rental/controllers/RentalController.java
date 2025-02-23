@@ -1,9 +1,6 @@
 package com.ohgiraffers.funniture.rental.controllers;
 
-import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
-import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
-import com.ohgiraffers.funniture.rental.model.dto.AdminRentalSearchCriteria;
-import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
+import com.ohgiraffers.funniture.rental.model.dto.*;
 import com.ohgiraffers.funniture.rental.model.service.RentalService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +32,9 @@ import java.util.Map;
 public class RentalController {
 
     private final RentalService rentalService;
+
+
+    /* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
 
     @Operation(summary = "사용자 상품 예약 등록",
             description = "예약 등록 페이지에서 사용"
@@ -88,8 +89,73 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자 예약 조회 성공", res));
     }
 
+    @Operation(summary = "예약 상세 조회",
+            description = "사용자 마이페이지, 제공자 마이페이지에서 사용",
+            parameters = {
+                    @Parameter(name = "rentalNo", description = "주문번호")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "404",description = "해당 예약을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "200", description = "예약 상세 조회 성공")
+    })
     // 예약 상세 조회(사용자, 제공자 동일) /{rentalNo}
+    @GetMapping("/{rentalNo}")
+    public ResponseEntity<ResponseMessage> findRentalDetail(@PathVariable String rentalNo){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
+        List<RentalDetailDTO> rentalDetail = rentalService.findRentalDetail(rentalNo);
+
+        if (rentalDetail.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .headers(headers)
+                    .body(new ResponseMessage(404, "해당 예약을 찾을 수 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("rentalDetail", rentalDetail);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약 상세 조회 성공", res));
+    }
+
+    /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
+
+    @Operation(summary = "제공자별 예약 조회",
+            description = "제공자 마이페이지 예약/배송/반납에서 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
+                    @Parameter(name = "currentDate", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "예약 내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자별 예약 조회 성공")
+    })
+    @GetMapping("/owner")
+    public ResponseEntity<ResponseMessage> findRentalListByOwner(@RequestParam String ownerNo, @RequestParam String period) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<OwnerRentalViewDTO> ownerRentalList = rentalService.findRentalListByOwner(ownerNo, period);
+
+        if (ownerRentalList.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "예약 내역이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("ownerRentalList", ownerRentalList);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자별 예약 조회 성공", res));
+    }
+
+
+
+
+    /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
 
     @Operation(summary = "예약 전체 조회",
             description = "관리자 예약정보페이지에서 사용",
@@ -114,6 +180,11 @@ public class RentalController {
                                                                     @RequestParam(required = false) String rentalNo
     ) {
 
+        System.out.println("rentalState = " + rentalState);
+        System.out.println("storeName = " + storeName);
+        System.out.println("categoryName = " + categoryName);
+        System.out.println("searchDate = " + searchDate);
+        System.out.println("rentalNo = " + rentalNo);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 

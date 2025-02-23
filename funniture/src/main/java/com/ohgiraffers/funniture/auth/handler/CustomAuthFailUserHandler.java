@@ -41,6 +41,7 @@ public class CustomAuthFailUserHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         JSONObject jsonObject;
         String failMsg;
+        System.out.println("onAuthenticationFailure 로그인 실패 했나?");
 
         if (exception instanceof AuthenticationServiceException) {
             //사용자의 로그인 또는 인증 처리 과정에서 문제가 발생한다.

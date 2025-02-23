@@ -2,10 +2,7 @@ package com.ohgiraffers.funniture.rental.model.service;
 
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
 import com.ohgiraffers.funniture.rental.model.dao.*;
-import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
-import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
-import com.ohgiraffers.funniture.rental.model.dto.AdminRentalSearchCriteria;
-import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
+import com.ohgiraffers.funniture.rental.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,8 @@ public class RentalService {
     private final ModelMapper modelMapper;
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
+    private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
+    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
 
     // 사용자 - 예약 등록
     @Transactional
@@ -38,6 +37,7 @@ public class RentalService {
 
         // 해당 날짜의 기존 예약 개수 조회
         int count = rentalRepository.countByOrderDate(orderDateOnly);
+        System.out.println("count = " + count);
 
         // 새로운 예약번호 생성 (YYYYMMDD + 3자리 숫자)
         String rentalNo = orderDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + String.format("%03d", count + 1);
@@ -55,17 +55,26 @@ public class RentalService {
         rentalRepository.save(modelMapper.map(rentalDTO, RentalEntity.class));
     }
 
-    // 사용자 - 예약 조회(쿼리DSL)
+    // 사용자 - 예약 조회(쿼리 DSL)
     public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
         return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
 
+    // 사용자,제공자 예약 상세페이지
+    public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
+        return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
+    }
 
-    // 관리자 - 예약 전체 조회(쿼리DSL)
+
+    // 관리자 - 예약 조회(쿼리 DSL)
     public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
         return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria);
     }
 
+    // 제공자 - 예약 조회(쿼리 DSL)
+    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period) {
+        return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo,period);
+    }
 
 
 }

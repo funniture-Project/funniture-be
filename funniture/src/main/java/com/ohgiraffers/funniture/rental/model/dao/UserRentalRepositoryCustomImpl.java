@@ -1,10 +1,9 @@
 package com.ohgiraffers.funniture.rental.model.dao;
 
+import com.ohgiraffers.funniture.product.entity.QProductEntity;
 import com.ohgiraffers.funniture.product.entity.QRentalOptionInfoEntity;
-import com.ohgiraffers.funniture.rental.entity.QUserProductEntity;
 import com.ohgiraffers.funniture.rental.entity.QUserRentalEntity;
 import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,7 +23,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
     @Override
     public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
         QUserRentalEntity rental = QUserRentalEntity.userRentalEntity;
-        QUserProductEntity product = QUserProductEntity.userProductEntity;
+        QProductEntity product = QProductEntity.productEntity;
         QRentalOptionInfoEntity optionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
 
         JPAQuery<UserOrderViewDTO>query = jpaQueryFactory

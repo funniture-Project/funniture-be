@@ -1,10 +1,9 @@
 package com.ohgiraffers.funniture.product.controllers;
 
+import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
-import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
+import com.ohgiraffers.funniture.member.model.service.CustomUserDetailsService;
+import com.ohgiraffers.funniture.product.model.dto.*;
 import com.ohgiraffers.funniture.product.model.service.ProductService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,8 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,8 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final CloudinaryService cloudinaryService;
 
     // ?categoryCode=10로 작성 시 해당 카테고리 상품만 출력, 없으면 전체
     // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
@@ -45,7 +48,8 @@ public class ProductController {
             parameters = {
                     @Parameter(name = "categoryCode", description = "조회할 카테고리 코드 리스트 (선택)"),
                     @Parameter(name = "ownerNo", description = "상품 제공자의 번호 리스트 (선택)"),
-                    @Parameter(name = "searchText", description = "상품 검색명 (선택)")
+                    @Parameter(name = "searchText", description = "상품 검색명 (선택)"),
+                    @Parameter(name = "productStatus", description = "판매 상태 (선택)")
             }
     )
     @ApiResponses({
@@ -133,7 +137,7 @@ public class ProductController {
 
             // 결과가 없을 경우 처리 (상품을 찾지 못한 경우)
             if (result == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                return ResponseEntity.ok()
                         .headers(headers)
                         .body(new ResponseMessage(404, "상품을 찾을 수 없습니다", null));
             }
@@ -159,14 +163,32 @@ public class ProductController {
             @ApiResponse(responseCode = "400",description = "상품 등록에 실패."),
             @ApiResponse(responseCode = "201", description = "상품 등록 성공")
     })
-    @PostMapping("/register")
-    public ResponseEntity<ResponseMessage> registerProduct(@Valid @RequestBody ProductDTO product, BindingResult bindingResult){
+    @PostMapping(value = "/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ResponseMessage> registerProduct(@Valid @RequestPart(value = "formData") ProductDTO product,
+                                @RequestPart(value = "rentalOptions") List<RentalOptionInfoDTO> rentalOptionList,
+                                @RequestPart(value = "productImage", required = false) MultipartFile file,
+                                BindingResult bindingResult) {
+
+        System.out.println("rentalOptionList = " + rentalOptionList);
+
+        if (file != null && !file.isEmpty()) {
+            System.out.println("파일명: " + file.getOriginalFilename());
+            // cloudinary 에 파일올리고 url 받아오기
+            Map<String, Object> response = cloudinaryService.uploadFile(file);
+            if (response != null){
+                product.setProductImageLink(response.get("url").toString());
+                product.setProductImageId(response.get("id").toString());
+            }
+        } else {
+            System.out.println("파일이 없습니다.");
+        }
 
         Map<String, Object> responseMap = new HashMap<>();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
+        // 예외처리 확인 validation
         if (bindingResult.hasErrors()){
             System.out.println("bindingResult = " + bindingResult);
 
@@ -189,6 +211,7 @@ public class ProductController {
                 product.setProductNo(newNo);
             }
 
+            System.out.println("저장 전 product = " + product);
             productService.registerProduct(product);
 
             String checkNo = productService.findMaxNO();
@@ -217,7 +240,6 @@ public class ProductController {
     })
     @GetMapping("/category")
     private ResponseEntity<ResponseMessage> getCategoryList(@RequestParam(required = false) Integer refCategoryCode){
-
         List<CategoryDTO> categoryList = productService.getCategoryList(refCategoryCode);
 
         HttpHeaders headers = new HttpHeaders();
@@ -249,7 +271,13 @@ public class ProductController {
     @GetMapping(value = "/ownerlist")
     private ResponseEntity<ResponseMessage> getOwnerByCategory(@RequestParam(required = false) List<Integer> categoryCode){
 
-        List<Map<String, String>> result = productService.getOwnerByCategory(categoryCode);
+        List<Map<String, String>> result = new ArrayList<>();
+
+        if (categoryCode != null){
+            result = productService.getOwnerByCategory(categoryCode);
+        }else {
+            result = customUserDetailsService.findAllOwner();
+        }
 
         Map<String, Object> map = new HashMap<>();
 
@@ -266,7 +294,43 @@ public class ProductController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new ResponseMessage(200, "카테고리에 따른 제공자 정보 조회 성공", map));
+                .body(new ResponseMessage(200, "제공자 정보 조회 성공", map));
     }
 
+
+    // 상품 상태 변경
+    @Operation(summary = "상품 상태 변경",
+            description = "관리자 페이지, 제공자 페이지에서 사용하는 상품별 상태 변경"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "제품 상태 변경 완료"),
+            @ApiResponse(responseCode = "404", description = "찾을 수 없는 상품의 정보가 포함되어 있습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    })
+    @PutMapping(value = "/changestatus")
+    private ResponseEntity<ResponseMessage> modifyProductStatus(@RequestBody ChangeStatusDTO changeStatusList ){
+        System.out.println("changeStatusList = " + changeStatusList);
+
+        Map<Integer, String> result = productService.modifyProductStatus(changeStatusList);
+
+        Integer code = result.keySet().stream().findFirst().orElse(500);
+        String msg = "내부적인 오류 발생";
+        if (code != null){
+            msg = result.get(code);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(code, msg, null));
+    }
+
+    @DeleteMapping(value = "/deleteproduct")
+    private void deleteProduct(@RequestBody List<String> productList){
+
+        productService.deleteProduct(productList);
+
+    }
 }

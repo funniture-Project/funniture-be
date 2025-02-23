@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.product.entity;
 
+import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class ProductDetailEntity {
     @Column(name = "product_name")
     private String productName;
 
-    @Column(name = "owner_no")
-    private String ownerNo;
+    @ManyToOne
+    @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
+    private OwnerInfoEntity ownerInfo;
 
     @Column(name = "total_stock")
     private int totalStock;
@@ -42,7 +44,7 @@ public class ProductDetailEntity {
     private int regularPrice;
 
     // 상품 설명
-    @Column(name = "product_content")
+    @Column(name = "product_content", columnDefinition = "MEDIUMTEXT")
     private String productContent;
 
     // 판매 상태

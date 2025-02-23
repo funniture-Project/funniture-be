@@ -5,15 +5,10 @@ import com.ohgiraffers.funniture.product.entity.CategoryEntity;
 import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import com.ohgiraffers.funniture.product.entity.ProductWithPriceEntity;
-import com.ohgiraffers.funniture.product.model.dao.CategoryRepository;
-import com.ohgiraffers.funniture.product.model.dao.ProductDetailRepository;
-import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
-import com.ohgiraffers.funniture.product.model.dao.ProductWithPriceRepository;
-import com.ohgiraffers.funniture.product.model.dto.CategoryDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductDetailDTO;
-import com.ohgiraffers.funniture.product.model.dto.ProductWithPriceDTO;
+import com.ohgiraffers.funniture.product.model.dao.*;
+import com.ohgiraffers.funniture.product.model.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +50,7 @@ public class ProductService {
     // 제공자별 상품 조회
     public List<ProductDetailDTO> getProductInfoByOwner(String ownerNo){
 
-        List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerNo(ownerNo);
+        List<ProductDetailEntity> productList = productDetailRepository.findAllByOwnerInfo_memberId(ownerNo);
 
         return productList.stream().map(product -> modelMapper.map(product, ProductDetailDTO.class))
                 .collect(Collectors.toList());
@@ -81,7 +76,10 @@ public class ProductService {
     @Transactional
     public void registerProduct(ProductDTO product) {
         try {
-            productRepository.save(modelMapper.map(product, ProductEntity.class));
+            ProductEntity productEntity = modelMapper.map(product, ProductEntity.class);
+            System.out.println("변환된 productEntity = " + productEntity);
+            productRepository.save(productEntity);
+//            productRepository.save(modelMapper.map(product, ProductEntity.class));
         } catch (Exception e) {
             System.out.println("e = " + e);
             System.out.println("error = " + e.getMessage());
@@ -123,6 +121,39 @@ public class ProductService {
         return result;
     }
 
+    @Transactional
+    public Map<Integer, String> modifyProductStatus(ChangeStatusDTO changeStatusList) {
+
+        Map<Integer, String> response = new HashMap<>();
+
+        if (!changeStatusList.getProductList().isEmpty() && changeStatusList.getChangeStatus() != null && changeStatusList.getChangeStatus().trim() != ""){
+
+            for (String product : changeStatusList.getProductList()){
+                ProductEntity foundProduct = productRepository.findById(product).orElse(null);
+
+                if (foundProduct == null ){
+                    response.put(404,"찾을 수 없는 상품의 정보가 포함되어 있습니다.");
+                    return response;
+                }
+
+                foundProduct = foundProduct.toBuilder().productStatus(changeStatusList.getChangeStatus()).build();
+
+                productRepository.save(foundProduct);
+            }
+
+            response.put(204,"제품 상태 변경 완료");
+        } else {
+            response.put(400,"잘못된 요청입니다.");
+        }
+        return response;
+    }
+
+    @Transactional
+    public void deleteProduct(List<String> productList) {
+        System.out.println("productList = " + productList);
+
+    }
+
 
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
@@ -131,5 +162,4 @@ public class ProductService {
 //                .map(ProductWithPriceDTO::fromQueryResult)
 //                .toList();
 //    }
-
 }

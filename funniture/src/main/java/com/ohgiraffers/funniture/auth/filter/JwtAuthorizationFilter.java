@@ -34,11 +34,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("✅ jwtAuthorizationFilter - 요청 처리 중: " + request.getRequestURI());
         /*
         * 권한이 필요없는 리소스 (여기에 로그인 필요 없는 rest-api url 넣어야 함)
         * */
 
         List<String> roleLeessList = Arrays.asList(
+                "/api/v1/email",
+                "/api/v1/email/.*",
+                "/api/v1/member(/\\w+)?",
+                "/api/v1/member",
                 "/api/v1/product/\\d+",
                 "/api/v1/product/\\w+",
                 "/api/v1/product",
@@ -57,6 +62,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/rental/user",
                 "/api/v1/rental/admin",
                 "/api/v1/rental/owner",
+                "/api/v1/rental/regist",
+                "/api/v1/rental/\\d+",
+                "/api/v1/rental/\\w+",
                 "/api/v1/review/product/\\d+",
                 "/api/v1/product/search?s=\\w+",
                 "/api/v1/review",
@@ -76,10 +84,18 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String header = request.getHeader(AuthConstants.AUTH_HEADER);
+        System.out.println("✅ header");
+        System.out.println(header); // Bearer {{accessToken}
+
+        System.out.println("✅ request");
+        System.out.println(request);
 
         try {
             if(header != null && !header.equalsIgnoreCase("")){
                 String token = TokenUtils.splitHeader(header);
+
+                System.out.println("✅ token");
+                System.out.println(token); // {{accessToken}
 
                 if(TokenUtils.isValidToken(token)){
                     Claims claims = TokenUtils.getClaimsFromToken(token);

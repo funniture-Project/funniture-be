@@ -1,7 +1,7 @@
 package com.ohgiraffers.funniture.rental.model.dao;
 
+import com.ohgiraffers.funniture.member.entity.QOwnerInfoEntity;
 import com.ohgiraffers.funniture.rental.entity.QAdminCategoryEntity;
-import com.ohgiraffers.funniture.rental.entity.QAdminOwnerInfoEntity;
 import com.ohgiraffers.funniture.rental.entity.QAdminProductEntity;
 import com.ohgiraffers.funniture.rental.entity.QAdminRentalEntity;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
@@ -27,7 +27,7 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
 
         QAdminRentalEntity rental = QAdminRentalEntity.adminRentalEntity;
         QAdminProductEntity product = QAdminProductEntity.adminProductEntity;
-        QAdminOwnerInfoEntity ownerInfo = QAdminOwnerInfoEntity.adminOwnerInfoEntity;
+        QOwnerInfoEntity ownerInfo = QOwnerInfoEntity.ownerInfoEntity;
         QAdminCategoryEntity category = QAdminCategoryEntity.adminCategoryEntity;
         QAdminCategoryEntity parentCategory = new QAdminCategoryEntity("parentCategory");
 
@@ -59,8 +59,8 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
                     .and(rental.rentalEndDate.goe(startOfDay)); // rentalEndDate >= 2025-02-01 00:00:00
         }
 
-        if(criteria.getRentalNo() != null){
-            builder.and(rental.rentalNo.eq(criteria.getRentalNo()));
+        if (criteria.getRentalNo() != null) {
+            builder.and(rental.rentalNo.like("%" + criteria.getRentalNo() + "%"));
         }
 
         // 쿼리실행
