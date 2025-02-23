@@ -37,6 +37,7 @@ public class DeliveryAddressController {
             @ApiResponse(responseCode = "204",description = "배송지 내역이 없습니다."),
             @ApiResponse(responseCode = "200", description = "배송지 조회 완료")
     })
+    // 사용자별 배송지 조회
     @GetMapping
     public ResponseEntity<ResponseMessage> findDeliveryAddressByUser(@RequestParam String memberId){
 
@@ -55,6 +56,23 @@ public class DeliveryAddressController {
         res.put("addressList", addressList);
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 조회 완료", res));
+    }
+
+    @Operation(summary = "사용자 신규 배송지 등록",
+            description = "예약 등록 페이지, 마이페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "신규배송지 등록이 완료되었습니다.")
+    })
+    // 신규 배송지 등록
+    @PostMapping("/regist")
+    public ResponseEntity<ResponseMessage> deliveryAddressRegist(@RequestBody DeliveryAddressDTO deliveryAddressDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        deliveryAddressService.deliveryAddressRegist(deliveryAddressDTO);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(201, "신규배송지 등록이 완료되었습니다.", null));
     }
 
 
