@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.point.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,6 +24,7 @@ public class PointDTO {
 
     private int currentPoint;   // 현재 보유 포인트
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime pointDateTime;    // 포인트 시간
 
 }
