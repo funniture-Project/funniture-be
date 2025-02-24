@@ -219,9 +219,18 @@ public class ProductController {
 
             if (product.getProductNo().equals(checkNo)){
 
+                // 상품 등록 후 렌탈 조건 저장
+                rentalOptionList.forEach(option ->{
+                    option.setProductNo(checkNo);
+                });
+
+                System.out.println("rentalOptionList = " + rentalOptionList);
+
+                Integer optionResult = productService.saveOptionList(rentalOptionList);
+
                 return ResponseEntity.ok()
                         .headers(headers)
-                        .body(new ResponseMessage(201, "상품 등록 성공", null));
+                        .body(new ResponseMessage(201, "상품 등록 성공, " + (optionResult == null? 0 : optionResult) +"개의 옵셩 저장 완료" , null));
             }
 
             return ResponseEntity.ok()
@@ -332,5 +341,18 @@ public class ProductController {
 
         productService.deleteProduct(productList);
 
+    }
+
+    @PostMapping(value = "test")
+    private void saveRentalInfo(@RequestBody List<RentalOptionInfoDTO> rentalOptionList){
+        System.out.println("rentalOptionList = " + rentalOptionList);
+        String maxNo = productService.findMaxNO();
+        rentalOptionList.forEach(option ->{
+            option.setProductNo(maxNo);
+        });
+
+        System.out.println("rentalOptionList22222222 = " + rentalOptionList);
+
+        productService.saveOptionList(rentalOptionList);
     }
 }

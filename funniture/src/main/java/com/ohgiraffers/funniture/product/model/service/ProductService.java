@@ -1,10 +1,7 @@
 package com.ohgiraffers.funniture.product.model.service;
 
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
-import com.ohgiraffers.funniture.product.entity.CategoryEntity;
-import com.ohgiraffers.funniture.product.entity.ProductDetailEntity;
-import com.ohgiraffers.funniture.product.entity.ProductEntity;
-import com.ohgiraffers.funniture.product.entity.ProductWithPriceEntity;
+import com.ohgiraffers.funniture.product.entity.*;
 import com.ohgiraffers.funniture.product.model.dao.*;
 import com.ohgiraffers.funniture.product.model.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +23,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductWithPriceRepository ProductWithPriceRepository;
     private final CategoryRepository categoryRepository;
+    private final RentalOptionInfoRepository rentalOptionInfoRepository;
 
     // 전체 상품 조회, 카테고리별 상품 조회(상품 + 가격 리스트)
     public List<ProductWithPriceDTO> getProductAll(ProductSearchCondition condition) {
@@ -151,7 +149,24 @@ public class ProductService {
     @Transactional
     public void deleteProduct(List<String> productList) {
         System.out.println("productList = " + productList);
+    }
 
+    @Transactional
+    public Integer saveOptionList(List<RentalOptionInfoDTO> rentalOptionList) {
+
+        List<RentalOptionInfoEntity> optionInfoEntityList = rentalOptionList.stream()
+                .map(dto -> modelMapper.map(dto, RentalOptionInfoEntity.class))
+                .collect(Collectors.toList());
+
+        List<RentalOptionInfoEntity> savedEntities = rentalOptionInfoRepository.saveAll(optionInfoEntityList);
+
+        if (savedEntities.isEmpty()) {
+            System.out.println( "저장에 실패했습니다.");
+
+            return null;
+        }
+
+        return savedEntities.size();
     }
 
 
