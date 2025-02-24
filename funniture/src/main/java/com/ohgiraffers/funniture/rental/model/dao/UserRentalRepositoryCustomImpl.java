@@ -36,7 +36,8 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
                 .from(rental)
                 .join(rental.productEntity, product)
                 .join(rental.rentalOptionInfoEntity, optionInfo)
-                .where(rental.memberId.eq(memberId));
+                .where(rental.memberId.eq(memberId))
+                .orderBy(rental.orderDate.desc());
 
         if ("1MONTH".equals(period)) {
             searchDate = LocalDate.now().minusMonths(1); // 1개월 전 날짜
