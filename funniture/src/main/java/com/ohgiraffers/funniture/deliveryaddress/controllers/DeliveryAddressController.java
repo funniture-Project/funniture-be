@@ -37,9 +37,9 @@ public class DeliveryAddressController {
             @ApiResponse(responseCode = "204",description = "배송지 내역이 없습니다."),
             @ApiResponse(responseCode = "200", description = "배송지 조회 완료")
     })
-    // 사용자별 배송지 조회
-    @GetMapping
-    public ResponseEntity<ResponseMessage> findDeliveryAddressByUser(@RequestParam String memberId){
+    // 사용자별 배송지 전체 조회
+    @GetMapping("/{memberId}")
+    public ResponseEntity<ResponseMessage> findDeliveryAddressByUser(@PathVariable String memberId){
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
@@ -56,6 +56,38 @@ public class DeliveryAddressController {
         res.put("addressList", addressList);
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 조회 완료", res));
+    }
+
+
+    @Operation(summary = "사용자별 기본 배송지 조회",
+            description = "사용자 배송지 관리 페이지 & 주문/배송 페이지 & 예약 등록 페이지 & 반납 등록 페이지에서 사용",
+            parameters = {
+                    @Parameter(name = "memberId", description = "사용자 ID(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "기본 배송지가 없습니다."),
+            @ApiResponse(responseCode = "200", description = "기본 배송지 조회 완료")
+    })
+    // 사용자별 기본배송지 조회 => (is_default = true)인 배송지
+    @GetMapping("/default/{memberId}")
+    public ResponseEntity<ResponseMessage> findDefaultDeliveryAddressByUser(@PathVariable String memberId){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<DeliveryAddressDTO> defaultAddressList = deliveryAddressService.findDefaultDeliveryAddressByUser(memberId);
+
+        if (defaultAddressList.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "기본 배송지가 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("defaultAddressList", defaultAddressList);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "기본 배송지 조회 완료", res));
     }
 
     @Operation(summary = "사용자 신규 배송지 등록",
