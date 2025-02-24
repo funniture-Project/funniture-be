@@ -1,17 +1,22 @@
 package com.ohgiraffers.funniture.member.controller;
 
+import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import com.ohgiraffers.funniture.member.model.service.MemberService;
+import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +29,8 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
-
     private final AuthController authController;
+    private final CloudinaryService cloudinaryService;
 
     @Operation(summary = "로그인 회원 정보 조회",
             description = "로그인 시, 로그인 한 회원에 대한 정보 조회",
@@ -64,7 +69,7 @@ public class MemberController {
             description = "로그인 페이지에서 비밀번호 변경")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "비밀번호 변경 성공"),
-            @ApiResponse(responseCode = "404", description = "비밀번호 변경 실패")
+            @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패")
     })
     @PostMapping ("/findPass")
     public ResponseEntity<ResponseMessage> changePasswordByLogin (@RequestBody MemberDTO memberDTO) {
@@ -85,15 +90,15 @@ public class MemberController {
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404 , "비밀번호 변경 실패", null));
+                    .body(new ResponseMessage(400 , "비밀번호 변경 실패", null));
         }
     }
 
     @Operation(summary = "사용자 본인 인증",
             description = "사용자 마이페이지에서 비밀번호 인증")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "성공"),
-            @ApiResponse(responseCode = "404", description = "실패")
+            @ApiResponse(responseCode = "201", description = "비밀번호 인증 성공"),
+            @ApiResponse(responseCode = "404", description = "비밀번호 인증 실패")
     })
     @PostMapping("/conform")
     public ResponseEntity<ResponseMessage> confirmToMyPage (@RequestBody MemberDTO memberDTO) {
@@ -109,11 +114,11 @@ public class MemberController {
         if (result) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(200,"인증 성공", null));
+                    .body(new ResponseMessage(200,"비밀번호 인증 성공", null));
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404,"인증 실패", null));
+                    .body(new ResponseMessage(404,"비밀번호 인증 실패", null));
         }
     }
 
@@ -121,7 +126,7 @@ public class MemberController {
             description = "사용자 마이페이지에서 휴대전화 번호 변경")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "휴대전화 번호 변경 성공"),
-            @ApiResponse(responseCode = "404", description = "휴대전화 번호 변경 실패")
+            @ApiResponse(responseCode = "400", description = "휴대전화 번호 변경 실패")
     })
     @PutMapping("modify/phone")
     public ResponseEntity<ResponseMessage> modifyPhoneNumber (@RequestBody MemberDTO memberDTO) {
@@ -138,7 +143,7 @@ public class MemberController {
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404,"휴대전화 번호 변경 실패", null));
+                    .body(new ResponseMessage(400,"휴대전화 번호 변경 실패", null));
         }
     }
 
@@ -146,7 +151,7 @@ public class MemberController {
             description = "사용자 마이페이지에서 비밀번호 변경")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "비밀번호 변경 성공"),
-            @ApiResponse(responseCode = "404", description = "비밀번호 변경 실패")
+            @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패")
     })
     @PutMapping("modify/password")
     public ResponseEntity<ResponseMessage> modifyPassword (@RequestBody MemberDTO memberDTO) {
@@ -165,7 +170,7 @@ public class MemberController {
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404 , "비밀번호 변경 실패", null));
+                    .body(new ResponseMessage(400 , "비밀번호 변경 실패", null));
         }
     }
 
@@ -173,7 +178,7 @@ public class MemberController {
             description = "사용자 마이페이지에서 주소 변경")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "주소 변경 성공"),
-            @ApiResponse(responseCode = "404", description = "주소 변경 실패")
+            @ApiResponse(responseCode = "400", description = "주소 변경 실패")
     })
     @PutMapping("modify/address")
     public ResponseEntity<ResponseMessage> modifyAddress (@RequestBody MemberDTO memberDTO) {
@@ -192,8 +197,46 @@ public class MemberController {
         } else {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404 , "주소 변경 실패", null));
+                    .body(new ResponseMessage(400 , "주소 변경 실패", null));
         }
     }
 
+    // 프로필 사진 변경
+    @Operation(summary = "프로필 사진 변경",
+            description = "사용자 페이지에서 프로필 사진 변경"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "400",description = "프로필 사진 변경 실패."),
+            @ApiResponse(responseCode = "201", description = "프로필 사진 변경 성공")
+    })
+    @PutMapping(value = "modify/imageLink", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseMessage> modifyImageLink(
+            @Valid @RequestPart (value = "formData") MemberDTO memberDTO,
+            @RequestPart(value = "imageLink") MultipartFile file) { // 파일 데이터
+
+        System.out.println("memberDTO = " + memberDTO);
+        System.out.println("file = " + file);
+
+        String memberId = memberDTO.getMemberId();
+        MemberEntity memberEntity = memberService.findByMemberId(memberId);
+
+        // Cloudinary에 파일 업로드
+        Map<String, Object> response = cloudinaryService.uploadFile(file);
+        System.out.println("response = " + response);
+
+        memberDTO.setImageLink(response.get("url").toString());
+//        memberDTO.setMemberId(response.get("id").toString());
+
+        memberService.updateMemberImage(memberDTO);
+
+        if (response != null) {
+
+            return ResponseEntity.ok(new ResponseMessage(201, "프로필 사진 변경 성공", null));
+
+            // DB 업데이트 로직 수행
+        } else {
+            System.out.println("파일이 없습니다.");
+            return ResponseEntity.ok(new ResponseMessage(400, "프로필 사진 변경 실패", null));
+        }
+    }
 }
