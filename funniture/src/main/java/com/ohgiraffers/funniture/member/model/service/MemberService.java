@@ -116,4 +116,18 @@ public class MemberService {
         System.out.println("비밀번호 변경 완료. : " + result);
         return result;
     }
+
+    public MemberEntity changeAddressByMypage(MemberEntity memberEntity, String newAddress) {
+        System.out.println("서비스 memberEntity = " + memberEntity);
+        System.out.println("서비스 newAddress = " + newAddress);
+
+        // 기존 회원 엔티티에 새로운 비밀번호 설정
+        memberEntity.setAddress(newAddress);
+
+        // DB에 저장
+        MemberEntity result = memberRepository.save(memberEntity);
+        System.out.println("주소 변경 완료. : " + result);
+        return result;
+
+    }
 }
