@@ -80,10 +80,8 @@ public class MemberService {
 
     // 마이페이지 비번 변경 전 해당 id에 해당하는 엔티티 찾아오는 로직
     public MemberEntity findByMemberId(String memberId) {
-        System.out.println("비밀번호 변경 전, 서비스로 memberId 넘어 왔나 = " + memberId);
 
         MemberEntity memberEntity = memberRepository.findByMemberId(memberId);
-        System.out.println("서비스에서 아이디에 해당하는 memberEntity 잘 찾았나 = " + memberEntity);
         return memberEntity;
 
     }
@@ -149,5 +147,17 @@ public class MemberService {
         memberRepository.save(existingMember);
     }
 
+    @Transactional
+    public MemberDTO withdrawService(String memberId) {
 
+        MemberEntity memberEntity = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 회원이 존재하지 않습니다."));
+
+        memberEntity.setMemberRole("LIMIT");
+
+        MemberDTO result = modelMapper.map(memberEntity , MemberDTO.class);
+
+        return result;
+
+    }
 }

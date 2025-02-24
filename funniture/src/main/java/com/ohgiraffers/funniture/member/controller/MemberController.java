@@ -231,12 +231,43 @@ public class MemberController {
 
         if (response != null) {
 
-            return ResponseEntity.ok(new ResponseMessage(201, "프로필 사진 변경 성공", null));
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "프로필 사진 변경 성공", null));
 
             // DB 업데이트 로직 수행
         } else {
             System.out.println("파일이 없습니다.");
-            return ResponseEntity.ok(new ResponseMessage(400, "프로필 사진 변경 실패", null));
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "프로필 사진 변경 실패", null));
         }
+    }
+
+    // 회원 탈퇴
+    @Operation(summary = "회원 탈퇴",
+            description = "사용자 페이지에서 회원 탈퇴(권한 변경 LIMIT)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "회원 탈퇴 성공"),
+            @ApiResponse(responseCode = "400",description = "회원 탈퇴 실패.")
+    })
+    @PutMapping("/withdraw/{memberId}")
+    public ResponseEntity<ResponseMessage> withdrawByMemberId(@PathVariable String memberId){
+        System.out.println("최초 프론트에서 회원 탈퇴 요청 들왔나 memberId = " + memberId);
+
+        MemberDTO result = memberService.withdrawService(memberId);
+
+        System.out.println("result.getMemberRole() = " + result.getMemberRole());
+        if (result.getMemberRole() == "LIMIT"){
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "회원 탈퇴 성공", null));
+        } else{
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "회원 탈퇴 실패", null));
+        }
+
     }
 }
