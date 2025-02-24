@@ -40,6 +40,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         * */
 
         List<String> roleLeessList = Arrays.asList(
+                "/api/v1/member/modify/imageLink",
                 "/api/v1/deliveryaddress/.*",
                 "/api/v1/email",
                 "/api/v1/email/.*",
@@ -70,12 +71,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/deliveryaddress",
                 "/api/v1/deliveryaddress/\\w+",
                 "/api/v1/deliveryaddress/\\d+",
+                "/api/v1/deliveryaddress/default/\\w+",
+                "/api/v1/deliveryaddress/default/\\d+",
                 "/api/v1/deliveryaddress/regist",
                 "/api/v1/deliveryaddress/update",
                 "/api/v1/deliveryaddress/delete/\\d+",
                 "/api/v1/deliveryaddress/delete/\\w+",
                 "/api/v1/point/\\w+",
                 "/api/v1/point/\\d+",
+                "/api/v1/point/logs/\\d+",
+                "/api/v1/point/logs/\\w+",
                 "/api/v1/review/product/\\d+",
                 "/api/v1/product/search?s=\\w+",
                 "/api/v1/review",

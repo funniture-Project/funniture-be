@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.member.model.service;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -130,4 +131,23 @@ public class MemberService {
         return result;
 
     }
+
+    @Transactional
+    public void updateMemberImage(MemberDTO memberDTO) {
+        System.out.println("서비스의 memberDTO = " + memberDTO);
+
+        // 데이터베이스에서 기존 회원 정보 조회
+        MemberEntity existingMember = memberRepository.findById(memberDTO.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다: " + memberDTO.getMemberId()));
+
+        // 새로운 이미지 링크만 업데이트
+        if (memberDTO.getImageLink() != null) {
+            existingMember.setImageLink(memberDTO.getImageLink());
+        }
+
+        // 변경 사항 저장 (변경 감지 또는 save 호출)
+        memberRepository.save(existingMember);
+    }
+
+
 }
