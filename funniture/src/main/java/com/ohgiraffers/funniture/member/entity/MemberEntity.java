@@ -49,6 +49,7 @@ public class MemberEntity {
     @Column(name = "image_link")
     private String imageLink;
 
+    // 25-02-24, 사용자 기본 주소 추가
     @Column(name = "address")
     private String address;
 

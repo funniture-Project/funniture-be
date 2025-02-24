@@ -42,6 +42,7 @@ public class MemberDTO implements UserDetails {
     private String imageId;
     private Collection<GrantedAuthority> authorities;
 
+    // 25-02-24, 사용자 기본 주소 추가
     private String address;
 
     @Override

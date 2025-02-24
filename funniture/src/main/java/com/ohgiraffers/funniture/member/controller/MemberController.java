@@ -169,4 +169,31 @@ public class MemberController {
         }
     }
 
+    @Operation(summary = "사용자 주소 변경",
+            description = "사용자 마이페이지에서 주소 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "주소 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "주소 변경 실패")
+    })
+    @PutMapping("modify/address")
+    public ResponseEntity<ResponseMessage> modifyAddress (@RequestBody MemberDTO memberDTO) {
+        System.out.println("주소 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
+
+        String memberId = memberDTO.getMemberId();
+        String address = memberDTO.getAddress();
+
+        MemberEntity memberEntity = memberService.findByMemberId(memberId);
+        MemberEntity result = memberService.changeAddressByMypage(memberEntity, address);
+
+        if(result.getPassword() != null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201 , "주소 변경 완료", null));
+        } else {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404 , "주소 변경 실패", null));
+        }
+    }
+
 }
