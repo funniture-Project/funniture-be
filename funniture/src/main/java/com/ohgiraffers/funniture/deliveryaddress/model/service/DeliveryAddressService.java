@@ -31,6 +31,16 @@ public class DeliveryAddressService {
         return addressList.stream().map(address -> modelMapper.map(address, DeliveryAddressDTO.class)).collect(Collectors.toList());
     }
 
+    // 사용자별 기본 배송지 조회
+    public List<DeliveryAddressDTO> findDefaultDeliveryAddressByUser(String memberId) {
+
+        List<DeliveryAddressEntity> defaultAddressList = deliveryAddressRepository.findDefaultDeliveryAddressByUser(memberId);
+
+        return defaultAddressList.stream()
+                .map(defaultAddress -> modelMapper.map(defaultAddress, DeliveryAddressDTO.class))
+                .collect(Collectors.toList());
+    }
+
     // 신규 배송지 등록
     @Transactional
     public void deliveryAddressRegist(DeliveryAddressDTO deliveryAddressDTO) {
@@ -127,4 +137,5 @@ public class DeliveryAddressService {
             });
         }
     }
+
 }

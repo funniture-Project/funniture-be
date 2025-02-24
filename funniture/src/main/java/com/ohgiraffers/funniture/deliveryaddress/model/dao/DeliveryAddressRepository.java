@@ -14,9 +14,13 @@ public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress
     @Query("SELECT d FROM DeliveryAddressEntity d WHERE d.memberId = :memberId and d.destinationStatus = '활성화'")
     List<DeliveryAddressEntity> findDeliveryAddressByUser(String memberId);
 
+    @Query("SELECT d FROM DeliveryAddressEntity d WHERE d.memberId = :memberId and d.isDefault = true ")
+    List<DeliveryAddressEntity> findDefaultDeliveryAddressByUser(String memberId);
+
     Optional<DeliveryAddressEntity> findByMemberIdAndIsDefaultTrue(String memberId);
 
     Optional<DeliveryAddressEntity> findTopByMemberIdAndDestinationStatusOrderByCreatedAtDesc(
             String memberId, String destinationStatus);
+
 
 }
