@@ -3,8 +3,7 @@ package com.ohgiraffers.funniture.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
-
-import java.util.List;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Table(name = "tbl_product")
@@ -14,6 +13,7 @@ import java.util.List;
 @ToString
 @Builder(toBuilder = true)
 @DynamicInsert
+@DynamicUpdate
 public class ProductEntity {
     @Id
     @Column(name = "product_no")
@@ -53,4 +53,18 @@ public class ProductEntity {
     // 대표 이미지 ID(삭제 시 필요)
     @Column(name = "product_image_id", nullable = true)
     private String productImageId;
+
+    // ✅ 값이 존재하면 업데이트
+    public void update(ProductEntity updatedProduct) {
+        if (updatedProduct.productName != null) this.productName = updatedProduct.productName;
+        if (updatedProduct.ownerNo != null) this.ownerNo = updatedProduct.ownerNo;
+        if (updatedProduct.totalStock != 0) this.totalStock = updatedProduct.totalStock;
+        if (updatedProduct.usedStock != 0) this.usedStock = updatedProduct.usedStock;
+        if (updatedProduct.categoryCode != 0) this.categoryCode = updatedProduct.categoryCode;
+        if (updatedProduct.regularPrice != 0) this.regularPrice = updatedProduct.regularPrice;
+        if (updatedProduct.productContent != null) this.productContent = updatedProduct.productContent;
+        if (updatedProduct.productStatus != null) this.productStatus = updatedProduct.productStatus;
+        if (updatedProduct.productImageLink != null) this.productImageLink = updatedProduct.productImageLink;
+        if (updatedProduct.productImageId != null) this.productImageId = updatedProduct.productImageId;
+    }
 }
