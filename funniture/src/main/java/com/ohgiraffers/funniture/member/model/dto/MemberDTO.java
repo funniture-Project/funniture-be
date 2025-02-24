@@ -42,6 +42,8 @@ public class MemberDTO implements UserDetails {
     private String imageId;
     private Collection<GrantedAuthority> authorities;
 
+    private String address;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
