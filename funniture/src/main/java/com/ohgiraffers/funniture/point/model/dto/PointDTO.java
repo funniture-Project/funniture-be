@@ -1,6 +1,8 @@
 package com.ohgiraffers.funniture.point.model.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -11,13 +13,16 @@ import java.time.LocalDateTime;
 @ToString
 public class PointDTO {
 
+    private int pointId;    // 포인트 id
+
     private String memberId;    // 회원번호
 
-    private int usedPoint;      // 사용 포인트
+    private int used_point;     // 사용 포인트
 
-    private int remainPoint;    // 잔여 포인트
+    private int addPoint;      // 충전 포인트
 
-    private LocalDateTime usedDateTime; // 사용 날짜
+    private int currentPoint;   // 현재 보유 포인트
 
-    private int addPoint;   // 충전 포인트
+    private LocalDateTime pointDateTime;    // 포인트 시간
+
 }
