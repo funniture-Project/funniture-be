@@ -222,6 +222,7 @@ public class ProductController {
                 // 상품 등록 후 렌탈 조건 저장
                 rentalOptionList.forEach(option ->{
                     option.setProductNo(checkNo);
+                    option.setActive(true);
                 });
 
                 System.out.println("rentalOptionList = " + rentalOptionList);
@@ -336,6 +337,14 @@ public class ProductController {
                 .body(new ResponseMessage(code, msg, null));
     }
 
+    // 상품 정보 수정
+    @Operation(summary = "상품 정보 수정",
+            description = "기존에 있는 상품에 대해서 정보 수정. 이미지, 렌탈옵션 이름 등등 수정 가능"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "수정 성공"),
+            @ApiResponse(responseCode = "404", description = "수정 대상 상품을 찾지 못했습니다.")
+    })
     @PutMapping(value = "/modify/{productNo}")
     private ResponseEntity<ResponseMessage> modifyProductInfo(@PathVariable String productNo, @RequestPart(value = "formData") ProductDTO product,
                                    @RequestPart(value = "rentalOptions") List<RentalOptionInfoDTO> rentalOptionList,
@@ -380,4 +389,24 @@ public class ProductController {
                 .headers(headers)
                 .body(new ResponseMessage(404, "수정 대상 상품을 찾지 못했습니다.", null));
     }
+
+    @PostMapping("/quillimg")
+    private Map<String, Object> quillImgUpload(@RequestParam("file") MultipartFile file){
+        System.out.println("프론트에서 넘겨받은 file = " + file);
+        System.out.println("파일명: " + file.getOriginalFilename());
+        // cloudinary 에 파일올리고 url 받아오기
+        Map<String, Object> response = cloudinaryService.uploadFile(file);
+
+        System.out.println("response = " + response);
+
+        Map<String, Object> uploadResult = new HashMap<>();
+
+        if (!response.isEmpty()){
+            uploadResult.put("id",response.get("id"));
+            uploadResult.put("url",response.get("url"));
+        }
+
+        return uploadResult;
+    }
+
 }
