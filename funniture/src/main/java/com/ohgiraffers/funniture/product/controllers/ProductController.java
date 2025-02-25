@@ -222,6 +222,7 @@ public class ProductController {
                 // 상품 등록 후 렌탈 조건 저장
                 rentalOptionList.forEach(option ->{
                     option.setProductNo(checkNo);
+                    option.setActive(true);
                 });
 
                 System.out.println("rentalOptionList = " + rentalOptionList);
@@ -336,23 +337,76 @@ public class ProductController {
                 .body(new ResponseMessage(code, msg, null));
     }
 
-    @DeleteMapping(value = "/deleteproduct")
-    private void deleteProduct(@RequestBody List<String> productList){
+    // 상품 정보 수정
+    @Operation(summary = "상품 정보 수정",
+            description = "기존에 있는 상품에 대해서 정보 수정. 이미지, 렌탈옵션 이름 등등 수정 가능"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "수정 성공"),
+            @ApiResponse(responseCode = "404", description = "수정 대상 상품을 찾지 못했습니다.")
+    })
+    @PutMapping(value = "/modify/{productNo}")
+    private ResponseEntity<ResponseMessage> modifyProductInfo(@PathVariable String productNo, @RequestPart(value = "formData") ProductDTO product,
+                                   @RequestPart(value = "rentalOptions") List<RentalOptionInfoDTO> rentalOptionList,
+                                   @RequestPart(value = "productImage", required = false) MultipartFile file){
 
-        productService.deleteProduct(productList);
+        System.out.println("수정 대상 productNo = " + productNo);
+        product.setProductNo(productNo);
 
-    }
+        // 사진을 변경하는게 아니라면 기존의 image link 와 id 사용하기
+        if (file == null || file.isEmpty()){
+            ProductDetailDTO findProduct = productService.getProductInfoByNo(productNo);
 
-    @PostMapping(value = "test")
-    private void saveRentalInfo(@RequestBody List<RentalOptionInfoDTO> rentalOptionList){
-        System.out.println("rentalOptionList = " + rentalOptionList);
-        String maxNo = productService.findMaxNO();
-        rentalOptionList.forEach(option ->{
-            option.setProductNo(maxNo);
+            product.setProductImageLink(findProduct.getProductImageLink());
+            product.setProductImageId(findProduct.getProductImageId());
+        }
+
+        Integer productUpdateResult =  productService.updateProductInfo(productNo,product);
+        Integer optionUpdateResult = 500;
+
+        System.out.println("수정 product = " + product);
+
+        rentalOptionList.forEach(option->{
+            option.setProductNo(productNo);
+            option.setActive(true);
         });
 
-        System.out.println("rentalOptionList22222222 = " + rentalOptionList);
+        if (productUpdateResult == 204){
+            optionUpdateResult = productService.updateRentalOption(productNo,rentalOptionList);
+        }
 
-        productService.saveOptionList(rentalOptionList);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        if (productUpdateResult == 204 && optionUpdateResult == 204){
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "상품 정보 수정에 성공했습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(404, "수정 대상 상품을 찾지 못했습니다.", null));
     }
+
+    @PostMapping("/quillimg")
+    private Map<String, Object> quillImgUpload(@RequestParam("file") MultipartFile file){
+        System.out.println("프론트에서 넘겨받은 file = " + file);
+        System.out.println("파일명: " + file.getOriginalFilename());
+        // cloudinary 에 파일올리고 url 받아오기
+        Map<String, Object> response = cloudinaryService.uploadFile(file);
+
+        System.out.println("response = " + response);
+
+        Map<String, Object> uploadResult = new HashMap<>();
+
+        if (!response.isEmpty()){
+            uploadResult.put("id",response.get("id"));
+            uploadResult.put("url",response.get("url"));
+        }
+
+        return uploadResult;
+    }
+
 }

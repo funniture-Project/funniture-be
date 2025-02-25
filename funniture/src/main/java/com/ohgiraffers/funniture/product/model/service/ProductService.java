@@ -5,7 +5,6 @@ import com.ohgiraffers.funniture.product.entity.*;
 import com.ohgiraffers.funniture.product.model.dao.*;
 import com.ohgiraffers.funniture.product.model.dto.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.javassist.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,6 +166,69 @@ public class ProductService {
         }
 
         return savedEntities.size();
+    }
+
+    @Transactional
+    public Integer updateProductInfo(String productNo, ProductDTO product) {
+        try{
+            ProductEntity findProduct = productRepository.findById(productNo)
+                    .orElse(null);
+
+            if (findProduct != null){
+                findProduct.update(modelMapper.map(product,ProductEntity.class));
+
+                return 204;
+            } else {
+                return 404;
+            }
+        } catch (Exception e){
+            return 500;
+        }
+    }
+
+    @Transactional
+    public Integer updateRentalOption(String productNo, List<RentalOptionInfoDTO> rentalOptionList) {
+
+        try{
+            System.out.println("새로 저장될 rentalOptionList = " + rentalOptionList);
+
+            List<RentalOptionInfoEntity> rentalOptionInfoEntityList = rentalOptionInfoRepository.findAllByProductNo(productNo);
+            System.out.println("변경 전 rentalOptionInfoEntityList = " + rentalOptionInfoEntityList);
+
+            for (RentalOptionInfoEntity exist : rentalOptionInfoEntityList){
+                boolean change = false;
+
+                for (RentalOptionInfoDTO newOption : rentalOptionList){
+                    // 원래 있던걸 변경한 경우
+                    if (exist.getRentalInfoNo() == newOption.getRentalInfoNo()){
+                        exist.update(newOption);
+                        rentalOptionInfoRepository.save(exist);
+                        change = true;
+                        break;
+                        // 새로 만들어서 저장한 경우
+                    }
+
+                    // 새로운 리스트와 비교했는데 여전히 false => 사용하지 않는 옵션이 됐다는 뜻
+                    if (!change){
+                        exist = exist.toBuilder().isActive(false).build();
+                        rentalOptionInfoRepository.save(exist);
+                    }
+                }
+            }
+
+            // 새로운 데이터 추가
+            for (RentalOptionInfoDTO newOption : rentalOptionList) {
+                if (newOption.getRentalInfoNo() == 0) { // 새로운 데이터만 처리
+                    System.out.println("저장 시도 중: " + newOption);
+                    RentalOptionInfoEntity newEntity = modelMapper.map(newOption, RentalOptionInfoEntity.class);
+                    rentalOptionInfoRepository.save(newEntity);
+                }
+            }
+
+            return 204;
+        } catch (Exception e) {
+            return 500;
+        }
     }
 
 
