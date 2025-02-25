@@ -336,23 +336,48 @@ public class ProductController {
                 .body(new ResponseMessage(code, msg, null));
     }
 
-    @DeleteMapping(value = "/deleteproduct")
-    private void deleteProduct(@RequestBody List<String> productList){
+    @PutMapping(value = "/modify/{productNo}")
+    private ResponseEntity<ResponseMessage> modifyProductInfo(@PathVariable String productNo, @RequestPart(value = "formData") ProductDTO product,
+                                   @RequestPart(value = "rentalOptions") List<RentalOptionInfoDTO> rentalOptionList,
+                                   @RequestPart(value = "productImage", required = false) MultipartFile file){
 
-        productService.deleteProduct(productList);
+        System.out.println("수정 대상 productNo = " + productNo);
+        product.setProductNo(productNo);
 
-    }
+        // 사진을 변경하는게 아니라면 기존의 image link 와 id 사용하기
+        if (file == null || file.isEmpty()){
+            ProductDetailDTO findProduct = productService.getProductInfoByNo(productNo);
 
-    @PostMapping(value = "test")
-    private void saveRentalInfo(@RequestBody List<RentalOptionInfoDTO> rentalOptionList){
-        System.out.println("rentalOptionList = " + rentalOptionList);
-        String maxNo = productService.findMaxNO();
-        rentalOptionList.forEach(option ->{
-            option.setProductNo(maxNo);
+            product.setProductImageLink(findProduct.getProductImageLink());
+            product.setProductImageId(findProduct.getProductImageId());
+        }
+
+        Integer productUpdateResult =  productService.updateProductInfo(productNo,product);
+        Integer optionUpdateResult = 500;
+
+        System.out.println("수정 product = " + product);
+
+        rentalOptionList.forEach(option->{
+            option.setProductNo(productNo);
+            option.setActive(true);
         });
 
-        System.out.println("rentalOptionList22222222 = " + rentalOptionList);
+        if (productUpdateResult == 204){
+            optionUpdateResult = productService.updateRentalOption(productNo,rentalOptionList);
+        }
 
-        productService.saveOptionList(rentalOptionList);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        if (productUpdateResult == 204 && optionUpdateResult == 204){
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "상품 정보 수정에 성공했습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(404, "수정 대상 상품을 찾지 못했습니다.", null));
     }
 }
