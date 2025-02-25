@@ -1,10 +1,7 @@
 package com.ohgiraffers.funniture.point.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -15,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder(toBuilder = true)
 public class PointEntity {
 
     @Id
@@ -26,7 +24,7 @@ public class PointEntity {
     private String memberId;    // 회원번호
 
     @Column(name = "used_point")
-    private int used_point;     // 사용 포인트
+    private int usedPoint;     // 사용 포인트
 
     @Column(name = "add_point")
     private int addPoint;      // 충전 포인트
