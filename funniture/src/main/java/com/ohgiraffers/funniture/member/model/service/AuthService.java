@@ -61,4 +61,15 @@ public class AuthService {
         System.out.println("maxNo 잘 받아 오는지 = " + maxNo);
         return maxNo;
     }
+
+    // 회원 가입 시 중복 이메일 있는지 검증 서비스
+    public Boolean validationDuplicateEmail(String email) {
+//        System.out.println("서비스에 email 잘들어 왔나. = " + email);
+
+       Boolean result = memberRepository.existsByEmail(email);
+
+        System.out.println("서비스에서 이메일이 존재하는지 여부 result = " + result);
+
+       return result;
+    }
 }

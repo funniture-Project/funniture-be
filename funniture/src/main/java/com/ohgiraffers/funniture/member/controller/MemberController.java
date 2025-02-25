@@ -268,6 +268,5 @@ public class MemberController {
                     .headers(authController.headersMethod())
                     .body(new ResponseMessage(400, "회원 탈퇴 실패", null));
         }
-
     }
 }

@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -70,6 +67,36 @@ public class AuthController {
             int newMemberNo = Integer.parseInt(maxMember.substring(3)) + 1;
             System.out.println("newMemberNo = " + newMemberNo);
             return String.format("MEM%03d",newMemberNo);
+        }
+    }
+
+    // 회원가입 시, 중복된 이메일(회원 있는지 확인)
+    @Operation(summary = "중복 검사 로직",
+            description = "회원 가입 시, 중복된 이메일인지 검증"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 가입 가능한 이메일"),
+            @ApiResponse(responseCode = "400",description = "중복된 이메일")
+    })
+    @GetMapping("/validation/{email}")
+    public ResponseEntity<ResponseMessage> withdrawByMemberId(@PathVariable String email){
+//        System.out.println("최초 프론트에서 회원가입 이메일 들어왔나 = " + email);
+
+        Boolean result = authService.validationDuplicateEmail(email);
+
+        Map <String , Object> response = new HashMap<>();
+
+        response.put("response" , result);
+
+        // false 라면 동일 이메일 없으므로 회원가입 가능
+        if (!result){
+            return ResponseEntity.ok()
+                    .headers(headersMethod())
+                    .body(new ResponseMessage(200, "회원가입 가능한 이메일 입니다.", response));
+        } else {
+            return ResponseEntity.ok()
+                    .headers(headersMethod())
+                    .body(new ResponseMessage(400, "중복된 이메일이 존재합니다.", response));
         }
     }
 
