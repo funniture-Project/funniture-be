@@ -233,16 +233,12 @@ public class ProductService {
     }
 
     public List<RecentProductDTO> findAllProductInfo(List<String> productList) {
-        System.out.println("productList = " + productList);
         List<RecentProductDTO> infoList = productWithPriceRepository.findAllProductInfo(productList);
-
-        System.out.println("infoList = " + infoList);
 
         infoList.sort(Comparator.comparing(item -> productList.indexOf(item.getProductNo())));
 
         return infoList;
     }
-
 
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {

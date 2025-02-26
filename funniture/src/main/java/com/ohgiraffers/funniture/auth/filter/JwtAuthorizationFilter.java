@@ -51,6 +51,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/product/\\w+",
                 "/api/v1/product",
                 "/api/v1/product/modify/.*",
+                "/api/v1/favorite/.*",
+                "/api/v1/favorite",
                 "/api/product",
                 "/api/v1/auth/.*",
                 "/api/v1/auth/login",
