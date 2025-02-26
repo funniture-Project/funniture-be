@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface OwnerRentalRepositoryCustom {
-    List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period);
+    List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab);
 }

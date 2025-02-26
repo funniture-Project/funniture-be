@@ -125,7 +125,9 @@ public class RentalController {
             description = "제공자 마이페이지 예약/배송/반납에서 사용",
             parameters = {
                     @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
-                    @Parameter(name = "period", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)")
+                    @Parameter(name = "period", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)"),
+                    @Parameter(name = "rentalTab", description = "예약/배송/반납 필터링 조회(선택)")
+
             }
     )
     @ApiResponses({
@@ -133,12 +135,14 @@ public class RentalController {
             @ApiResponse(responseCode = "200", description = "제공자별 예약 조회 성공")
     })
     @GetMapping("/owner")
-    public ResponseEntity<ResponseMessage> findRentalListByOwner(@RequestParam String ownerNo, @RequestParam(required = false) String period) {
+    public ResponseEntity<ResponseMessage> findRentalListByOwner(@RequestParam String ownerNo,
+                                                                 @RequestParam(required = false) String period,
+                                                                 @RequestParam(required = false) String rentalTab) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        List<OwnerRentalViewDTO> ownerRentalList = rentalService.findRentalListByOwner(ownerNo, period);
+        List<OwnerRentalViewDTO> ownerRentalList = rentalService.findRentalListByOwner(ownerNo, period, rentalTab);
 
         if (ownerRentalList.isEmpty()){
             return ResponseEntity.ok()

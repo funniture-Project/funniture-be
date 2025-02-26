@@ -123,8 +123,8 @@ public class RentalService {
     }
 
     // 제공자 - 예약 조회(쿼리 DSL)
-    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period) {
-        return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo,period);
+    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab) {
+        return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo,period, rentalTab);
     }
 
 
