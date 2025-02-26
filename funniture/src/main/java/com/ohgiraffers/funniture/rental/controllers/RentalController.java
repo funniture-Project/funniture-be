@@ -125,7 +125,7 @@ public class RentalController {
             description = "제공자 마이페이지 예약/배송/반납에서 사용",
             parameters = {
                     @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
-                    @Parameter(name = "currentDate", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)")
+                    @Parameter(name = "period", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)")
             }
     )
     @ApiResponses({
@@ -133,7 +133,7 @@ public class RentalController {
             @ApiResponse(responseCode = "200", description = "제공자별 예약 조회 성공")
     })
     @GetMapping("/owner")
-    public ResponseEntity<ResponseMessage> findRentalListByOwner(@RequestParam String ownerNo, @RequestParam String period) {
+    public ResponseEntity<ResponseMessage> findRentalListByOwner(@RequestParam String ownerNo, @RequestParam(required = false) String period) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
