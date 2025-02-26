@@ -23,7 +23,7 @@ public class OwnerRentalRepositoryCustomImpl implements OwnerRentalRepositoryCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period) {
+    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab) {
 
         // 현재 날짜
         LocalDate currentDate = LocalDate.now();  // 현재 날짜를 사용
@@ -54,6 +54,17 @@ public class OwnerRentalRepositoryCustomImpl implements OwnerRentalRepositoryCus
             // 만약 startDate가 설정되었다면, 해당 기간에 맞는 필터링을 적용
             if (startDate != null) {
                 whereCondition.and(rental.rentalEndDate.between(startDate, endDate));
+            }
+        }
+
+        // **예약 진행 상태별 필터 추가**
+        if (rentalTab != null) {
+            if ("예약".equals(rentalTab)) {
+                whereCondition.and(rental.rentalState.in("예약대기", "예약완료", "예약취소"));
+            } else if ("배송".equals(rentalTab)) {
+                whereCondition.and(rental.rentalState.in("배송중", "배송완료"));
+            } else if ("반납".equals(rentalTab)) {
+                whereCondition.and(rental.rentalState.in("반납요청", "수거중", "반납완료"));
             }
         }
 
