@@ -39,9 +39,6 @@ public class ProductController {
     private final CustomUserDetailsService customUserDetailsService;
     private final CloudinaryService cloudinaryService;
 
-    // ?categoryCode=10로 작성 시 해당 카테고리 상품만 출력, 없으면 전체
-    // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
-
     // product 조회 (전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회)
     @Operation(summary = "상품 조회 (상품 정보 + 가격 리스트)",
             description = "전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회, 검색명으로 조회",
@@ -141,6 +138,8 @@ public class ProductController {
                         .headers(headers)
                         .body(new ResponseMessage(404, "상품을 찾을 수 없습니다", null));
             }
+
+            System.out.println("상품 정보 result = " + result);
 
             responseMap.put("result",result);
 
@@ -390,6 +389,13 @@ public class ProductController {
                 .body(new ResponseMessage(404, "수정 대상 상품을 찾지 못했습니다.", null));
     }
 
+    // 상품 정보 수정
+    @Operation(summary = "이미지 cloudinary 에 올리기",
+            description = "react - quill 의 base64 대신 url로 변경해서 올리기 위해 추가된 api입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 업로드 후 url 과 id가 반환됩니다.")
+    })
     @PostMapping("/quillimg")
     private Map<String, Object> quillImgUpload(@RequestParam("file") MultipartFile file){
         System.out.println("프론트에서 넘겨받은 file = " + file);
@@ -407,6 +413,38 @@ public class ProductController {
         }
 
         return uploadResult;
+    }
+
+    // 상품 정보 수정
+    @Operation(summary = "최근 본 상품 정보 가져오기",
+            description = "최근 본 상품 최근 상품 순서 맞춰서 가져오기",
+            parameters = {
+            @Parameter(name = "productList", description = "상품 번호 리스트 (필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 업로드 후 url 과 id가 반환됩니다.")
+    })
+    @PostMapping("/recentlist")
+    private ResponseEntity<ResponseMessage> recentProductListInfo(@RequestBody List<String> productList){
+        System.out.println("productList = " + productList);
+
+        List<RecentProductDTO> infoList = productService.findAllProductInfo(productList);
+
+        System.out.println("controller단의 infoList = " + infoList);
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("infoList", infoList);
+
+        System.out.println("넘겨줄 result = " + result);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "상품 정보 정상 조회", result));
     }
 
 }

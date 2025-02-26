@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.product.entity;
 import com.ohgiraffers.funniture.product.model.dto.RentalOptionInfoDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Filter;
 
 @Table(name = "tbl_rentaloptioninfo")
 @Entity
