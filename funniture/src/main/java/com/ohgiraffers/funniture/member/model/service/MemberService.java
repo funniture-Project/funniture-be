@@ -1,7 +1,10 @@
 package com.ohgiraffers.funniture.member.model.service;
 
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
+import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
+import com.ohgiraffers.funniture.member.model.dao.OwnerRepository;
+import com.ohgiraffers.funniture.member.model.dto.AppOwnerInfoDTO;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final OwnerRepository ownerRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -160,4 +164,41 @@ public class MemberService {
         return result;
 
     }
+
+    @Transactional
+    public void registerOwner(@Valid AppOwnerInfoDTO appOwnerInfoDTO) {
+        // 1. tbl_member에서 회원 정보 조회
+        MemberEntity memberEntity = memberRepository.findByMemberId(appOwnerInfoDTO.getMemberId());
+
+        // 2. owner 테이블에 데이터가 이미 존재하는지 확인
+        OwnerInfoEntity ownerInfoEntity;
+        if (ownerRepository.existsByMemberId(memberEntity.getMemberId())) {
+            // 이미 존재하는 경우 데이터 조회
+            ownerInfoEntity = ownerRepository.findByMemberId(memberEntity.getMemberId())
+                    .orElseThrow(() -> new IllegalStateException("데이터가 존재해야 하지만 찾을 수 없습니다."));
+        } else {
+            // 없는 경우 새 엔티티 생성 (save가 된 것이 아니기 때문에 메모리 상에서만 생성되는 것, 안전)
+            ownerInfoEntity = new OwnerInfoEntity();
+            ownerInfoEntity.setMemberId(memberEntity.getMemberId());
+        }
+
+        // 3. 엔티티에 데이터 설정
+        ownerInfoEntity.setStoreName(appOwnerInfoDTO.getStoreName());
+        ownerInfoEntity.setBank(appOwnerInfoDTO.getBank());
+        ownerInfoEntity.setAccount(appOwnerInfoDTO.getAccount());
+        ownerInfoEntity.setStoreNo(appOwnerInfoDTO.getStoreNo());
+        ownerInfoEntity.setStoreAddress(appOwnerInfoDTO.getStoreAddress());
+        ownerInfoEntity.setStorePhone(appOwnerInfoDTO.getStorePhone());
+        ownerInfoEntity.setIsRejected(appOwnerInfoDTO.getIsRejected());
+
+        // Cloudinary에서 받은 URL 설정
+        ownerInfoEntity.setStoreImage(appOwnerInfoDTO.getStoreImage());
+        ownerInfoEntity.setAttechmentLink(appOwnerInfoDTO.getAttechmentLink());
+
+        System.out.println("서비스에서 잘 저장 됐는지 = ");
+
+        // 4. 데이터베이스 저장
+        ownerRepository.save(ownerInfoEntity);
+    }
+
 }
