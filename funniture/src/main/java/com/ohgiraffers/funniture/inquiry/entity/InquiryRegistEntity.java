@@ -1,40 +1,42 @@
 package com.ohgiraffers.funniture.inquiry.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-// 자신이 필요한걸로 변경해서 하세요!
-@Entity (name = "inquiry")
+@Entity
 @Table(name = "tbl_inquiry")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Setter
 @Builder(toBuilder = true)
-public class Inquiry {
+public class InquiryRegistEntity {
 
     @Id
-    @Column
+    @Column(name = "inquiry_no")
     private String inquiryNo;
 
-    @Column
+    @Column (name = "member_id")
     private String memberId;
 
-    @Column
+    @Column (name = "inquiry_content")
     private String inquiryContent;
 
-    @Column
+    @Column (name = "show_status")
     private int showStatus;
 
-    @Column
+    @Column (name = "qna_type")
     private int qnaType;
 
-    @Column
+    @Column (name = "product_no")
     private String productNo;
 
-    @Column
+    @Column (name = "qna_write_time")
     private LocalDateTime qnaWriteTime;
-
 }

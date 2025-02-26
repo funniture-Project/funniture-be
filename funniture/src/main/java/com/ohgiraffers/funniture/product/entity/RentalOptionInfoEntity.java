@@ -1,15 +1,16 @@
 package com.ohgiraffers.funniture.product.entity;
 
+import com.ohgiraffers.funniture.product.model.dto.RentalOptionInfoDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Table(name = "tbl_rentaloptioninfo")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
+@Getter
+@ToString
+@Builder(toBuilder = true)
 public class RentalOptionInfoEntity {
 
     @Id
@@ -28,4 +29,15 @@ public class RentalOptionInfoEntity {
 
     @Column(name = "as_number")
     private Integer asNumber;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+    // update 메서드 추가
+    public void update(RentalOptionInfoDTO dto) {
+        this.rentalTerm = dto.getRentalTerm();
+        this.rentalPrice = dto.getRentalPrice();
+        this.asNumber = dto.getAsNumber();
+        this.isActive = dto.isActive();  // isActive도 업데이트
+    }
 }

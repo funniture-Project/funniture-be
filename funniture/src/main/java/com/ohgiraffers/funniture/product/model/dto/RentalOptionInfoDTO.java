@@ -18,4 +18,6 @@ public class RentalOptionInfoDTO {
     private int rentalPrice;    // 가격
 
     private Integer asNumber;       // A/S 횟수
+
+    private boolean isActive;
 }

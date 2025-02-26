@@ -1,5 +1,7 @@
 package com.ohgiraffers.funniture.rental.entity;
 
+import com.ohgiraffers.funniture.product.entity.ProductEntity;
+import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,13 +54,13 @@ public class UserRentalEntity {
 
     @OneToOne
     @JoinColumn(name = "rental_info_no")
-    private UserRentalOptionInfoEntity rentalOptionInfoEntity;       // 대여조건정보 (fk)
+    private RentalOptionInfoEntity rentalOptionInfoEntity;       // 대여조건정보 (fk)
 
     @Column(name = "destination_no")
     private int destinationNo;      // 배송지 식별번호 (fk)
 
     @ManyToOne
     @JoinColumn(name = "product_no")
-    private UserProductEntity productEntity;       // 상품번호 (fk)
+    private ProductEntity productEntity;       // 상품번호 (fk)
 
 }

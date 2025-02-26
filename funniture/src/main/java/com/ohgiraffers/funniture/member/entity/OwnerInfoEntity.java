@@ -1,28 +1,27 @@
-package com.ohgiraffers.funniture.rental.entity;
+package com.ohgiraffers.funniture.member.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "tbl_ownerinfo")
+@Table(name = "tbl_ownerinfo", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "member_id")
+})
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AdminOwnerInfoEntity {
+public class OwnerInfoEntity {
 
     @Id
-    @Column(name = "member_id")
-    private String memberId;
-
     @Column(name = "store_no")
     private String storeNo;
+
+    @Column(name = "member_id", unique = true) // 유니크 제약 조건 추가
+    private String memberId;
 
     @Column(name = "store_name")
     private String storeName;
@@ -38,5 +37,4 @@ public class AdminOwnerInfoEntity {
 
     @Column(name = "attechment_link")
     private String attechmentLink;
-
 }

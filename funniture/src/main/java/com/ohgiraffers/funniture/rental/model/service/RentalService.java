@@ -1,14 +1,16 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
-import com.ohgiraffers.funniture.rental.entity.AdminRentalEntity;
+import com.ohgiraffers.funniture.member.entity.MemberEntity;
+import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
+import com.ohgiraffers.funniture.point.entity.PointEntity;
+import com.ohgiraffers.funniture.point.model.dao.PointRepository;
+import com.ohgiraffers.funniture.product.entity.ProductEntity;
+import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
+import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
+import com.ohgiraffers.funniture.product.model.dao.RentalOptionInfoRepository;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
-import com.ohgiraffers.funniture.rental.model.dao.AdminRentalRepository;
-import com.ohgiraffers.funniture.rental.model.dao.RentalMapper;
-import com.ohgiraffers.funniture.rental.model.dao.RentalRepository;
-import com.ohgiraffers.funniture.rental.model.dao.UserRentalRepository;
-import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
-import com.ohgiraffers.funniture.rental.model.dto.RentalDTO;
-import com.ohgiraffers.funniture.rental.model.dto.UserOrderViewDTO;
+import com.ohgiraffers.funniture.rental.model.dao.*;
+import com.ohgiraffers.funniture.rental.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +28,20 @@ public class RentalService {
     private final RentalMapper rentalMapper;
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
-    private final AdminRentalRepository adminRentalRepository;
-    private final UserRentalRepository userRentalRepository;
+    private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
+    private final UserRentalRepositoryCustom userRentalRepositoryCustom;
+    private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
+    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
+    private final PointRepository pointRepository;
+    private final RentalOptionInfoRepository rentalOptionInfoRepository;
+    private final ProductRepository productRepository;
 
+    // 사용자 - 예약 등록
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
 
         // 주문일 가져오기 (현재 시간)
         LocalDateTime orderDate = LocalDateTime.now();
-
-        // 날짜만 추출하여 LocalDate 형식으로 변환
         LocalDate orderDateOnly = orderDate.toLocalDate();
 
         // 해당 날짜의 기존 예약 개수 조회
@@ -44,24 +49,83 @@ public class RentalService {
 
         // 새로운 예약번호 생성 (YYYYMMDD + 3자리 숫자)
         String rentalNo = orderDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + String.format("%03d", count + 1);
-        System.out.println("rentalNo = " + rentalNo);
+
+        String status = "예약대기";
 
         // DTO에 예약번호 & 주문일 설정 (Setter 사용)
         rentalDTO.setRentalNo(rentalNo);   // 예약번호 설정
         rentalDTO.setOrderDate(orderDate);  // 주문일 설정 (날짜 + 시간)
-        System.out.println("orderDate = " + orderDate);
+        rentalDTO.setRentalState(status);   // 예약진행상태 예약대기로
+
+        // 최신 포인트 가져오기
+        int currentPoints = pointRepository.findCurrentPointByUser(rentalDTO.getMemberId());
+
+        // 렌탈 가격 가져오기
+        RentalOptionInfoEntity rentalOption = rentalOptionInfoRepository.findById(rentalDTO.getRentalInfoNo())
+                .orElseThrow(() -> new RuntimeException("대여 조건 정보 없음"));
+
+        int rentalPrice = rentalDTO.getRentalNumber() * rentalOption.getRentalPrice(); // 렌탈 가격 계산
+
+        // 포인트 부족 여부 확인
+        if (currentPoints < rentalPrice) {
+            throw new RuntimeException("포인트 부족");
+        }
+
+        // 포인트 차감 후 저장
+        PointEntity pointUsage = PointEntity.builder()
+                .memberId(rentalDTO.getMemberId())
+                .usedPoint(rentalPrice)
+                .addPoint(0)
+                .currentPoint(currentPoints - rentalPrice) // 차감 후 저장
+                .pointDateTime(LocalDateTime.now())
+                .build();
+
+        pointRepository.save(pointUsage);
+
+        // 상품 정보 조회
+        ProductEntity product = productRepository.findById(rentalDTO.getProductNo())
+                .orElseThrow(() -> new RuntimeException("상품 정보 없음"));
+
+        // 제공자 정보 추가
+        String ownerNo = product.getOwnerNo();  // 상품의 제공자 번호
+
+        // DTO에 제공자 번호 설정
+        rentalDTO.setOwnerNo(ownerNo);
+
+        // 재고 부족 체크 - 수량 증가 전에 확인!!
+        int availableStock = product.getTotalStock() - product.getUsedStock();
+
+        if (availableStock < rentalDTO.getRentalNumber()) {
+            throw new RuntimeException("재고 부족");
+        }
+
+        // 사용 중 재고 증가
+        productRepository.incrementUsedStock(product.getProductNo(), rentalDTO.getRentalNumber());
 
         // JPA 저장
         rentalRepository.save(modelMapper.map(rentalDTO, RentalEntity.class));
     }
 
-
-    public List<AdminRentalViewDTO> findRentalAllListByAdmin() {
-
-        return adminRentalRepository.findRentalAllListByAdmin();
+    // 사용자 - 예약 조회(쿼리 DSL)
+    public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
+        return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
     }
 
-    public List<UserOrderViewDTO> findRentalOrderListByUser() {
-        return userRentalRepository.findRentalOrderListByUser();
+    // 사용자,제공자 예약 상세페이지
+    public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
+        return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
     }
+
+
+    // 관리자 - 예약 조회(쿼리 DSL)
+    public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
+        return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria);
+    }
+
+    // 제공자 - 예약 조회(쿼리 DSL)
+    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period) {
+        return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo,period);
+    }
+
+
 }

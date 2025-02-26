@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.product.model.dao;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -36,4 +37,32 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
         GROUP BY p.product_no
         """, nativeQuery = true)
     List<Object[]> findAllProductsWithPriceList();
+
+    @Query(value = """
+        SELECT DISTINCT
+            oi.store_name,
+            p.owner_no
+        FROM tbl_product p
+        LEFT JOIN tbl_ownerinfo oi ON p.owner_no = oi.member_id
+        WHERE p.category_code in :categoryCode
+        """, nativeQuery = true)
+    List<Object[]> getOwnerByCategory(List<Integer> categoryCode);
+
+    @Query(value = """
+        SELECT DISTINCT
+            oi.store_name,
+            p.owner_no
+        FROM tbl_product p
+        LEFT JOIN tbl_ownerinfo oi ON p.owner_no = oi.member_id
+        LEFT JOIN tbl_category c ON p.category_code = c.category_code
+        WHERE c.ref_category_code in :categoryCode
+        """, nativeQuery = true)
+    List<Object[]> getOwnerByRefCategory(List<Integer> categoryCode);
+
+    // 렌탈 등록 - 사용 재고 증가
+    // @Query, @Modifying 함께 사용될 때,
+    // 데이터베이스 레벨에서 바로 업데이트가 이루어지므로 효율적이고 안전하게 동시성 문제를 처리 가능
+    @Modifying
+    @Query("UPDATE ProductEntity p SET p.usedStock = p.usedStock + :rentalNumber WHERE p.productNo = :productNo")
+    void incrementUsedStock(String productNo, int rentalNumber);
 }

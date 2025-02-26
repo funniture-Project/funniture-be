@@ -41,7 +41,7 @@ public class ProductWithOptionEntity {
     private int regularPrice;
 
     // 상품 설명
-    @Column(name = "product_content")
+    @Column(name = "product_content", columnDefinition = "MEDIUMTEXT")
     private String productContent;
 
     // 판매 상태
