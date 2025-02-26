@@ -139,8 +139,6 @@ public class ProductController {
                         .body(new ResponseMessage(404, "상품을 찾을 수 없습니다", null));
             }
 
-            System.out.println("상품 정보 result = " + result);
-
             responseMap.put("result",result);
 
             return ResponseEntity.ok()
@@ -427,17 +425,12 @@ public class ProductController {
     })
     @PostMapping("/recentlist")
     private ResponseEntity<ResponseMessage> recentProductListInfo(@RequestBody List<String> productList){
-        System.out.println("productList = " + productList);
 
         List<RecentProductDTO> infoList = productService.findAllProductInfo(productList);
-
-        System.out.println("controller단의 infoList = " + infoList);
 
         Map<String, Object> result = new HashMap<>();
 
         result.put("infoList", infoList);
-
-        System.out.println("넘겨줄 result = " + result);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
