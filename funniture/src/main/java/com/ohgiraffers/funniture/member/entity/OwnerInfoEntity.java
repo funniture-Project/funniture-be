@@ -26,8 +26,8 @@ public class OwnerInfoEntity {
     @Column(name = "store_name")
     private String storeName;
 
-    @Column(name = "store_adress")
-    private String storeAdress;
+    @Column(name = "store_address")
+    private String storeAddress;
 
     @Column(name = "account")
     private String account;

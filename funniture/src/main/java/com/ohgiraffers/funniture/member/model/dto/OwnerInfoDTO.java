@@ -12,7 +12,7 @@ public class OwnerInfoDTO {
     private String storeNo;
     private String memberId;
     private String storeName;
-    private String storeAdress;
+    private String storeAddress;
     private String account;
     private String bank;
     private String attechmentLink;
