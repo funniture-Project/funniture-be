@@ -23,6 +23,7 @@ public class ProductService {
     private final ProductWithPriceRepository ProductWithPriceRepository;
     private final CategoryRepository categoryRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
+    private final ProductWithPriceRepository productWithPriceRepository;
 
     // 전체 상품 조회, 카테고리별 상품 조회(상품 + 가격 리스트)
     public List<ProductWithPriceDTO> getProductAll(ProductSearchCondition condition) {
@@ -229,6 +230,17 @@ public class ProductService {
         } catch (Exception e) {
             return 500;
         }
+    }
+
+    public List<RecentProductDTO> findAllProductInfo(List<String> productList) {
+        System.out.println("productList = " + productList);
+        List<RecentProductDTO> infoList = productWithPriceRepository.findAllProductInfo(productList);
+
+        System.out.println("infoList = " + infoList);
+
+        infoList.sort(Comparator.comparing(item -> productList.indexOf(item.getProductNo())));
+
+        return infoList;
     }
 
 

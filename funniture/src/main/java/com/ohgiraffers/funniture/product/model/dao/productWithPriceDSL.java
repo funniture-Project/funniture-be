@@ -1,9 +1,13 @@
 package com.ohgiraffers.funniture.product.model.dao;
 
+import com.ohgiraffers.funniture.common.OrderByNull;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.member.entity.QOwnerInfoEntity;
 import com.ohgiraffers.funniture.product.entity.*;
+import com.ohgiraffers.funniture.product.model.dto.RecentProductDTO;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -69,13 +73,59 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
                         productPrice.productImageId,
                         ownerInfo.storeName,
                         // rentalOption의 rentalPrice를 여러 값으로 이어붙이기
-                        Expressions.stringTemplate("GROUP_CONCAT({0}) ", rentalOption.rentalPrice).as("priceList")))  // GROUP_CONCAT 사용List"))) // stringTemplate 사용
+//                        Expressions.stringTemplate("GROUP_CONCAT({0}) ", rentalOption.rentalPrice).as("priceList")))  // GROUP_CONCAT 사용List"))) // stringTemplate 사용
+                        Expressions.stringTemplate(
+                                "GROUP_CONCAT(CASE WHEN {0} THEN {1} ELSE NULL END)",
+                                rentalOption.isActive.isTrue(),
+                                rentalOption.rentalPrice
+                        ).as("priceList")))
                 .from(productPrice)
                 .leftJoin(rentalOption).on(productPrice.productNo.eq(rentalOption.productNo))
                 .leftJoin(ownerInfo).on(productPrice.ownerNo.eq(ownerInfo.memberId))
                 .leftJoin(category).on(productPrice.categoryCode.eq(category.categoryCode))
                 .where(builder)
                 .groupBy(productPrice.productNo)
+                .fetch();
+    }
+
+    @Override
+    public List<RecentProductDTO> findAllProductInfo(List<String> productList) {
+        System.out.println("꺼내야할 정보 productList = " + productList);
+
+        QProductWithPriceEntity productPrice = QProductWithPriceEntity.productWithPriceEntity;
+        QRentalOptionInfoEntity rentalOption = QRentalOptionInfoEntity.rentalOptionInfoEntity;
+        QOwnerInfoEntity ownerInfo = QOwnerInfoEntity.ownerInfoEntity;
+        QCategoryEntity category = QCategoryEntity.categoryEntity;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        // 상품 번호
+        if (productList != null){
+           builder.and(productPrice.productNo.in(productList));
+        }
+
+        return jpaQueryFactory
+                .select(Projections.bean(RecentProductDTO.class,
+                        productPrice.productNo,
+                        productPrice.productName,
+                        productPrice.categoryCode,
+                        productPrice.productStatus,
+                        productPrice.productImageLink,
+                        ownerInfo.storeName,
+                        // rentalOption의 rentalPrice를 여러 값으로 이어붙이기
+//                        Expressions.stringTemplate("GROUP_CONCAT({0}) ", rentalOption.rentalPrice).as("priceList")))  // GROUP_CONCAT 사용List"))) // stringTemplate 사용
+                        Expressions.stringTemplate(
+                                "GROUP_CONCAT(CASE WHEN {0} THEN {1} ELSE NULL END)",
+                                rentalOption.isActive.isTrue(),
+                                rentalOption.rentalPrice
+                        ).as("priceList")))
+                .from(productPrice)
+                .leftJoin(rentalOption).on(productPrice.productNo.eq(rentalOption.productNo))
+                .leftJoin(ownerInfo).on(productPrice.ownerNo.eq(ownerInfo.memberId))
+                .leftJoin(category).on(productPrice.categoryCode.eq(category.categoryCode))
+                .where(builder)
+                .groupBy(productPrice.productNo)
+                .orderBy(OrderByNull.DEFAULT)
                 .fetch();
     }
 }
