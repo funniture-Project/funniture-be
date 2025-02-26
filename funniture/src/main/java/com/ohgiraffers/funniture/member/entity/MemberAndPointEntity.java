@@ -1,15 +1,10 @@
 package com.ohgiraffers.funniture.member.entity;
 
-import com.ohgiraffers.funniture.point.entity.PointEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-//import lombok.AllArgsConstructor;
-//import lombok.Getter;
-//import lombok.Setter;
-//import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +35,7 @@ public class MemberAndPointEntity {
     @Column(name = "member_role")
     private String memberRole;
 
-    @Column(name = "current_point") // 추가
+    @Transient
     private int currentPoint;
 
     // 25-02-24, 사용자 기본 주소 추가
