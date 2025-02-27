@@ -38,6 +38,9 @@ public class MemberAndPointEntity {
     @Transient
     private int currentPoint;
 
+    @Transient
+    private int is_rejected;
+
     // 25-02-24, 사용자 기본 주소 추가
 //    @Column(name = "address")
 //    private String address;

@@ -20,11 +20,19 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
     List<Object[]> AllUserListByAdmin();
 
 
-
     @Query(value = "SELECT a.member_id, a.store_no, a.store_name, a.store_phone, " +
             "b.user_name, b.email, b.signup_date, b.member_role " +
             "FROM tbl_ownerinfo a " +
             "JOIN tbl_member b ON a.member_id = b.member_id", nativeQuery = true)
     List<Object[]> findAllOwnerInfo();
+
+
+    @Query(value = "SELECT m.member_id, m.user_name, m.phone_number, m.email, m.signup_date, m.member_role, o.is_rejected " +
+            "FROM tbl_member m " +
+            "JOIN tbl_ownerinfo o ON m.member_id = o.member_id " +
+            "WHERE o.is_rejected = 0",
+            nativeQuery = true)
+    List<Object[]> AllConvertListByAdmin();
+
 
 }
