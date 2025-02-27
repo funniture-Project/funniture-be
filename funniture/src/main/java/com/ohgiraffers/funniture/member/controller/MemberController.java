@@ -273,7 +273,7 @@ public class MemberController {
     }
 
     // 제공자 전환 신청
-    @Operation(summary = "제공자 전환 신청", description = "제공자 전환 신청 데이터를 처리합니다.")
+    @Operation(summary = "제공자 전환 신청", description = "제공자 전환 신청 데이터를 처리")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "제공자 전환 신청 성공"),
             @ApiResponse(responseCode = "400", description = "제공자 전환 신청 실패")
@@ -309,14 +309,82 @@ public class MemberController {
             // 서비스 호출로 DB 업데이트
             memberService.registerOwner(appOwnerInfoDTO);
 
-            return ResponseEntity.status(201)
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
                     .body(new ResponseMessage(201, "제공자 전환 신청 성공", null));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(400)
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
                     .body(new ResponseMessage(400, "제공자 전환 신청 실패", null));
         }
     }
 
+    // 기존 제공자 신청 여부 확인하기 ( 여기에는 400 을 작성하면 에러가 발생해서
+    @Operation(summary = "제공자 전환 신청 여부 확인",
+            description = "제공자 전환 재신청 시 최초 신청인지 재신청인지 여부 확인",
+            parameters = {
+                    @Parameter(name = "memberId", description = "회원 ID를 이용하여 제공자 신청여부 확인"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 신청 여부 확인 성공")
+    })
+    @GetMapping("/owner/status/{memberId}")
+    public ResponseEntity<ResponseMessage> checkOwnerStatus(@PathVariable String memberId) {
+        boolean isRegistered = memberService.existsByMemberId(memberId);
+        System.out.println("제공자 전환 신청 여부 확인 컨트롤러 - memberId: " + memberId + ", isRegistered: " + isRegistered);
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("isRegistered", isRegistered);
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "제공자 전환 신청 여부 확인 성공", response));
+    }
+
+
+
+    // 제공자 전환 재신청 (update)
+    @Operation(summary = "제공자 전환 재신청", description = "제공자 전환 재신청 시 데이터를 업데이트")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "제공자 전환 재신청 성공"),
+            @ApiResponse(responseCode = "400", description = "제공자 전환 재신청 실패")
+    })
+    @PostMapping(value = "/owner/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseMessage> upsertOwner(
+            @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
+            @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
+            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
+
+        try {
+            // Cloudinary에 이미지 업로드
+            String storeImageUrl = "";
+            if (storeImage != null && !storeImage.isEmpty()) {
+                Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
+                storeImageUrl = imageResponse.get("url").toString();
+            }
+            appOwnerInfoDTO.setStoreImage(storeImageUrl);
+
+            // Cloudinary에 첨부파일 업로드
+            String attachmentFileUrl = "";
+            if (attachmentFile != null && !attachmentFile.isEmpty()) {
+                Map<String, Object> fileResponse = cloudinaryService.uploadPdfFile(attachmentFile);
+                attachmentFileUrl = fileResponse.get("url").toString();
+            }
+            appOwnerInfoDTO.setAttechmentLink(attachmentFileUrl);
+
+            // 서비스 호출로 데이터 삽입 또는 업데이트
+            memberService.upsertOwner(appOwnerInfoDTO);
+
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "제공자 정보 저장 성공", null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "제공자 정보 저장 실패", null));
+        }
+    }
 }

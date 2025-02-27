@@ -165,6 +165,7 @@ public class MemberService {
 
     }
 
+    // 최초 사용자 → 제공자 전환 신청 데이터 저장
     @Transactional
     public void registerOwner(@Valid AppOwnerInfoDTO appOwnerInfoDTO) {
         // 1. tbl_member에서 회원 정보 조회
@@ -202,5 +203,48 @@ public class MemberService {
         ownerRepository.save(ownerInfoEntity);
         System.out.println("서비스에서 잘 저장 됐는지 = ");
     }
+
+    // 제공자 신청할 때 최초 신청인지 재신청인지 여부 확인
+    public boolean existsByMemberId(String memberId) {
+        // Optional을 사용하여 데이터 존재 여부 확인
+        Optional<OwnerInfoEntity> ownerInfoEntity = ownerRepository.findByMemberId(memberId);
+        return ownerInfoEntity.isPresent(); // 존재하면 true 반환
+    }
+
+    // 제공자 재신청 (기존 데이터에서 업데이트로)
+    @Transactional
+    public void upsertOwner(AppOwnerInfoDTO appOwnerInfoDTO) {
+        // 1. tbl_member에서 회원 정보 조회
+        MemberEntity memberEntity = memberRepository.findByMemberId(appOwnerInfoDTO.getMemberId());
+
+        // 2. owner 테이블에서 member_id로 데이터 조회
+        OwnerInfoEntity existingEntity = ownerRepository.findByMemberId(memberEntity.getMemberId())
+                .orElse(null);
+
+        if (existingEntity != null) {
+            // 3. 기존 데이터 삭제 (store_no 포함 모든 데이터 삭제)
+            ownerRepository.delete(existingEntity);
+            // Hibernate의 쓰기 지연(flush delay) 문제를 방지하기 위해 flush() 호출
+            ownerRepository.flush(); // 이거 안 넣으면 insert가 먼저 실행돼서 중복 에러남
+        }
+
+        // 4. 새로운 엔티티 생성 및 저장
+        OwnerInfoEntity newEntity = new OwnerInfoEntity();
+        newEntity.setMemberId(memberEntity.getMemberId());
+        newEntity.setStoreNo(appOwnerInfoDTO.getStoreNo()); // 새로운 store_no 설정
+        newEntity.setStoreName(appOwnerInfoDTO.getStoreName());
+        newEntity.setBank(appOwnerInfoDTO.getBank());
+        newEntity.setAccount(appOwnerInfoDTO.getAccount());
+        newEntity.setStoreAddress(appOwnerInfoDTO.getStoreAddress());
+        newEntity.setStorePhone(appOwnerInfoDTO.getStorePhone());
+        newEntity.setIsRejected(appOwnerInfoDTO.getIsRejected());
+        newEntity.setAttechmentLink(appOwnerInfoDTO.getAttechmentLink());
+        newEntity.setStoreImage(appOwnerInfoDTO.getStoreImage());
+
+        // 5. 저장 (새로운 데이터 삽입)
+        ownerRepository.save(newEntity);
+    }
+
+
 
 }
