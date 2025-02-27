@@ -1,5 +1,7 @@
 package com.ohgiraffers.funniture.rental.controllers;
 
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PageDTO;
 import com.ohgiraffers.funniture.rental.model.dto.*;
 import com.ohgiraffers.funniture.rental.model.service.RentalService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -137,12 +140,17 @@ public class RentalController {
     @GetMapping("/owner")
     public ResponseEntity<ResponseMessage> findRentalListByOwner(@RequestParam String ownerNo,
                                                                  @RequestParam(required = false) String period,
-                                                                 @RequestParam(required = false) String rentalTab) {
+                                                                 @RequestParam(required = false) String rentalTab,
+                                                                 @RequestParam(name = "offset", defaultValue = "1") String offset) {  // offset 추가
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        List<OwnerRentalViewDTO> ownerRentalList = rentalService.findRentalListByOwner(ownerNo, period, rentalTab);
+        // Criteria 생성 (첫 번째 인자 = 페이지 번호, 두 번째 인자 = 보여 줄 행의 수)
+        Criteria cri = new Criteria(Integer.valueOf(offset), 11);
+
+        // Page로 변경하여 페이징된 데이터 가져오기
+        Page<OwnerRentalViewDTO> ownerRentalList = rentalService.findRentalListByOwner(ownerNo, period, rentalTab, cri);
 
         if (ownerRentalList.isEmpty()){
             return ResponseEntity.ok()
@@ -150,8 +158,10 @@ public class RentalController {
                     .body(new ResponseMessage(204, "예약 내역이 없습니다.", null));
         }
 
+        // 페이징 정보 포함
         Map<String, Object> res = new HashMap<>();
-        res.put("ownerRentalList", ownerRentalList);
+        res.put("ownerRentalList", ownerRentalList.getContent());  // 실제 데이터 (content) 가져오기
+        res.put("pageInfo", new PageDTO(cri, (int) ownerRentalList.getTotalElements()));  // PageDTO 정보 포함
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자별 예약 조회 성공", res));
     }
