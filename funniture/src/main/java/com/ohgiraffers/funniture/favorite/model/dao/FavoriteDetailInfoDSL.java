@@ -17,7 +17,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class FavoriteDSL implements FavoriteRepository{
+public class FavoriteDetailInfoDSL implements FavoriteDetailInfoRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class FavoriteDTO {
+public class FavoriteDetailInfoDTO {
 
     private String memberId;
     private String productNo;
