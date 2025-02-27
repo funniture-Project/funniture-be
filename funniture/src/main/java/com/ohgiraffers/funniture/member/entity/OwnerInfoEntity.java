@@ -1,10 +1,7 @@
 package com.ohgiraffers.funniture.member.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "tbl_ownerinfo", uniqueConstraints = {
@@ -14,6 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Setter
 public class OwnerInfoEntity {
 
     @Column(name = "member_id", unique = true) // 유니크 제약 조건 추가

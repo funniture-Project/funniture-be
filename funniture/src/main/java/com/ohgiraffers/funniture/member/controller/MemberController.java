@@ -2,7 +2,9 @@ package com.ohgiraffers.funniture.member.controller;
 
 import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
+import com.ohgiraffers.funniture.member.model.dto.AppOwnerInfoDTO;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
+import com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO;
 import com.ohgiraffers.funniture.member.model.service.MemberService;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -269,4 +271,47 @@ public class MemberController {
                     .body(new ResponseMessage(400, "회원 탈퇴 실패", null));
         }
     }
+
+    // 제공자 전환
+    @Operation(summary = "제공자 전환 신청", description = "제공자 전환 신청 데이터를 처리합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "제공자 전환 신청 성공"),
+            @ApiResponse(responseCode = "400", description = "제공자 전환 신청 실패")
+    })
+    @PostMapping(value = "/owner/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseMessage> registerOwner(
+            @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
+            @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
+            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
+
+        System.out.println("제공자 전환 신청 잘 들어 왔는지 = " + appOwnerInfoDTO);
+        try {
+            // Cloudinary에 이미지 업로드
+            String storeImageUrl = null;
+            if (storeImage != null && !storeImage.isEmpty()) {
+                Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
+                storeImageUrl = imageResponse.get("url").toString();
+                appOwnerInfoDTO.setStoreImage(storeImageUrl);
+            }
+
+            // Cloudinary에 첨부파일 업로드
+            String attachmentFileUrl = null;
+            if (attachmentFile != null && !attachmentFile.isEmpty()) {
+                Map<String, Object> fileResponse = cloudinaryService.uploadFile(attachmentFile);
+                attachmentFileUrl = fileResponse.get("url").toString();
+                appOwnerInfoDTO.setAttechmentLink(attachmentFileUrl);
+            }
+
+            // 서비스 호출로 DB 업데이트
+            memberService.registerOwner(appOwnerInfoDTO);
+
+            return ResponseEntity.status(201)
+                    .body(new ResponseMessage(201, "제공자 전환 신청 성공", null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(400)
+                    .body(new ResponseMessage(400, "제공자 전환 신청 실패", null));
+        }
+    }
+
 }
