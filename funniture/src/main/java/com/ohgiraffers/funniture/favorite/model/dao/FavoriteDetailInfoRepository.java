@@ -4,6 +4,6 @@ import com.ohgiraffers.funniture.favorite.entity.FavoriteEntity;
 
 import java.util.List;
 
-public interface FavoriteRepository{
+public interface FavoriteDetailInfoRepository {
     List<FavoriteEntity> findAllByMemberId(String memberId);
 }
