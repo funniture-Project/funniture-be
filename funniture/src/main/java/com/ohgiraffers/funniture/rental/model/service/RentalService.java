@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
+import com.ohgiraffers.funniture.common.Criteria;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.point.entity.PointEntity;
@@ -13,6 +14,9 @@ import com.ohgiraffers.funniture.rental.model.dao.*;
 import com.ohgiraffers.funniture.rental.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,9 +127,13 @@ public class RentalService {
     }
 
     // 제공자 - 예약 조회(쿼리 DSL)
-    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab) {
-        return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo,period, rentalTab);
+    public Page<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab, Criteria cri) {
+        Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());  // 페이지 번호 조정
+        return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo, period, rentalTab, pageable);
     }
+
+
+
 
 
 }

@@ -9,6 +9,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -23,7 +26,7 @@ public class OwnerRentalRepositoryCustomImpl implements OwnerRentalRepositoryCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab) {
+    public Page<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab, Pageable pageable) {
 
         // 현재 날짜
         LocalDate currentDate = LocalDate.now();  // 현재 날짜를 사용
@@ -85,8 +88,23 @@ public class OwnerRentalRepositoryCustomImpl implements OwnerRentalRepositoryCus
                 .from(rental)
                 .join(rental.productEntity, product)
                 .join(rental.rentalOptionInfoEntity, optionInfo)
+                .where(whereCondition)
+                .offset(pageable.getOffset()) // 페이지 오프셋 설정
+                .limit(pageable.getPageSize()); // 페이지 크기 설정
+
+        List<OwnerRentalViewDTO> ownerRentalList = query.fetch();
+
+        // 전체 개수를 구하기 위해 limit과 offset을 제외한 count query 실행
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(rental.count())
+                .from(rental)
+                .join(rental.productEntity, product)
+                .join(rental.rentalOptionInfoEntity, optionInfo)
                 .where(whereCondition);
 
-        return query.fetch();
+        Long countResult = countQuery.fetchOne();
+        long totalCount = (countResult != null) ? countResult : 0;
+
+        return new PageImpl<>(ownerRentalList, pageable, totalCount);  // Page 객체 반환
     }
 }
