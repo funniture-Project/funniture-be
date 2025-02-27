@@ -16,7 +16,7 @@ public class AppOwnerInfoDTO {
     private String account;
     private String bank;
     private String attechmentLink;
-    private String isRejected;
+    private int isRejected;
     private String storeImage;
     private String storePhone;
 }

@@ -272,7 +272,7 @@ public class MemberController {
         }
     }
 
-    // 제공자 전환
+    // 제공자 전환 신청
     @Operation(summary = "제공자 전환 신청", description = "제공자 전환 신청 데이터를 처리합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "제공자 전환 신청 성공"),
@@ -282,25 +282,29 @@ public class MemberController {
     public ResponseEntity<ResponseMessage> registerOwner(
             @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
             @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
-            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
+            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) { // 변수명 수정
 
         System.out.println("제공자 전환 신청 잘 들어 왔는지 = " + appOwnerInfoDTO);
+
         try {
             // Cloudinary에 이미지 업로드
-            String storeImageUrl = null;
+            String storeImageUrl = "";
+            System.out.println("storeImageUrl 상태 확인: " + storeImageUrl);
             if (storeImage != null && !storeImage.isEmpty()) {
                 Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
                 storeImageUrl = imageResponse.get("url").toString();
-                appOwnerInfoDTO.setStoreImage(storeImageUrl);
             }
+            appOwnerInfoDTO.setStoreImage(storeImageUrl);
 
             // Cloudinary에 첨부파일 업로드
-            String attachmentFileUrl = null;
-            if (attachmentFile != null && !attachmentFile.isEmpty()) {
-                Map<String, Object> fileResponse = cloudinaryService.uploadFile(attachmentFile);
+            String attachmentFileUrl = "";
+            System.out.println("첨부파일 상태 확인: " + attachmentFile);
+            if (attachmentFile != null && !attachmentFile.isEmpty()) { // 변수명 수정
+                Map<String, Object> fileResponse = cloudinaryService.uploadPdfFile(attachmentFile);
                 attachmentFileUrl = fileResponse.get("url").toString();
-                appOwnerInfoDTO.setAttechmentLink(attachmentFileUrl);
             }
+            System.out.println("첨부파일 업로드된 URL: " + attachmentFileUrl);
+            appOwnerInfoDTO.setAttechmentLink(attachmentFileUrl);
 
             // 서비스 호출로 DB 업데이트
             memberService.registerOwner(appOwnerInfoDTO);
@@ -313,5 +317,6 @@ public class MemberController {
                     .body(new ResponseMessage(400, "제공자 전환 신청 실패", null));
         }
     }
+
 
 }
