@@ -5,10 +5,7 @@ import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import com.ohgiraffers.funniture.member.model.dao.AdminRepository;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
-import com.ohgiraffers.funniture.member.model.dto.AppOwnerListDTO;
-import com.ohgiraffers.funniture.member.model.dto.MemberAndPointDTO;
-import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
-import com.ohgiraffers.funniture.member.model.dto.OwnerInfoAndMemberDTO;
+import com.ohgiraffers.funniture.member.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,4 +50,8 @@ public class AdminService {
                 .map(AppOwnerListDTO::new) // ✅ 새로운 생성자 활용
                 .collect(Collectors.toList());
     }
+
+//    public List<AppOwnerListModalDTO> getConvertAppListByAdminModal() {
+//            return adminRepository.findConvertAppListByAdminModal();
+//    }
 }
