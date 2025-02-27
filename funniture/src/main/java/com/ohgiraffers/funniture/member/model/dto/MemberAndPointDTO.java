@@ -25,6 +25,7 @@ public class MemberAndPointDTO {
 
     private String memberRole;
     private PointDTO pointDTO;
+    private int isRejected;
 
     public MemberAndPointDTO(Object[] obj) {
         this.memberId = obj.length > 0 ? (String) obj[0] : null;
@@ -34,6 +35,7 @@ public class MemberAndPointDTO {
         this.signupDate = obj.length > 4 && obj[4] != null ? ((Timestamp) obj[4]).toLocalDateTime() : null; // ✅ Timestamp 변환
         this.memberRole = obj.length > 5 ? (String) obj[5] : null;
         this.pointDTO = new PointDTO(obj.length > 6 && obj[6] != null ? ((Number) obj[6]).intValue() : 0);
+        this.isRejected = obj.length > 7 && obj[7] != null ? ((Number) obj[7]).intValue() : 0; // ✅ 추가된 필드 매핑
     }
 }
 

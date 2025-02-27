@@ -38,7 +38,7 @@ public class OwnerInfoEntity {
 
     // 25-02-26 컬럼 추가돼서 아래부터 추가
     @Column(name = "is_rejected")
-    private String isRejected;
+    private int isRejected;
 
     @Column (name = "store_image")
     private String storeImage;
