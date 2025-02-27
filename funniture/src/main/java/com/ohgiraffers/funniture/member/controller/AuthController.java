@@ -43,7 +43,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ResponseMessage> signup (@RequestBody MemberDTO memberDTO) {
 
-        System.out.println("회원가입 프론트에서 들어온 memberDTO = " + memberDTO);
+//        System.out.println("회원가입 프론트에서 들어온 memberDTO = " + memberDTO);
 
         String newMemberNo = authService.getMaxMember();
         String newNo = returnMemberNo(newMemberNo);

@@ -29,7 +29,7 @@ public class AuthService {
     @Transactional
     public MemberDTO authSignupService(MemberDTO memberDTO) {
 
-        System.out.println("서비스 : 컨트롤러에서 온 memberDTO = " + memberDTO);
+//        System.out.println("서비스 : 컨트롤러에서 온 memberDTO = " + memberDTO);
 
         memberDTO.setMemberRole("USER");
         memberDTO.setSignupDate(LocalDateTime.now());
@@ -41,7 +41,6 @@ public class AuthService {
 
         // DTO에 담아온 값 엔티티화.
         MemberEntity registMember = modelMapper.map(memberDTO , MemberEntity.class);
-        System.out.println("엔티티화 한 값 registMember = " + registMember);
 
         // 패스워드 인코딩해서 registMember에 담음
         registMember = registMember.password(passwordEncoder.encode(registMember.getPassword())).create();
