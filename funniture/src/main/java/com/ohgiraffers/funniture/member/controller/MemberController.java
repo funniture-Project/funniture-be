@@ -282,36 +282,34 @@ public class MemberController {
     public ResponseEntity<ResponseMessage> registerOwner(
             @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
             @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
-            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) { // 변수명 수정
+            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
 
-        System.out.println("제공자 전환 신청 잘 들어 왔는지 = " + appOwnerInfoDTO);
+        System.out.println("제공자 전환 신청 잘 들어왔는지 = " + appOwnerInfoDTO);
 
         try {
             // Cloudinary에 이미지 업로드
-            String storeImageUrl = "";
-            System.out.println("storeImageUrl 상태 확인: " + storeImageUrl);
             if (storeImage != null && !storeImage.isEmpty()) {
                 Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
-                storeImageUrl = imageResponse.get("url").toString();
+                appOwnerInfoDTO.setStoreImage(imageResponse.get("url").toString());
             }
-            appOwnerInfoDTO.setStoreImage(storeImageUrl);
 
             // Cloudinary에 첨부파일 업로드
-            String attachmentFileUrl = "";
-            System.out.println("첨부파일 상태 확인: " + attachmentFile);
-            if (attachmentFile != null && !attachmentFile.isEmpty()) { // 변수명 수정
+            if (attachmentFile != null && !attachmentFile.isEmpty()) {
                 Map<String, Object> fileResponse = cloudinaryService.uploadPdfFile(attachmentFile);
-                attachmentFileUrl = fileResponse.get("url").toString();
+                appOwnerInfoDTO.setAttechmentLink(fileResponse.get("url").toString());
             }
-            System.out.println("첨부파일 업로드된 URL: " + attachmentFileUrl);
-            appOwnerInfoDTO.setAttechmentLink(attachmentFileUrl);
 
-            // 서비스 호출로 DB 업데이트
-            memberService.registerOwner(appOwnerInfoDTO);
+            // 서비스 호출 후 저장된 데이터를 가져옴
+            AppOwnerInfoDTO savedOwnerInfo = memberService.registerOwner(appOwnerInfoDTO);
 
+            Map <String , Object> result = new HashMap<>();
+            result.put("result", savedOwnerInfo);
+
+            // 응답 객체 생성 및 반환
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(201, "제공자 전환 신청 성공", null));
+                    .body(new ResponseMessage(201, "제공자 전환 신청 성공", result));
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok()
@@ -319,6 +317,7 @@ public class MemberController {
                     .body(new ResponseMessage(400, "제공자 전환 신청 실패", null));
         }
     }
+
 
     // 기존 제공자 신청 여부 확인하기 ( 여기에는 400 을 작성하면 에러가 발생해서
     @Operation(summary = "제공자 전환 신청 여부 확인",
@@ -359,27 +358,28 @@ public class MemberController {
 
         try {
             // Cloudinary에 이미지 업로드
-            String storeImageUrl = "";
             if (storeImage != null && !storeImage.isEmpty()) {
                 Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
-                storeImageUrl = imageResponse.get("url").toString();
+                appOwnerInfoDTO.setStoreImage(imageResponse.get("url").toString());
             }
-            appOwnerInfoDTO.setStoreImage(storeImageUrl);
 
             // Cloudinary에 첨부파일 업로드
-            String attachmentFileUrl = "";
             if (attachmentFile != null && !attachmentFile.isEmpty()) {
                 Map<String, Object> fileResponse = cloudinaryService.uploadPdfFile(attachmentFile);
-                attachmentFileUrl = fileResponse.get("url").toString();
+                appOwnerInfoDTO.setAttechmentLink(fileResponse.get("url").toString());
             }
-            appOwnerInfoDTO.setAttechmentLink(attachmentFileUrl);
 
-            // 서비스 호출로 데이터 삽입 또는 업데이트
-            memberService.upsertOwner(appOwnerInfoDTO);
+            // 서비스 호출 후 저장된 데이터를 가져옴
+            AppOwnerInfoDTO savedOwnerInfo = memberService.upsertOwner(appOwnerInfoDTO);
 
+            Map <String , Object> result = new HashMap<>();
+            result.put("result", savedOwnerInfo);
+
+            // 응답 객체 생성 및 반환
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(201, "제공자 정보 저장 성공", null));
+                    .body(new ResponseMessage(201, "제공자 정보 저장 성공", result));
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok()
@@ -387,4 +387,5 @@ public class MemberController {
                     .body(new ResponseMessage(400, "제공자 정보 저장 실패", null));
         }
     }
+
 }

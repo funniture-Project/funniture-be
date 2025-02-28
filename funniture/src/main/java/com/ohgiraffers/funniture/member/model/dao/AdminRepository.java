@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.member.model.dao;
 import com.ohgiraffers.funniture.member.entity.MemberAndPointEntity;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
+import com.ohgiraffers.funniture.member.model.dto.AppOwnerListModalDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -65,5 +66,15 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             nativeQuery = true)
     List<Object[]> AllConvertListByAdmin();
 
+
+//    @Query("SELECT new com.ohgiraffers.funniture.member.model.dto.AppOwnerListModalDTO(" +
+//            "m.memberId, m.userName, m.phoneNumber, m.email, m.signupDate, m.memberRole, " +
+//            "new com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO(" +
+//            "o.storeNo, o.memberId, o.storeName, o.storeAddress, o.account, o.bank, o.attechmentLink, " +
+//            "o.isRejected, o.storeImage, o.storePhone)) " +
+//            "FROM MemberAndPointEntity m " +
+//            "JOIN OwnerInfoEntity o ON m.memberId = o.memberId " +
+//            "WHERE o.isRejected = 0")
+//    List<AppOwnerListModalDTO> findConvertAppListByAdminModal();
 
 }
