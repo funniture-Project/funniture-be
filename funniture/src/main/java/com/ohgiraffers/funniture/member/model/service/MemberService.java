@@ -167,15 +167,14 @@ public class MemberService {
 
     // 최초 사용자 → 제공자 전환 신청 데이터 저장
     @Transactional
-    public void registerOwner(@Valid AppOwnerInfoDTO appOwnerInfoDTO) {
+    public AppOwnerInfoDTO registerOwner(@Valid AppOwnerInfoDTO appOwnerInfoDTO) {
         // 1. tbl_member에서 회원 정보 조회
         MemberEntity memberEntity = memberRepository.findByMemberId(appOwnerInfoDTO.getMemberId());
 
-        System.out.println("서비스 제공자 전환 신청 memberEntity  = " + memberEntity);
-        // 2. owner 테이블에 데이터가 이미 존재하는지 확인
-        OwnerInfoEntity ownerInfoEntity;
+        System.out.println("서비스 제공자 전환 신청 memberEntity = " + memberEntity);
+
+        // 2. owner 테이블에 데이터가 이미 존재하는지 확인 후 삭제
         if (ownerRepository.existsByMemberId(memberEntity.getMemberId())) {
-            // 기존 엔티티 삭제
             OwnerInfoEntity existingEntity = ownerRepository.findByMemberId(memberEntity.getMemberId())
                     .orElseThrow(() -> new IllegalStateException("데이터가 존재해야 하지만 찾을 수 없습니다."));
             ownerRepository.delete(existingEntity);
@@ -183,26 +182,38 @@ public class MemberService {
 
         appOwnerInfoDTO.setIsRejected(0);
 
-        // 3. 엔티티에 데이터 설정
-        ownerInfoEntity = new OwnerInfoEntity();
+        // 3. 새로운 엔티티 생성 및 데이터 설정
+        OwnerInfoEntity ownerInfoEntity = new OwnerInfoEntity();
         ownerInfoEntity.setMemberId(memberEntity.getMemberId());
         ownerInfoEntity.setStoreNo(appOwnerInfoDTO.getStoreNo());
         ownerInfoEntity.setStoreName(appOwnerInfoDTO.getStoreName());
-        ownerInfoEntity.setBank(appOwnerInfoDTO.getBank());
-        ownerInfoEntity.setAccount(appOwnerInfoDTO.getAccount());
         ownerInfoEntity.setStoreAddress(appOwnerInfoDTO.getStoreAddress());
-        ownerInfoEntity.setStorePhone(appOwnerInfoDTO.getStorePhone());
-        ownerInfoEntity.setIsRejected(appOwnerInfoDTO.getIsRejected());
+        ownerInfoEntity.setAccount(appOwnerInfoDTO.getAccount());
+        ownerInfoEntity.setBank(appOwnerInfoDTO.getBank());
         ownerInfoEntity.setAttechmentLink(appOwnerInfoDTO.getAttechmentLink());
+        ownerInfoEntity.setIsRejected(appOwnerInfoDTO.getIsRejected());
         ownerInfoEntity.setStoreImage(appOwnerInfoDTO.getStoreImage());
-
-        ownerRepository.save(ownerInfoEntity);
-
+        ownerInfoEntity.setStorePhone(appOwnerInfoDTO.getStorePhone());
 
         // 4. 데이터베이스 저장
-        ownerRepository.save(ownerInfoEntity);
-        System.out.println("서비스에서 잘 저장 됐는지 = ");
+        OwnerInfoEntity savedEntity = ownerRepository.save(ownerInfoEntity);
+        System.out.println("서비스에서 저장 완료된 데이터: " + savedEntity);
+
+        // 5. 저장된 데이터를 DTO로 변환하여 반환
+        return new AppOwnerInfoDTO(
+                savedEntity.getMemberId(),
+                savedEntity.getStoreNo(),
+                savedEntity.getStoreName(),
+                savedEntity.getStoreAddress(),
+                savedEntity.getAccount(),
+                savedEntity.getBank(),
+                savedEntity.getAttechmentLink(),
+                savedEntity.getIsRejected(),
+                savedEntity.getStoreImage(),
+                savedEntity.getStorePhone()
+        );
     }
+
 
     // 제공자 신청할 때 최초 신청인지 재신청인지 여부 확인
     public boolean existsByMemberId(String memberId) {
@@ -213,37 +224,52 @@ public class MemberService {
 
     // 제공자 재신청 (기존 데이터에서 업데이트로)
     @Transactional
-    public void upsertOwner(AppOwnerInfoDTO appOwnerInfoDTO) {
+    public AppOwnerInfoDTO upsertOwner(AppOwnerInfoDTO appOwnerInfoDTO) {
         // 1. tbl_member에서 회원 정보 조회
         MemberEntity memberEntity = memberRepository.findByMemberId(appOwnerInfoDTO.getMemberId());
 
-        // 2. owner 테이블에서 member_id로 데이터 조회
+        // 2. owner 테이블에서 기존 데이터 조회
         OwnerInfoEntity existingEntity = ownerRepository.findByMemberId(memberEntity.getMemberId())
                 .orElse(null);
 
         if (existingEntity != null) {
-            // 3. 기존 데이터 삭제 (store_no 포함 모든 데이터 삭제)
-            ownerRepository.delete(existingEntity);
-            // Hibernate의 쓰기 지연(flush delay) 문제를 방지하기 위해 flush() 호출
-            ownerRepository.flush(); // 이거 안 넣으면 insert가 먼저 실행돼서 중복 에러남
+            // 기존 데이터 삭제 (store_no 포함 모든 데이터 삭제)
+            ownerRepository.delete(existingEntity);  // Hibernate의 쓰기 지연(flush delay) 문제 방지
+            ownerRepository.flush(); // 이거 안 넣으면 insert가 먼저 실행돼서 중복 에러남.
         }
 
-        // 4. 새로운 엔티티 생성 및 저장
+        // 3. 새로운 엔티티 생성 및 저장
         OwnerInfoEntity newEntity = new OwnerInfoEntity();
         newEntity.setMemberId(memberEntity.getMemberId());
-        newEntity.setStoreNo(appOwnerInfoDTO.getStoreNo()); // 새로운 store_no 설정
+        newEntity.setStoreNo(appOwnerInfoDTO.getStoreNo());
         newEntity.setStoreName(appOwnerInfoDTO.getStoreName());
-        newEntity.setBank(appOwnerInfoDTO.getBank());
-        newEntity.setAccount(appOwnerInfoDTO.getAccount());
         newEntity.setStoreAddress(appOwnerInfoDTO.getStoreAddress());
-        newEntity.setStorePhone(appOwnerInfoDTO.getStorePhone());
-        newEntity.setIsRejected(appOwnerInfoDTO.getIsRejected());
+        newEntity.setAccount(appOwnerInfoDTO.getAccount());
+        newEntity.setBank(appOwnerInfoDTO.getBank());
         newEntity.setAttechmentLink(appOwnerInfoDTO.getAttechmentLink());
+        newEntity.setIsRejected(appOwnerInfoDTO.getIsRejected());
         newEntity.setStoreImage(appOwnerInfoDTO.getStoreImage());
+        newEntity.setStorePhone(appOwnerInfoDTO.getStorePhone());
 
-        // 5. 저장 (새로운 데이터 삽입)
-        ownerRepository.save(newEntity);
+        // 4. 저장 (새로운 데이터 삽입)
+        OwnerInfoEntity savedEntity = ownerRepository.save(newEntity);
+
+        // 5. 저장된 데이터를 DTO로 변환하여 반환
+        return new AppOwnerInfoDTO(
+                savedEntity.getMemberId(),
+                savedEntity.getStoreNo(),
+                savedEntity.getStoreName(),
+                savedEntity.getStoreAddress(),
+                savedEntity.getAccount(),
+                savedEntity.getBank(),
+                savedEntity.getAttechmentLink(),
+                savedEntity.getIsRejected(),
+                savedEntity.getStoreImage(),
+                savedEntity.getStorePhone()
+
+        );
     }
+
 
 
 
