@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -157,6 +158,9 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 회원이 존재하지 않습니다."));
 
+        // 현재 시간을 가져와서 signupDate에 설정
+        LocalDateTime currentTime = LocalDateTime.now();
+        memberEntity.setSignupDate(currentTime); // 현재 시간을 signupDate에 설정
         memberEntity.setMemberRole("LIMIT");
 
         MemberDTO result = modelMapper.map(memberEntity , MemberDTO.class);

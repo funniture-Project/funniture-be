@@ -112,6 +112,62 @@ public class AdminController {
                 .body(new ResponseMessage(200, "모든 제공자 전환신청 정보 조회 성공", result));
     }
 
+    @Operation(summary = "전체 탈퇴자 정보 조회",
+            description = "관리자 페이지에서 모든 탈퇴자 정보 조회"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "모든 탈퇴자 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "모든 탈퇴자 정보 조회 실패")
+    })
+    @GetMapping("/leaverList")
+    public ResponseEntity<ResponseMessage> leaverListByAdmin () {
+        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 불러오는 컨트롤러 동작");
+
+        List<MemberAndPointDTO> memberAndPointDTO = adminService.getLeaverListByAdmin();
+        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
+
+        Map<String , Object> result = new HashMap<>();
+        result.put("result" , memberAndPointDTO);
+
+        if (memberAndPointDTO.isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "모든 탈퇴자 정보가 존재하지 않음.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "모든 탈퇴자 정보 조회 성공", result));
+    }
+
+    @Operation(summary = "권한 정보 변경",
+            description = "관리자 페이지에서 탈퇴자를 유저로 권한 변경"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "탈퇴자 회원, 유저로 권한 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "탈퇴자 회원, 유저로 권한 변경 실패")
+    })
+    @PostMapping("/reactivate")
+    public ResponseEntity<ResponseMessage> leaverToUserApproveByAdmin (@RequestBody List<String> userIds) {
+        System.out.println("✅ 관리자 페이지에서 탈퇴자 → 유저 권한 변경 컨트롤러 userIds 잘 받아왔나 : " + userIds);
+
+        Boolean isSuccess = adminService.leaverToUserApproveService(userIds);
+
+        if (isSuccess) {
+            // 성공 응답
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "탈퇴자 회원, 유저로 권한이 성공적으로 변경되었습니다.", null));
+        } else {
+            // 실패 응답
+            return ResponseEntity.status(400) // 상태 코드 400 (Bad Request)
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "탈퇴자 회원 중 일부 또는 전체가 이미 유저 권한입니다.", null));
+        }
+    }
+
+
+
 //    @Operation(summary = "모달에 표시될 제공자 전환 데이터",
 //            description = "관리자 페이지에서 모달에 표시될 제공자로 전환 요청 정보 조회"
 //    )
