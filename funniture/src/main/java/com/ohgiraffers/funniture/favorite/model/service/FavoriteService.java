@@ -53,14 +53,17 @@ public class FavoriteService {
     }
 
     @Transactional
-    public boolean addData(List<Map<String, String>> addFavoriteList) {
+    public synchronized boolean addData(List<Map<String, String>> addFavoriteList) {
 
         try {
             List<FavoriteEntity> favoriteEntityList = addFavoriteList.stream().map(item -> modelMapper.map(item, FavoriteEntity.class))
+                                                        .filter(entity -> !favoriteListRepository.existsByMemberIdAndProductNo(entity.getMemberId(), entity.getProductNo())) // 🔹 중복 체크
                                                         .collect(Collectors.toList());
             System.out.println("favoriteEntityList = " + favoriteEntityList);
 
-            favoriteListRepository.saveAll(favoriteEntityList);
+            if (!favoriteEntityList.isEmpty()) {
+                favoriteListRepository.saveAll(favoriteEntityList);
+            }
         } catch (Exception e){
             System.out.println("e = " + e);
 

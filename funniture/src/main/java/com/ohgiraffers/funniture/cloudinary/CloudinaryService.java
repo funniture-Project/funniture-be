@@ -66,7 +66,7 @@ public class CloudinaryService {
 
             System.out.println("uploadResult (PDF) = " + uploadResult);
 
-            response.put("url", uploadResult.get("url").toString());
+            response.put("url", uploadResult.get("secure_url").toString());
             response.put("id", uploadResult.get("public_id").toString());
 
             // 로컬 파일 삭제
