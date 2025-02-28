@@ -67,6 +67,18 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
     List<Object[]> AllConvertListByAdmin();
 
 
+    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, \n" +
+            "IFNULL(b.current_point, 0) AS current_point \n" +
+            "FROM tbl_member a \n" +
+            "LEFT JOIN tbl_point b ON a.member_id = b.member_id \n" +
+            "WHERE a.member_role = 'LIMIT' \n" +
+            "ORDER BY a.member_id ASC\n",
+            nativeQuery = true)
+    List<Object[]> AllLeaverListByAdmin();
+
+
+
+
 //    @Query("SELECT new com.ohgiraffers.funniture.member.model.dto.AppOwnerListModalDTO(" +
 //            "m.memberId, m.userName, m.phoneNumber, m.email, m.signupDate, m.memberRole, " +
 //            "new com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO(" +
