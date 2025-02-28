@@ -15,7 +15,11 @@ public class ChatService {
 
     public void getChatQuList(Integer refNum, Integer qaLevel) {
         List<ChatEntity> result =  chatRepository.getChatQuList(refNum,qaLevel);
+        if (qaLevel != null && qaLevel >= 2){
+            List<ChatEntity> refResult = chatRepository.getRefChatQuList(qaLevel-1);
+            System.out.println("상위 단계 중 하위질문이 있는 리스트 refResult = " + refResult);
+        }
 
-        System.out.println("질문 리스트 result = " + result);
+        System.out.println("해당 단계 질문 리스트 result = " + result);
     }
 }

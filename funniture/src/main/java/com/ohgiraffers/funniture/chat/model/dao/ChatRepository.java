@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ChatRepository {
     List<ChatEntity> getChatQuList(Integer refNum, Integer qaLevel);
+
+    List<ChatEntity> getRefChatQuList(int i);
 }
