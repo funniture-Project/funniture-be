@@ -1,6 +1,8 @@
 package com.ohgiraffers.funniture.product.controllers;
 
 import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PageDTO;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.member.model.service.CustomUserDetailsService;
 import com.ohgiraffers.funniture.product.model.dto.*;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,12 +59,40 @@ public class ProductController {
     @GetMapping({"", "/"})
     public ResponseEntity<ResponseMessage> getProductAll(@ModelAttribute ProductSearchCondition condition){
 
+        System.out.println("컨트롤러 단의 제품 검색 조건 = " + condition);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         Map<String, Object> responseMap = new HashMap<>();
 
+        // 관리자 페이지에서만 페이징 처리 동작
+        if (condition.getPageNum() != null) {
+            Criteria cri = new Criteria(Integer.valueOf(condition.getPageNum()), 10);
+            System.out.println("cri = " + cri);
+
+            System.out.println("페이징 할꺼임!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            Page<ProductWithPriceDTO> pagingResults = productService.getPagingProductAll(condition,cri);
+
+            if (pagingResults.isEmpty()){
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+            }
+
+            responseMap.put("result", pagingResults.getContent());  // 실제 데이터 (content) 가져오기
+            responseMap.put("pageInfo", new PageDTO(cri, (int) pagingResults.getTotalElements()));  // PageDTO 정보 포함
+            System.out.println("results.size() = " + pagingResults.getContent().size());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(200, "전체 상품 리스트 조회 성공", responseMap));
+        }
+
+        // 페이징 처리가 없을때의 제품 정보 가져오기
+        System.out.println("페이징 안해!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         List<ProductWithPriceDTO> results = productService.getProductAll(condition);
+        System.out.println("results.size() = " + results.size());
 
         if (results.isEmpty()){
             return ResponseEntity.ok()

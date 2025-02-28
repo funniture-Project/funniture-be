@@ -23,4 +23,6 @@ public interface FavoriteListRepository extends JpaRepository<FavoriteEntity, Fa
         and like.productNo IN :deleteData
     """)
     void removeAllByMemIdANDProductNoIn(@Param("memberId")String memberId,@Param("deleteData") List<String> deleteData);
+
+    boolean existsByMemberIdAndProductNo(String memberId, String productNo);
 }
