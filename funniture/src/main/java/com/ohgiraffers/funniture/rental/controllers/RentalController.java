@@ -62,7 +62,8 @@ public class RentalController {
             parameters = {
                     @Parameter(name = "memberId", description = "사용자 ID(필수)"),
                     @Parameter(name = "period", description = "조회 할 개월수(개월수에 orderDate 가 해당되면 조회) ex.1개월전~현재=1MONTH,3개월전~현재=3MONTH (선택)"),
-                    @Parameter(name = "searchDate", description = "조회 할 날짜(선택)")
+                    @Parameter(name = "searchDate", description = "조회 할 날짜(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
             }
     )
     @ApiResponses({
@@ -133,7 +134,8 @@ public class RentalController {
             parameters = {
                     @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
                     @Parameter(name = "period", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)"),
-                    @Parameter(name = "rentalTab", description = "예약/배송/반납 필터링 조회(선택)")
+                    @Parameter(name = "rentalTab", description = "예약/배송/반납 필터링 조회(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
 
             }
     )
@@ -182,7 +184,8 @@ public class RentalController {
                     @Parameter(name = "storeName", description = "회사명(선택)"),
                     @Parameter(name = "categoryName", description = "상위카테고리명 ex.가전/가구(선택)"),
                     @Parameter(name = "searchDate", description = "예약시작날짜(rentalStartDate),만료날짜(rentalEndDate) 사이에 선택 한 날짜가 해당되는 예약만 조회(선택)"),
-                    @Parameter(name = "rentalNo", description = "예약번호(선택)")
+                    @Parameter(name = "rentalNo", description = "예약번호(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
             }
     )
     @ApiResponses({
