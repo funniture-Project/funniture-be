@@ -73,21 +73,25 @@ public class RentalController {
     @GetMapping("/user")
     public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam String memberId,
                                                                      @RequestParam(required = false) String period,
-                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate) {
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate,
+                                                                     @RequestParam(name = "offset", defaultValue = "1") String offset) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(memberId,period,searchDate);
+        Criteria cri = new Criteria(Integer.valueOf(offset), 8);
 
-        if (orderList.isEmpty()){
+        Page<UserOrderViewDTO> userOrderList = rentalService.findRentalOrderListByUser(memberId,period,searchDate, cri);
+
+        if (userOrderList.isEmpty()){
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
         }
 
         Map<String, Object> res = new HashMap<>();
-        res.put("orderList", orderList);
+        res.put("userOrderList", userOrderList.getContent());
+        res.put("pageInfo", new PageDTO(cri, (int) userOrderList.getTotalElements()));
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자 예약 조회 성공", res));
     }
