@@ -111,8 +111,9 @@ public class RentalService {
     }
 
     // 사용자 - 예약 조회(쿼리 DSL)
-    public List<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate) {
-        return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate);
+    public Page<UserOrderViewDTO> findRentalOrderListByUser(String memberId, String period, LocalDate searchDate, Criteria cri) {
+        Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
+        return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate, pageable);
     }
 
     // 사용자,제공자 예약 상세페이지
