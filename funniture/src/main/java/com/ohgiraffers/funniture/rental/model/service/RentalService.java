@@ -123,8 +123,9 @@ public class RentalService {
 
 
     // 관리자 - 예약 조회(쿼리 DSL)
-    public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
-        return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria);
+    public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Criteria cri) {
+        Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
+        return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria, pageable);
     }
 
     // 제공자 - 예약 조회(쿼리 DSL)

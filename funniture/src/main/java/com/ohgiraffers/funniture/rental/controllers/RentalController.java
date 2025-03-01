@@ -195,14 +195,11 @@ public class RentalController {
                                                                     @RequestParam(required = false) String storeName,
                                                                     @RequestParam(required = false) String categoryName,
                                                                     @RequestParam(required = false) String searchDate,
-                                                                    @RequestParam(required = false) String rentalNo
+                                                                    @RequestParam(required = false) String rentalNo,
+                                                                    @RequestParam(name = "offset", defaultValue = "1") String offset
+
     ) {
 
-        System.out.println("rentalState = " + rentalState);
-        System.out.println("storeName = " + storeName);
-        System.out.println("categoryName = " + categoryName);
-        System.out.println("searchDate = " + searchDate);
-        System.out.println("rentalNo = " + rentalNo);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
@@ -216,7 +213,9 @@ public class RentalController {
         // 검색 조건 DTO 로 변환
         AdminRentalSearchCriteria criteria = new AdminRentalSearchCriteria(rentalState, storeName, categoryName, searchDateTime, rentalNo);
 
-        List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria);
+        Criteria cri = new Criteria(Integer.valueOf(offset), 11);
+
+        Page<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria, cri);
 
         if (adminRentalList.isEmpty()){
             return ResponseEntity.ok()
@@ -225,11 +224,11 @@ public class RentalController {
         }
 
         Map<String, Object> res = new HashMap<>();
-        res.put("adminRentalList", adminRentalList);
+        res.put("adminRentalList", adminRentalList.getContent());
+        res.put("pageInfo", new PageDTO(cri, (int) adminRentalList.getTotalElements()));
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약 전체 조회 성공", res));
     }
-
 
 
 }
