@@ -138,12 +138,25 @@ public class RentalService {
         return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo, period, rentalTab, pageable);
     }
 
+//    @Transactional
+//    public void confirmRental(String rentalNo, String rentalState) {
+//
+//        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
+//                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
+//
+//        rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
+//    }
+
+
     @Transactional
-    public void confirmRental(String rentalNo, String rentalState) {
+    public void confirmRentals(List<String> rentalNos) {
+        System.out.println("rentalNos 서비스 = " + rentalNos);
+        for (String rentalNo : rentalNos) {
+            System.out.println("rentalNo = " + rentalNo);
+            RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
 
-        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
-
-        rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
+            rental.changeRentalState("예약완료");  // 상태 변경
+        }
     }
 }

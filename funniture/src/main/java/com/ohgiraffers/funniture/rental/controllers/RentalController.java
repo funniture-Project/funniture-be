@@ -179,17 +179,35 @@ public class RentalController {
             @ApiResponse(responseCode = "200", description = "예약완료로 상태 변경 되었습니다.")
     })
     
-    // 예약확정
-    @PutMapping("/{rentalNo}/confirm")
-    public ResponseEntity<ResponseMessage> confirmRental(@PathVariable String rentalNo) {
-        String rentalState = "예약완료";  // 상태값 고정
+//    // 예약확정
+//    @PutMapping("/{rentalNo}/confirm")
+//    public ResponseEntity<ResponseMessage> confirmRental(@PathVariable String rentalNo) {
+//        String rentalState = "예약완료";  // 상태값 고정
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+//
+//        rentalService.confirmRental(rentalNo, rentalState);
+//
+//        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약완료로 상태 변경 되었습니다.", null));
+//    }
 
+    @PutMapping("/confirmBatch")
+    public ResponseEntity<ResponseMessage> confirmRentals(@RequestParam List<String> rentalNos) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        rentalService.confirmRental(rentalNo, rentalState);
+        System.out.println("rentalNos = " + rentalNos);
 
-        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약완료로 상태 변경 되었습니다.", null));
+        try {
+            rentalService.confirmRentals(rentalNos);  // 여러 개의 예약번호 처리
+            return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "선택된 예약들이 예약완료로 상태 변경되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(headers)
+                    .body(new ResponseMessage(500, "예약 상태 변경 중 오류가 발생했습니다.", null));
+        }
+
     }
 
 
