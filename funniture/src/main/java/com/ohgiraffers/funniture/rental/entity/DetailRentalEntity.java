@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.rental.entity;
 
 import com.ohgiraffers.funniture.deliveryaddress.entity.DeliveryAddressEntity;
+import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
 import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
@@ -49,8 +50,9 @@ public class DetailRentalEntity {
     @Column(name = "delivery_memo") // 배송 메모
     private String deliveryMemo;
 
-    @Column(name = "member_id")
-    private String memberId;        // 대여자 회원번호 (fk)
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private MemberEntity memberEntity;        // 대여자 회원번호 (fk)
 
     @ManyToOne
     @JoinColumn(name = "owner_no", referencedColumnName = "member_id")
