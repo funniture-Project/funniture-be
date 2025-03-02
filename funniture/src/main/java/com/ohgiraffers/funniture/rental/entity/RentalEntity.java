@@ -1,10 +1,7 @@
 package com.ohgiraffers.funniture.rental.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder(toBuilder = true)
 public class RentalEntity {
 
     @Id
@@ -58,5 +56,10 @@ public class RentalEntity {
 
     @Column(name = "product_no")
     private String productNo;       // 상품번호 (fk)
+
+    // 상태 변경 메서드 추가
+    public void changeRentalState(String newState) {
+        this.rentalState = newState;
+    }
 
 }

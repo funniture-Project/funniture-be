@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
 import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.deliveryaddress.entity.DeliveryAddressEntity;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.point.entity.PointEntity;
@@ -40,6 +41,7 @@ public class RentalService {
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
 
+/* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
     // 사용자 - 예약 등록
     @Transactional
     public void insertRental(RentalDTO rentalDTO) {
@@ -121,12 +123,14 @@ public class RentalService {
         return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
     }
 
-
+/* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
     // 관리자 - 예약 조회(쿼리 DSL)
     public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Criteria cri) {
         Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
         return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria, pageable);
     }
+
+/* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
 
     // 제공자 - 예약 조회(쿼리 DSL)
     public Page<OwnerRentalViewDTO> findRentalListByOwner(String ownerNo, String period, String rentalTab, Criteria cri) {
@@ -134,8 +138,12 @@ public class RentalService {
         return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo, period, rentalTab, pageable);
     }
 
+    @Transactional
+    public void confirmRental(String rentalNo, String rentalState) {
 
+        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
 
-
-
+        rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
+    }
 }
