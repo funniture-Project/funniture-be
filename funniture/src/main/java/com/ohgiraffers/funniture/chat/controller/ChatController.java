@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.chat.controller;
 
 import com.ohgiraffers.funniture.adminInquiry.model.service.AdminInquiryService;
+import com.ohgiraffers.funniture.chat.model.dto.ChatDTO;
 import com.ohgiraffers.funniture.chat.model.service.ChatService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,9 +10,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Chat API")
 @RestController
@@ -33,13 +41,23 @@ public class ChatController {
             @ApiResponse(responseCode = "200", description = "질문 리스트 정보 조회 성공")
     })
     @GetMapping("/list")
-    public void getChatList(@RequestParam(required = false) Integer refNum,@RequestParam(required = false) Integer qaLevel){
+    public ResponseEntity<ResponseMessage> getChatList(@RequestParam(required = false) Integer refNum, @RequestParam(required = false) Integer qaLevel){
 
         System.out.println("refNum = " + refNum);
         System.out.println("qaLevel = " + qaLevel);
 
-        chatService.getChatQuList(refNum, qaLevel);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
+        Map<String, Object> responseMap = new HashMap<>();
+
+        List<ChatDTO> result = chatService.getChatQuList(refNum, qaLevel);
+
+        responseMap.put("result", result);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "전체 질문 리스트 조회 성공", responseMap));
     }
 
 
