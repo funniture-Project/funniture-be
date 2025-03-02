@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.rental.model.dao;
 
 import com.ohgiraffers.funniture.deliveryaddress.entity.QDeliveryAddressEntity;
+import com.ohgiraffers.funniture.member.entity.QMemberEntity;
 import com.ohgiraffers.funniture.member.entity.QOwnerInfoEntity;
 import com.ohgiraffers.funniture.product.entity.QProductEntity;
 import com.ohgiraffers.funniture.product.entity.QRentalOptionInfoEntity;
@@ -28,6 +29,7 @@ public class DetailRentalRepositoryCustomImpl implements DetailRentalRepositoryC
         QDeliveryAddressEntity deliveryAddress = QDeliveryAddressEntity.deliveryAddressEntity;
         QProductEntity product = QProductEntity.productEntity;
         QDetailRentalEntity rental = QDetailRentalEntity.detailRentalEntity;
+        QMemberEntity member = QMemberEntity.memberEntity;
 
         BooleanBuilder whereCondition = new BooleanBuilder();
         whereCondition.and(rental.rentalNo.eq(rentalNo));
@@ -47,12 +49,16 @@ public class DetailRentalRepositoryCustomImpl implements DetailRentalRepositoryC
                         deliveryAddress.destinationName,
                         deliveryAddress.destinationPhone,
                         deliveryAddress.destinationAddress,
-                        deliveryAddress.receiver))
+                        deliveryAddress.receiver,
+                        member.email,
+                        member.userName,
+                        member.phoneNumber))
                 .from(rental)
                 .join(rental.productEntity, product)
                 .join(rental.ownerInfoEntity, ownerInfo)
                 .join(rental.rentalOptionInfoEntity, rentalOptionInfo)
                 .join(rental.deliveryAddressEntity, deliveryAddress)
+                .join(rental.memberEntity, member)
                 .where(whereCondition)
                 .fetch();
     }
