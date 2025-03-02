@@ -84,12 +84,12 @@ public class AdminController {
                 .body(new ResponseMessage(200, "모든 제공자 정보 조회 성공", result));
     }
 
-    @Operation(summary = "전체 유저 정보 조회",
-            description = "관리자 페이지에서 모든 유저 정보 조회"
+    @Operation(summary = "제공자 전환 요청 조회",
+            description = "관리자 페이지에서 제공자 전환 요청 정보 조회"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "모든 유저 정보 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "모든 유저 정보 조회 실패")
+            @ApiResponse(responseCode = "200", description = "제공자 전환 요청 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 정보 조회 실패")
     })
     @GetMapping("/convertApp")
     public ResponseEntity<ResponseMessage> convertListByAdmin () {
@@ -111,6 +111,92 @@ public class AdminController {
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(200, "모든 제공자 전환신청 정보 조회 성공", result));
     }
+
+    @Operation(summary = "제공자 전환 요청 상세 조회",
+            description = "관리자 페이지에서 제공자 전환 요청 상세정보 조회"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 요청 상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 상세 조회 실패")
+    })
+    @GetMapping("/convertApp/{memberId}")
+    public ResponseEntity<ResponseMessage> getConvertDetailByAdmin(@PathVariable String memberId) {
+        System.out.println("✅ 관리자 페이지에서 제공자 전환 상세 데이터 불러오는 컨트롤러 동작");
+
+        AppOwnerListModalDTO appOwnerListModalDTO = adminService.getConvertAppDetailByAdmin(memberId);
+        System.out.println("✅ 관리자 페이지에서 전환 요청 상세 정보 = " + appOwnerListModalDTO);
+
+        Map <String , Object> result = new HashMap<>();
+        result.put("result", appOwnerListModalDTO);
+
+        if (appOwnerListModalDTO == null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "해당 전환 요청 정보가 존재하지 않음.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "전환 요청 상세 정보 조회 성공", result));
+    }
+
+    @Operation(summary = "제공자 전환 승인",
+            description = "관리자 페이지에서 제공자 전환 요청 승인 로직"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 요청 승인 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 승인 실패")
+    })
+    @PutMapping("/approve/{memberId}")
+    public ResponseEntity<ResponseMessage> approveUserToOwnerByAdmin(@PathVariable String memberId) {
+        System.out.println("✅ 관리자 페이지에서 제공자 전환 승인 컨트롤러 동작 memberId : "+ memberId);
+
+        Boolean isSuccess = adminService.approveUserToOwnerByAdmin(memberId);
+        System.out.println("✅ 관리자 페이지에서 전환 승인 서비스 다녀왔나 = " + isSuccess);
+
+        if (!isSuccess) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "제공자 전환 요청 승인 실패", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(201, "제공자 전환 요청 승인 성공", null));
+    }
+
+    @Operation(summary = "제공자 전환 반려",
+            description = "관리자 페이지에서 제공자 전환 요청 반려 로직"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "제공자 전환 요청 반려 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 반려 실패")
+    })
+    @PutMapping("/reject/{memberId}")
+    public ResponseEntity<ResponseMessage> rejectUserToOwnerByAdmin(
+            @PathVariable String memberId,
+            @RequestBody Map<String, String> payload
+    ) {
+        System.out.println("✅ 관리자 페이지에서 제공자 전환 반려 컨트롤러 동작 memberId : " + memberId);
+
+        String rejectReason = payload.get("rejectReason");
+        Boolean isSuccess = adminService.rejectUserToOwnerByAdmin(memberId, rejectReason);
+
+        System.out.println("✅ 관리자 페이지에서 전환 반려 서비스 다녀왔나 = " + isSuccess);
+
+        if (!isSuccess) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "제공자 전환 요청 반려 실패", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(201, "제공자 전환 요청 반려 성공", null));
+    }
+
+
+
 
     @Operation(summary = "전체 탈퇴자 정보 조회",
             description = "관리자 페이지에서 모든 탈퇴자 정보 조회"

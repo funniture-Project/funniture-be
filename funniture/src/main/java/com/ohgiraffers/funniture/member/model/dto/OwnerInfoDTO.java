@@ -18,7 +18,7 @@ public class OwnerInfoDTO {
     private String attechmentLink;
 
     // 컬럼 추가 25-02-27
-    private String isRejected;
+    private int isRejected;
     private String storeImage;
     private String storePhone;
 

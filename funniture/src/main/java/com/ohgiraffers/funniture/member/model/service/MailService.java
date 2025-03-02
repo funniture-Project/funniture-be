@@ -58,6 +58,7 @@ public class MailService {
             javaMailSender.send(message); // 메일 발송
             return authCode;
         } catch (MailException e) {
+            System.out.println("이메일 발송 오류 = " + e);
             return null;
         }
     }

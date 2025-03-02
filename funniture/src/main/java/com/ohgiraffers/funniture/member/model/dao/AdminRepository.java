@@ -4,6 +4,7 @@ import com.ohgiraffers.funniture.member.entity.MemberAndPointEntity;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import com.ohgiraffers.funniture.member.model.dto.AppOwnerListModalDTO;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,18 +15,26 @@ import java.util.List;
 public interface AdminRepository extends JpaRepository<MemberAndPointEntity, String> {
 
 
+//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+//            "IFNULL(b.current_point, 0) AS current_point " +
+//            "FROM tbl_member a " +
+//            "LEFT JOIN tbl_point b ON a.member_id = b.member_id " +
+//            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +  // 추가된 부분
+//            "WHERE a.member_role = 'USER' " +
+//            "AND o.member_id IS NULL " +  // tbl_ownerinfo에 존재하지 않는 사용자만 가져옴
+//            "ORDER BY a.member_id ASC",
+//            nativeQuery = true)
+//    List<Object[]> AllUserListByAdmin();
     @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
             "IFNULL(b.current_point, 0) AS current_point " +
             "FROM tbl_member a " +
             "LEFT JOIN tbl_point b ON a.member_id = b.member_id " +
-            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +  // 추가된 부분
+            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
             "WHERE a.member_role = 'USER' " +
-            "AND o.member_id IS NULL " +  // tbl_ownerinfo에 존재하지 않는 사용자만 가져옴
+            "OR (o.is_rejected = -1) " +  // is_rejected가 -1인 회원도 포함
             "ORDER BY a.member_id ASC",
             nativeQuery = true)
     List<Object[]> AllUserListByAdmin();
-
-
 
 
     @Query(value = "SELECT a.member_id, a.store_no, a.store_name, a.store_phone, " +
@@ -54,6 +63,22 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             nativeQuery = true)
     List<Object[]> AllLeaverListByAdmin();
 
+    @Query(value = "SELECT new com.ohgiraffers.funniture.member.model.dto.AppOwnerListModalDTO(" +
+            "m.memberId, m.userName, m.phoneNumber, m.email, m.signupDate, m.memberRole, " +
+            "new com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO(" +
+            "o.storeNo, o.memberId, o.storeName, o.storeAddress, o.account, o.bank, o.attechmentLink, " +
+            "o.isRejected, o.storeImage, o.storePhone)) " +
+            "FROM MemberAndPointEntity m " +
+            "LEFT JOIN OwnerInfoEntity o ON m.memberId = o.memberId " +
+            "WHERE m.memberId = :memberId AND o.isRejected = 0")
+    AppOwnerListModalDTO findConvertAppDetailByMemberId(@Param("memberId") String memberId);
+
+}
+
+//    @Query("SELECT m.memberId, m.userName, m.phoneNumber, m.email, m.signupDate, c.attachmentLink " +
+//            "FROM Member m JOIN ConvertApplication c ON m.memberId = c.member.memberId " +
+//            "WHERE m.memberId = :memberId AND c.isResult = 0")
+//    Object[] getConvertDetailByAdmin(@Param("memberId") Long memberId);
 
 
 
@@ -67,4 +92,3 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
 //            "WHERE o.isRejected = 0")
 //    List<AppOwnerListModalDTO> findConvertAppListByAdminModal();
 
-}
