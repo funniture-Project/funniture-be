@@ -13,37 +13,15 @@ import java.util.List;
 @Repository
 public interface AdminRepository extends JpaRepository<MemberAndPointEntity, String> {
 
-//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
-//            "IFNULL(b.current_point, 0) AS current_point " +
-//            "FROM tbl_member a " +
-//            "LEFT JOIN tbl_point b ON a.member_id = b.member_id " +
-//            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +  // ✅ ownerInfo 테이블 조인
-//            "WHERE a.member_role = 'USER' " +
-//            "AND o.is_rejected = -1", nativeQuery = true)  // ✅ is_rejected가 -1인 유저만 조회
-//    List<Object[]> AllUserListByAdmin();
-//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
-//            "IFNULL(b.current_point, 0) as current_point " +
-//            "FROM tbl_member a " +
-//            "LEFT JOIN tbl_point b ON a.member_id = b.member_id " +
-//            "WHERE a.member_role = 'USER'", nativeQuery = true)
-//    List<Object[]> AllUserListByAdmin();
-//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
-//            "IFNULL(b.current_point, 0) AS current_point " +
-//            "FROM tbl_member a " +
-//            "LEFT JOIN tbl_point b ON a.member_id = b.member_id " +
-//            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +  // ✅ ownerInfo 테이블 조인
-//            "WHERE a.member_role = 'USER' " +
-//            "AND IFNULL(o.is_rejected, -1) = -1", nativeQuery = true)  // ✅ is_rejected가 -1이거나 NULL인 유저 포함
-//    List<Object[]> AllUserListByAdmin();
 
     @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
             "IFNULL(b.current_point, 0) AS current_point " +
             "FROM tbl_member a " +
             "LEFT JOIN tbl_point b ON a.member_id = b.member_id " +
-            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
+            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +  // 추가된 부분
             "WHERE a.member_role = 'USER' " +
-            "ORDER BY CASE WHEN o.is_rejected = -1 THEN 0 ELSE 1 END, " +
-            "a.member_id ASC",
+            "AND o.member_id IS NULL " +  // tbl_ownerinfo에 존재하지 않는 사용자만 가져옴
+            "ORDER BY a.member_id ASC",
             nativeQuery = true)
     List<Object[]> AllUserListByAdmin();
 
