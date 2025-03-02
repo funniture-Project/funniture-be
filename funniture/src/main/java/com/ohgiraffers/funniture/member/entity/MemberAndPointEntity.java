@@ -33,6 +33,10 @@ public class MemberAndPointEntity {
     @Column(name = "member_role")
     private String memberRole;
 
+    // 25-03-02 반려사유 추가
+    @Column(name = "reason_rejection")
+    private String reasonRejection;
+
     @Transient
     private int currentPoint;
 
