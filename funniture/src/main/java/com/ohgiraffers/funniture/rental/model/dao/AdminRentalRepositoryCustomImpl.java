@@ -6,10 +6,15 @@ import com.ohgiraffers.funniture.rental.entity.QAdminProductEntity;
 import com.ohgiraffers.funniture.rental.entity.QAdminRentalEntity;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalViewDTO;
 import com.ohgiraffers.funniture.rental.model.dto.AdminRentalSearchCriteria;
+import com.ohgiraffers.funniture.rental.model.dto.OwnerRentalViewDTO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -23,7 +28,7 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria) {
+    public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Pageable pageable) {
 
         QAdminRentalEntity rental = QAdminRentalEntity.adminRentalEntity;
         QAdminProductEntity product = QAdminProductEntity.adminProductEntity;
@@ -63,23 +68,40 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
             builder.and(rental.rentalNo.like("%" + criteria.getRentalNo() + "%"));
         }
 
-        // 쿼리실행
-        return jpaQueryFactory
-                .select(Projections.constructor(AdminRentalViewDTO.class,
-                        rental.rentalNo,
-                        ownerInfo.storeName,
-                        rental.rentalState,
-                        parentCategory.categoryName,
-                        product.productName,
-                        rental.rentalStartDate,
-                        rental.rentalEndDate,
-                        rental.rentalNumber))
+        JPAQuery<AdminRentalViewDTO> query = jpaQueryFactory
+            .select(Projections.constructor(AdminRentalViewDTO.class,
+                   rental.rentalNo,
+                   ownerInfo.storeName,
+                   rental.rentalState,
+                   parentCategory.categoryName,
+                   product.productName,
+                   rental.rentalStartDate,
+                   rental.rentalEndDate,
+                   rental.rentalNumber))
+           .from(rental)
+           .join(rental.adminProduct, product)
+           .join(product.adminOwnerInfo, ownerInfo)
+           .join(product.adminCategory, category)
+           .leftJoin(category.refCategoryCode, parentCategory)
+           .where(builder)
+           .orderBy(rental.orderDate.desc())
+           .offset(pageable.getOffset()) // 페이지 오프셋 설정
+           .limit(pageable.getPageSize()); // 페이지 크기 설정
+
+        List<AdminRentalViewDTO> adminRentalList = query.fetch();
+
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(rental.count())
                 .from(rental)
                 .join(rental.adminProduct, product)
                 .join(product.adminOwnerInfo, ownerInfo)
                 .join(product.adminCategory, category)
                 .leftJoin(category.refCategoryCode, parentCategory)
-                .where(builder)
-                .fetch();
+                .where(builder);
+
+        Long countResult = countQuery.fetchOne();
+        long totalCount = (countResult != null) ? countResult : 0;
+
+        return new PageImpl<>(adminRentalList, pageable, totalCount);
     }
 }

@@ -41,4 +41,14 @@ public class RentalDetailDTO {
     private String destinationAddress;  // 주소
 
     private String receiver;            // 받는분
+
+    private String email;        // 대여자 이메일
+
+    private String userName;        // 대여자 이름
+
+    private String phoneNumber;        // 대여자 폰번호
+
+
+
+
 }

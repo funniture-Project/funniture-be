@@ -62,7 +62,8 @@ public class RentalController {
             parameters = {
                     @Parameter(name = "memberId", description = "사용자 ID(필수)"),
                     @Parameter(name = "period", description = "조회 할 개월수(개월수에 orderDate 가 해당되면 조회) ex.1개월전~현재=1MONTH,3개월전~현재=3MONTH (선택)"),
-                    @Parameter(name = "searchDate", description = "조회 할 날짜(선택)")
+                    @Parameter(name = "searchDate", description = "조회 할 날짜(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
             }
     )
     @ApiResponses({
@@ -73,21 +74,25 @@ public class RentalController {
     @GetMapping("/user")
     public ResponseEntity<ResponseMessage> findRentalOrderListByUser(@RequestParam String memberId,
                                                                      @RequestParam(required = false) String period,
-                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate) {
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchDate,
+                                                                     @RequestParam(name = "offset", defaultValue = "1") String offset) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        List<UserOrderViewDTO> orderList = rentalService.findRentalOrderListByUser(memberId,period,searchDate);
+        Criteria cri = new Criteria(Integer.valueOf(offset), 8);
 
-        if (orderList.isEmpty()){
+        Page<UserOrderViewDTO> userOrderList = rentalService.findRentalOrderListByUser(memberId,period,searchDate, cri);
+
+        if (userOrderList.isEmpty()){
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
         }
 
         Map<String, Object> res = new HashMap<>();
-        res.put("orderList", orderList);
+        res.put("userOrderList", userOrderList.getContent());
+        res.put("pageInfo", new PageDTO(cri, (int) userOrderList.getTotalElements()));
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자 예약 조회 성공", res));
     }
@@ -129,7 +134,8 @@ public class RentalController {
             parameters = {
                     @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
                     @Parameter(name = "period", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)"),
-                    @Parameter(name = "rentalTab", description = "예약/배송/반납 필터링 조회(선택)")
+                    @Parameter(name = "rentalTab", description = "예약/배송/반납 필터링 조회(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
 
             }
     )
@@ -178,7 +184,8 @@ public class RentalController {
                     @Parameter(name = "storeName", description = "회사명(선택)"),
                     @Parameter(name = "categoryName", description = "상위카테고리명 ex.가전/가구(선택)"),
                     @Parameter(name = "searchDate", description = "예약시작날짜(rentalStartDate),만료날짜(rentalEndDate) 사이에 선택 한 날짜가 해당되는 예약만 조회(선택)"),
-                    @Parameter(name = "rentalNo", description = "예약번호(선택)")
+                    @Parameter(name = "rentalNo", description = "예약번호(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
             }
     )
     @ApiResponses({
@@ -191,14 +198,11 @@ public class RentalController {
                                                                     @RequestParam(required = false) String storeName,
                                                                     @RequestParam(required = false) String categoryName,
                                                                     @RequestParam(required = false) String searchDate,
-                                                                    @RequestParam(required = false) String rentalNo
+                                                                    @RequestParam(required = false) String rentalNo,
+                                                                    @RequestParam(name = "offset", defaultValue = "1") String offset
+
     ) {
 
-        System.out.println("rentalState = " + rentalState);
-        System.out.println("storeName = " + storeName);
-        System.out.println("categoryName = " + categoryName);
-        System.out.println("searchDate = " + searchDate);
-        System.out.println("rentalNo = " + rentalNo);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
@@ -212,7 +216,9 @@ public class RentalController {
         // 검색 조건 DTO 로 변환
         AdminRentalSearchCriteria criteria = new AdminRentalSearchCriteria(rentalState, storeName, categoryName, searchDateTime, rentalNo);
 
-        List<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria);
+        Criteria cri = new Criteria(Integer.valueOf(offset), 11);
+
+        Page<AdminRentalViewDTO> adminRentalList = rentalService.findRentalAllListByAdmin(criteria, cri);
 
         if (adminRentalList.isEmpty()){
             return ResponseEntity.ok()
@@ -221,11 +227,11 @@ public class RentalController {
         }
 
         Map<String, Object> res = new HashMap<>();
-        res.put("adminRentalList", adminRentalList);
+        res.put("adminRentalList", adminRentalList.getContent());
+        res.put("pageInfo", new PageDTO(cri, (int) adminRentalList.getTotalElements()));
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약 전체 조회 성공", res));
     }
-
 
 
 }
