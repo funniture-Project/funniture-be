@@ -388,4 +388,31 @@ public class MemberController {
         }
     }
 
+    // 재공자 신청 반려 됐을 때 반려 메시지 가져오는 애)
+    @Operation(summary = "제공자 전환 반려 메시지", description = "제공자 전환 반려 됐을 때 반려 메시지 불러오기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 반려 메시지 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 반려 메시지 조회 실패")
+    })
+    @GetMapping(value = "/rejected/{memberId}")
+    public ResponseEntity<ResponseMessage> rejectedMessageMypage(@PathVariable String memberId)  {
+
+        System.out.println("✅ 반려 메시지 조회, 화면에서 넘어온 memberId"+ memberId);
+        MemberDTO memberDTO = memberService.getRejectedMessage(memberId);
+        System.out.println("✅ 서비스에서 넘어온 반려 메시지 DTO = " + memberDTO);
+
+        Map<String , Object> result = new HashMap<>();
+        result.put("result" , memberDTO);
+
+        if (memberDTO == null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "제공자 전환 반려 메시지가 존재하지 않습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "제공자 전환 반려 메시지 조회 성공", result));
+    }
+
 }
