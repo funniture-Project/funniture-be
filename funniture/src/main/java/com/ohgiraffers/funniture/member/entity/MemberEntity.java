@@ -53,6 +53,9 @@ public class MemberEntity {
     @Column(name = "address")
     private String address;
 
+//    @Column (name = "reason_rejection")
+//    private String reasonRejection;
+
     protected MemberEntity(){}
 
     public MemberEntity password(String password){

@@ -274,7 +274,12 @@ public class MemberService {
         );
     }
 
+    // 제공자 전환 반려 메시지 조회
+    public MemberDTO getRejectedMessage(String memberId) {
 
+        Optional<MemberEntity> memberEntity = memberRepository.findById(memberId);
+        System.out.println("✅ 반려 사유 조회 엔티티 값 : " + memberEntity);
 
-
+        return modelMapper.map(memberEntity , MemberDTO.class);
+    }
 }
