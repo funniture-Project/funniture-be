@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.rental.model.dao;
 
 import com.ohgiraffers.funniture.rental.model.dto.OwnerRentalViewDTO;
+import com.ohgiraffers.funniture.rental.model.dto.RentalDetailDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
