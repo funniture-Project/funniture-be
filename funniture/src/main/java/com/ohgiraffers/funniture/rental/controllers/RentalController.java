@@ -172,6 +172,40 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자별 예약 조회 성공", res));
     }
 
+    @Operation(summary = "예약대기에서 예약완료 상태 업데이트",
+            description = "제공자 마이페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "예약완료로 상태 변경 되었습니다.")
+    })
+    
+    // 예약확정
+    @PutMapping("/{rentalNo}/confirm")
+    public ResponseEntity<ResponseMessage> confirmRental(@PathVariable String rentalNo) {
+        String rentalState = "예약완료";  // 상태값 고정
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        rentalService.confirmRental(rentalNo, rentalState);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약완료로 상태 변경 되었습니다.", null));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
