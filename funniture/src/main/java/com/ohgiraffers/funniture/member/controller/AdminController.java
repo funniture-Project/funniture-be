@@ -84,6 +84,34 @@ public class AdminController {
                 .body(new ResponseMessage(200, "모든 제공자 정보 조회 성공", result));
     }
 
+    @Operation(summary = "제공자 상세 조회",
+            description = "관리자 페이지에서 제공자 상세정보 조회"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 상세 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 상세 조회 실패")
+    })
+    @GetMapping("/ownerDetail/{memberId}")
+    public ResponseEntity<ResponseMessage> getOwnerDetailByAdmin(@PathVariable String memberId) {
+        System.out.println("✅ 관리자 페이지에서 제공자 상세 데이터 불러오는 컨트롤러 동작 memberId : " + memberId);
+
+        AppOwnerListModalDTO appOwnerListModalDTO = adminService.getOwnerDetailByAdmin(memberId);
+        System.out.println("✅ 관리자 페이지에서 제공자 요청 상세 정보 = " + appOwnerListModalDTO);
+
+        Map <String , Object> result = new HashMap<>();
+        result.put("result", appOwnerListModalDTO);
+
+        if (appOwnerListModalDTO == null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "제공자 상세 정보가 존재하지 않음.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "제공자 상세 정보 조회 성공", result));
+    }
+
     @Operation(summary = "제공자 전환 요청 조회",
             description = "관리자 페이지에서 제공자 전환 요청 정보 조회"
     )
@@ -121,7 +149,7 @@ public class AdminController {
     })
     @GetMapping("/convertApp/{memberId}")
     public ResponseEntity<ResponseMessage> getConvertDetailByAdmin(@PathVariable String memberId) {
-        System.out.println("✅ 관리자 페이지에서 제공자 전환 상세 데이터 불러오는 컨트롤러 동작");
+        System.out.println("✅ 관리자 페이지에서 제공자 전환 상세 데이터 불러오는 컨트롤러 동작 memberId : " + memberId);
 
         AppOwnerListModalDTO appOwnerListModalDTO = adminService.getConvertAppDetailByAdmin(memberId);
         System.out.println("✅ 관리자 페이지에서 전환 요청 상세 정보 = " + appOwnerListModalDTO);
@@ -256,8 +284,8 @@ public class AdminController {
             description = "관리자 페이지에서 사용자를 탈퇴자로 권한 변경"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "사용자자 회원, 탈퇴자로 권한 변경 성공"),
-            @ApiResponse(responseCode = "404", description = "사용자자 회원, 탈퇴자로 권한 변경 실패")
+            @ApiResponse(responseCode = "201", description = "사용자 회원, 탈퇴자로 권한 변경 성공"),
+            @ApiResponse(responseCode = "400", description = "사용자 회원, 탈퇴자로 권한 변경 실패")
     })
     @PostMapping("/deactivate")
     public ResponseEntity<ResponseMessage> userToLeaverApproveByAdmin (@RequestBody List<String> userIds) {
@@ -275,6 +303,37 @@ public class AdminController {
             return ResponseEntity.ok() // 상태 코드 400 (Bad Request)
                     .headers(authController.headersMethod())
                     .body(new ResponseMessage(400, "사용자 회원 중 일부 또는 전체가 이미 탈퇴자 권한입니다.", null));
+        }
+    }
+
+    @Operation(summary = "사용자 포인트 수정",
+            description = "관리자 페이지에서 사용자의 포인트를 수정한다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "사용자 포인트 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "사용자 포인트 수정 실패")
+    })
+    @PostMapping("/updatePoint")
+    public ResponseEntity<ResponseMessage> userPointUpdateByAdmin (@RequestBody PointUpdateDTO pointUpdateDTO) {
+        System.out.println("✅ 관리자 페이지에서 유저 포인트 수정 memberAndPointDTO 잘 받아왔나 : " + pointUpdateDTO);
+
+        String memberId = pointUpdateDTO.getMemberId();
+        int newPoint = pointUpdateDTO.getNewPoint();
+        System.out.println("memberId = " + memberId);
+        System.out.println("newPoint = " + newPoint);
+
+        Boolean isSuccess = adminService.userPointUpdateService(memberId , newPoint);
+
+        if (isSuccess) {
+            // 성공 응답
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "사용자 회원, 포인트 수정이 완료 되었습니다.", null));
+        } else {
+            // 실패 응답
+            return ResponseEntity.ok() // 상태 코드 400 (Bad Request)
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "사용자 회원, 포인트 수정에 실패하였습니다.", null));
         }
     }
 

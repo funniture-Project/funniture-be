@@ -7,6 +7,9 @@ import com.ohgiraffers.funniture.member.model.dao.AdminRepository;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.member.model.dao.OwnerRepository;
 import com.ohgiraffers.funniture.member.model.dto.*;
+import com.ohgiraffers.funniture.point.entity.PointEntity;
+import com.ohgiraffers.funniture.point.model.dao.PointRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +26,7 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final OwnerRepository ownerRepository;
     private final ModelMapper modelMapper;
+    private final PointRepository pointRepository;
 
     // 관리자 페이지에서 모든 사용자 정보 불러오는 로직
     public List<MemberAndPointDTO> getUserListByAdmin() {
@@ -126,7 +130,16 @@ public class AdminService {
 
     // 관리자 페이지에서 제공자 전환 신청한 애들 눌렀을 때 모달에 표시될 데이터 부르는 로직
     public AppOwnerListModalDTO getConvertAppDetailByAdmin(String memberId) {
+//        System.out.println("제공자 , 전환 상세 모달 서비스member Id = " + memberId);
+//        System.out.println("제공자 , 전환 상세 모달 서비스member result = " + result);
         return adminRepository.findConvertAppDetailByMemberId(memberId);
+    }
+
+    // 관리자 페이지에서 제공자 애들 눌렀을 때 모달에 표시될 데이터 부르는 로직
+    public AppOwnerListModalDTO getOwnerDetailByAdmin(String memberId) {
+//        System.out.println("제공자 , 전환 상세 모달 서비스member Id = " + memberId);
+//        System.out.println("제공자 , 전환 상세 모달 서비스member result = " + result);
+        return adminRepository.findOwnerDetailByMemberId(memberId);
     }
 
     // 제공자 전환 신청 모달에서 승인 눌렀을 때 동작하는 애
@@ -188,6 +201,36 @@ public class AdminService {
             return false;
         }
     }
+
+    // 관리자 페이지에서 사용자 포인트 수정하는 구문
+    @Transactional
+    public Boolean userPointUpdateService(String memberId, int newPoint) {
+        try {
+            MemberAndPointEntity member = adminRepository.findById(memberId)
+                    .orElseThrow(() -> new EntityNotFoundException("Member not found"));
+
+            // MemberAndPointEntity 업데이트
+            MemberAndPointEntity updatedMember = member.toBuilder()
+                    .currentPoint(newPoint)
+                    .build();
+            adminRepository.save(updatedMember);
+
+            // PointEntity 생성 및 저장
+            PointEntity pointEntity = PointEntity.builder()
+                    .memberId(memberId)
+                    .currentPoint(newPoint)
+                    .addPoint(newPoint - member.getCurrentPoint()) // 포인트 증가분
+                    .usedPoint(0) // 사용된 포인트는 0으로 설정
+                    .build();
+            pointRepository.save(pointEntity);
+
+            return true;
+        } catch (Exception e) {
+            System.out.println("❌ 포인트 수정 중 오류 발생: " + e.getMessage());
+            return false;
+        }
+    }
+
 
 
 
