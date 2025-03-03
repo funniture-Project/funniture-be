@@ -226,6 +226,36 @@ public class RentalController {
 
     }
 
+    @Operation(summary = "운송장 번호와 운송업체명 업데이트",
+            description = "운송장 번호와 운송업체명을 업데이트합니다.",
+            parameters = {
+                    @Parameter(name = "rentalNo", description = "주문번호"),
+                    @Parameter(name = "deliveryNo", description = "운송장 번호"),
+                    @Parameter(name = "deliverCom", description = "운송업체명")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "운송장 번호와 운송업체명이 성공적으로 업데이트되었습니다."),
+            @ApiResponse(responseCode = "500", description = "운송장 번호 또는 운송업체명 업데이트 중 오류가 발생했습니다.")
+    })
+    @PutMapping("/{rentalNo}/delivery")
+    public ResponseEntity<ResponseMessage> updateDelivery(@PathVariable String rentalNo,
+                                                          @RequestParam String deliveryNo,
+                                                          @RequestParam String deliverCom) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        try {
+            rentalService.updateDelivery(rentalNo, deliveryNo, deliverCom);  // 운송장 번호와 업체명 업데이트
+            return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "운송장 번호와 운송업체명이 성공적으로 업데이트되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(headers)
+                    .body(new ResponseMessage(500, "운송장 번호 또는 운송업체명 업데이트 중 오류가 발생했습니다.", null));
+        }
+    }
+
 
 
 

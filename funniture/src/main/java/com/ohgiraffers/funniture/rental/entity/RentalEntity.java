@@ -62,4 +62,10 @@ public class RentalEntity {
         this.rentalState = newState;
     }
 
+    // 운송장번호, 운송업체명 변경 메서드 추가
+    public void changeDelivery(String newDeliveryNo, String newDeliverCom) {
+        this.deliveryNo = newDeliveryNo;
+        this.deliverCom = newDeliverCom;
+    }
+
 }

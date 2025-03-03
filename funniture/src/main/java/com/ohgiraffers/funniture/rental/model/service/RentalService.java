@@ -161,4 +161,24 @@ public class RentalService {
 
         rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
     }
+
+    // 운송장번호, 운송 업체명 수정 -> 배송중&수거중으로 상태 업데이트
+    @Transactional
+    public void updateDelivery(String rentalNo, String deliveryNo, String deliverCom) {
+        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
+
+        // 현재 예약 상태(rentalState) 확인
+        String currentState = rental.getRentalState();
+
+        // 상태에 따라 배송중 또는 수거중으로 변경
+        if ("예약완료".equals(currentState)) {
+            rental.changeRentalState("배송중");  // 배송중으로 상태 변경
+        } else if ("반납요청".equals(currentState)) {
+            rental.changeRentalState("수거중");  // 수거중으로 상태 변경
+        }
+
+        // 운송장 번호와 운송 업체명 업데이트
+        rental.changeDelivery(deliveryNo, deliverCom);
+    }
 }
