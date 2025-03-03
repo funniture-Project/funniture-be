@@ -46,7 +46,7 @@ public class MemberDTO implements UserDetails {
     private String address;
 
 //    // 25-03-02, 반려 사유 컬럼 추가
-//    private String reasonRejection;
+    private String reasonRejection;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

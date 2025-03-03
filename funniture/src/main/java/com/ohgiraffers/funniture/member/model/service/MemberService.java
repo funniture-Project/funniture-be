@@ -226,6 +226,25 @@ public class MemberService {
         return ownerInfoEntity.isPresent(); // 존재하면 true 반환
     }
 
+    // 사용자의 제공자 신청 여부 확인
+    public String getOwnerStatus(String memberId) {
+        Optional<OwnerInfoEntity> ownerInfoEntity = ownerRepository.findByMemberId(memberId);
+
+        if (ownerInfoEntity.isPresent()) {
+            int isRejected = ownerInfoEntity.get().getIsRejected();
+
+            if (isRejected == -1) {
+                return "REJECTED";
+            } else if (isRejected == 0) {
+                return "PENDING";
+            } else if (isRejected == 1) {
+                return "APPROVED";
+            }
+        }
+        return "NONE"; // 신청 이력이 없음
+    }
+
+
     // 제공자 재신청 (기존 데이터에서 업데이트로)
     @Transactional
     public AppOwnerInfoDTO upsertOwner(AppOwnerInfoDTO appOwnerInfoDTO) {

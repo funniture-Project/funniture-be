@@ -331,11 +331,12 @@ public class MemberController {
     })
     @GetMapping("/owner/status/{memberId}")
     public ResponseEntity<ResponseMessage> checkOwnerStatus(@PathVariable String memberId) {
-        boolean isRegistered = memberService.existsByMemberId(memberId);
-        System.out.println("제공자 전환 신청 여부 확인 컨트롤러 - memberId: " + memberId + ", isRegistered: " + isRegistered);
+//        boolean isRegistered = memberService.existsByMemberId(memberId);
+        String status = memberService.getOwnerStatus(memberId);
+        System.out.println("제공자 전환 신청 여부 확인 컨트롤러 - memberId: " + memberId + ", isRegistered: " + status);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("isRegistered", isRegistered);
+        response.put("status", status);
 
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())

@@ -53,8 +53,8 @@ public class MemberEntity {
     @Column(name = "address")
     private String address;
 
-//    @Column (name = "reason_rejection")
-//    private String reasonRejection;
+    @Column (name = "reason_rejection")
+    private String reasonRejection;
 
     protected MemberEntity(){}
 
@@ -64,7 +64,7 @@ public class MemberEntity {
     }
 
     public MemberEntity create(){
-        return new MemberEntity(memberId, email,password,userName,phoneNumber,signupDate,memberRole,isConsulting,hasImage,imageId,imageLink,address);
+        return new MemberEntity(memberId, email,password,userName,phoneNumber,signupDate,memberRole,isConsulting,hasImage,imageId,imageLink,address, reasonRejection);
     }
 
 //    // 연관관계 설정 (한 명의 회원이 여러 개의 상품을 소유할 수 있음)
