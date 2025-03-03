@@ -75,6 +75,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/rental/\\w+",
                 "/api/v1/rental/confirmBatch",
                 "/api/v1/rental/cancel",
+                "/api/v1/rental/\\w+/delivery",
+                "/api/v1/rental/\\d+/delivery",
                 "/api/v1/chat/.*",
                 "/api/v1/deliveryaddress",
                 "/api/v1/deliveryaddress/\\w+",

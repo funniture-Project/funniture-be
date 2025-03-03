@@ -111,6 +111,7 @@ public class OwnerRentalRepositoryCustomImpl implements OwnerRentalRepositoryCus
                 .join(rental.deliveryAddressEntity, deliveryAddress)
                 .join(rental.memberEntity, member)
                 .where(whereCondition)
+                .orderBy(rental.orderDate.desc())
                 .offset(pageable.getOffset()) // 페이지 오프셋 설정
                 .limit(pageable.getPageSize()); // 페이지 크기 설정
 
