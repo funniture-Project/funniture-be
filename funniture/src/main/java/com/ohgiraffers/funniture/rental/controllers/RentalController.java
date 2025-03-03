@@ -173,31 +173,19 @@ public class RentalController {
     }
 
     @Operation(summary = "예약대기에서 예약완료 상태 업데이트",
-            description = "제공자 마이페이지에서 사용"
+            description = "제공자 마이페이지에서 사용",
+            parameters = {
+            @Parameter(name = "rentalNos", description = "다중선택 한 주문번호")
+            }
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "예약완료로 상태 변경 되었습니다.")
+            @ApiResponse(responseCode = "200", description = "선택된 예약들이 예약완료로 상태 변경되었습니다."),
+            @ApiResponse(responseCode = "500", description = "예약 확정 중 오류가 발생했습니다.")
     })
-    
-//    // 예약확정
-//    @PutMapping("/{rentalNo}/confirm")
-//    public ResponseEntity<ResponseMessage> confirmRental(@PathVariable String rentalNo) {
-//        String rentalState = "예약완료";  // 상태값 고정
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
-//
-//        rentalService.confirmRental(rentalNo, rentalState);
-//
-//        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약완료로 상태 변경 되었습니다.", null));
-//    }
-
     @PutMapping("/confirmBatch")
     public ResponseEntity<ResponseMessage> confirmRentals(@RequestParam List<String> rentalNos) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
-
-        System.out.println("rentalNos = " + rentalNos);
 
         try {
             rentalService.confirmRentals(rentalNos);  // 여러 개의 예약번호 처리
@@ -205,12 +193,38 @@ public class RentalController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .headers(headers)
-                    .body(new ResponseMessage(500, "예약 상태 변경 중 오류가 발생했습니다.", null));
+                    .body(new ResponseMessage(500, "예약 확정 중 오류가 발생했습니다.", null));
         }
 
     }
 
+    @Operation(summary = "예약대기에서 예약취소 상태 업데이트",
+            description = "제공자 마이페이지 주문 상세모달에서 사용",
+            parameters = {
+                    @Parameter(name = "rentalNo", description = "주문번호")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "예약취소로 상태 변경되었습니다."),
+            @ApiResponse(responseCode = "500", description = "예약 취소 오류가 발생했습니다.")
+    })
+    @PutMapping("/cancel")
+    public ResponseEntity<ResponseMessage> cancelBatch(@RequestParam String rentalNo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
+        String rentalState = "예약취소";
+
+        try {
+            rentalService.cancelBatch(rentalNo, rentalState);  // 여러 개의 예약번호 처리
+            return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약취소로 상태 변경되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(headers)
+                    .body(new ResponseMessage(500, "예약 취소 오류가 발생했습니다.", null));
+        }
+
+    }
 
 
 
