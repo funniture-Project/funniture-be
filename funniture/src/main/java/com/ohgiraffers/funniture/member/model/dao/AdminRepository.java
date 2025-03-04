@@ -25,8 +25,7 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             "                                                  FROM tbl_point " +
             "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
             "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
-            "WHERE (a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1)) " +
-            "OR (a.member_role != 'USER' AND o.is_rejected = -1) " +
+            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1) " +
             "ORDER BY a.member_id ASC",
             nativeQuery = true)
     List<Object[]> AllUserListByAdmin();
