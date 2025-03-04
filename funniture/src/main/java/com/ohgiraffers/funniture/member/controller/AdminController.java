@@ -40,7 +40,7 @@ public class AdminController {
         System.out.println("✅ 관리자 페이지에서 유저 정보 불러오는 컨트롤러 동작");
 
         List<MemberAndPointDTO> memberAndPointDTO = adminService.getUserListByAdmin();
-        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
+//        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
 
         Map<String , Object> result = new HashMap<>();
         result.put("result" , memberAndPointDTO);
@@ -68,7 +68,7 @@ public class AdminController {
         System.out.println("✅ 관리자 페이지에서 제공자 정보 불러오는 컨트롤러 동작");
 
         List<OwnerInfoAndMemberDTO> ownerInfoAndMemberDTO = adminService.getOwnerListByAdmin();
-        System.out.println("제공자 정보 서비스에서 잘 넘어 왔는지 ownerInfoAndMemberDTO = " + ownerInfoAndMemberDTO);
+//        System.out.println("제공자 정보 서비스에서 잘 넘어 왔는지 ownerInfoAndMemberDTO = " + ownerInfoAndMemberDTO);
 
         Map<String, Object> result = new HashMap<>();
         result.put("result", ownerInfoAndMemberDTO);
@@ -124,7 +124,7 @@ public class AdminController {
         System.out.println("✅ 관리자 페이지에서 제공자 전환 데이터 불러오는 컨트롤러 동작");
 
         List<AppOwnerListDTO> appOwnerListDTO = adminService.getConvertAppListByAdmin();
-        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + appOwnerListDTO);
+//        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + appOwnerListDTO);
 
         Map<String , Object> result = new HashMap<>();
         result.put("result" , appOwnerListDTO);
@@ -238,7 +238,7 @@ public class AdminController {
         System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 불러오는 컨트롤러 동작");
 
         List<MemberAndPointDTO> memberAndPointDTO = adminService.getLeaverListByAdmin();
-        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
+//        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
 
         Map<String , Object> result = new HashMap<>();
         result.put("result" , memberAndPointDTO);

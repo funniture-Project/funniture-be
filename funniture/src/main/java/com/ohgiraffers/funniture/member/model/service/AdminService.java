@@ -31,7 +31,7 @@ public class AdminService {
     // 관리자 페이지에서 모든 사용자 정보 불러오는 로직
     public List<MemberAndPointDTO> getUserListByAdmin() {
         List<Object[]> memberEntityList = adminRepository.AllUserListByAdmin();
-        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+//        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
 
         return memberEntityList.stream()
                 .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
@@ -41,7 +41,7 @@ public class AdminService {
     // 관리자 페이지에서 모든 제공자 정보 불러오는 로직
     public List<OwnerInfoAndMemberDTO> getOwnerListByAdmin() {
         List<Object[]> ownerEntityList = adminRepository.findAllOwnerInfo();
-        System.out.println("레파지토리에서 잘 조회해 왔는지 ownerEntityList = " + ownerEntityList);
+//        System.out.println("레파지토리에서 잘 조회해 왔는지 ownerEntityList = " + ownerEntityList);
 
         return ownerEntityList.stream()
                 .map(OwnerInfoAndMemberDTO::new) // 생성자 사용하여 변환
@@ -51,7 +51,7 @@ public class AdminService {
     // 관리자 페이지에서 제공자 전환 신청 정보 불러오는 로직 (is_result가 0인 항목)
     public List<AppOwnerListDTO> getConvertAppListByAdmin() {
         List<Object[]> memberEntityList = adminRepository.AllConvertListByAdmin();
-        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+//        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
 
         return memberEntityList.stream()
                 .map(AppOwnerListDTO::new) // ✅ 새로운 생성자 활용
@@ -61,7 +61,7 @@ public class AdminService {
     // 관리자 페이지에서 모든 탈퇴자 정보 불러오는 로직
     public List<MemberAndPointDTO> getLeaverListByAdmin() {
         List<Object[]> memberEntityList = adminRepository.AllLeaverListByAdmin();
-        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+//        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
 
         return memberEntityList.stream()
                 .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용

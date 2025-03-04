@@ -419,12 +419,15 @@ public class MemberController {
     // 재공자 전환 신청에서 중복된 store_no 있는지 확인하는 로직
     @Operation(summary = "제공자 전환 중복 데이터 확인", description = "제공자 전환 시 중복 데이터 여부 확인")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "제공자 전환 사업자등록번호 리스트 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "제공자 전환 사업자등록번호 리스트 조회 실패")
+            @ApiResponse(responseCode = "200", description = "제공자 전환 사업자등록번호 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "제공자 전환 사업자등록번호 중복")
     })
     @GetMapping("/check-store-no")
     public ResponseEntity<ResponseMessage> checkStoreNoDuplicate(@RequestParam String storeNo, @RequestParam String memberId) {
         boolean isDuplicateOrOwned = memberService.isStoreNoDuplicateOrOwnedByUser(storeNo, memberId);
+
+        System.out.println("storeNo = " + storeNo);
+        System.out.println("memberId = " + memberId);
 
         if (isDuplicateOrOwned) {
             return ResponseEntity.ok(new ResponseMessage(400, "중복된 사업자 번호입니다.", null));
