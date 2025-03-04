@@ -12,4 +12,6 @@ public interface OwnerRepository extends JpaRepository<OwnerInfoEntity, Long> {
     Optional<OwnerInfoEntity> findByMemberId(String memberId);
 
     boolean existsByMemberId(String memberId);
+
+    boolean existsByStoreNoAndMemberIdNot(String storeNo, String memberId);
 }

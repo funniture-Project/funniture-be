@@ -301,4 +301,19 @@ public class MemberService {
 
         return modelMapper.map(memberEntity , MemberDTO.class);
     }
+
+    public boolean isStoreNoDuplicateOrOwnedByUser(String storeNo, String memberId) {
+        // 현재 사용자의 이전 신청 정보 확인
+        Optional<OwnerInfoEntity> existingOwnerInfo = ownerRepository.findByMemberId(memberId);
+
+        // 사용자 본인의 이전 store_no인 경우 사용 허용
+        if (existingOwnerInfo.isPresent() && existingOwnerInfo.get().getStoreNo().equals(storeNo)) {
+            return false;
+        }
+
+        // 다른 사용자의 store_no와 중복 확인
+        return ownerRepository.existsByStoreNoAndMemberIdNot(storeNo, memberId);
+    }
+
+
 }
