@@ -53,6 +53,11 @@ public class ChatController {
 
         List<ChatDTO> result = chatService.getChatQuList(refNum, qaLevel);
 
+        if (qaLevel != null && qaLevel >=2){
+            List<ChatDTO> refResult = chatService.getRefChatQuList(qaLevel);
+            responseMap.put("refResult", refResult);
+        }
+
         responseMap.put("result", result);
 
         return ResponseEntity.ok()
