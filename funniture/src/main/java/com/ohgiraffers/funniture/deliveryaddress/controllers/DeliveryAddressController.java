@@ -114,12 +114,12 @@ public class DeliveryAddressController {
             @ApiResponse(responseCode = "200", description = "배송지 수정이 완료되었습니다.")
     })
     // 배송지 수정
-    @PutMapping("/update")
-    public ResponseEntity<ResponseMessage> deliveryAddressUpdate(@RequestBody DeliveryAddressDTO deliveryAddressDTO) {
+    @PutMapping("/{destinationNo}/update")
+    public ResponseEntity<ResponseMessage> deliveryAddressUpdate(@PathVariable int destinationNo, @RequestBody DeliveryAddressDTO deliveryAddressDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        deliveryAddressService.deliveryAddressUpdate(deliveryAddressDTO);
+        deliveryAddressService.deliveryAddressUpdate(destinationNo,deliveryAddressDTO);
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 수정이 완료되었습니다.", null));
     }

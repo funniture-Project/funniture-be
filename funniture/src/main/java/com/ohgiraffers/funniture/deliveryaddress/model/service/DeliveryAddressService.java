@@ -73,11 +73,11 @@ public class DeliveryAddressService {
 
     // 배송지 수정
     @Transactional
-    public void deliveryAddressUpdate(DeliveryAddressDTO deliveryAddressDTO) {
+    public void deliveryAddressUpdate(int destinationNo, DeliveryAddressDTO deliveryAddressDTO) {
 
         // 수정할 배송지 찾기
         DeliveryAddressEntity deliveryAddressEntity =
-                deliveryAddressRepository.findById(deliveryAddressDTO.getDestinationNo())
+                deliveryAddressRepository.findById(destinationNo)
                         .orElseThrow(() -> new IllegalArgumentException("해당 배송지가 존재하지 않습니다."));
 
         // 만약 사용자가 기본 배송지를 설정하려는 경우

@@ -37,6 +37,7 @@ public class RentalService {
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
     private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
     private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
+    private final UserActiveRentalRepositoryCustom userActiveRentalRepositoryCustom;
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
@@ -118,6 +119,12 @@ public class RentalService {
         return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate, pageable);
     }
 
+    // 사용자 사용중인 상품 조회 = 배송완료상태인 예약
+    public Page<ActiveRentalDTO> findActiveRentalListByUser(String memberId, Criteria cri) {
+        Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
+        return userActiveRentalRepositoryCustom.findActiveRentalListByUser(memberId, pageable);
+    }
+
     // 사용자,제공자 예약 상세페이지
     public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
         return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
@@ -181,4 +188,5 @@ public class RentalService {
         // 운송장 번호와 운송 업체명 업데이트
         rental.changeDelivery(deliveryNo, deliverCom);
     }
+
 }

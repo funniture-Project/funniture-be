@@ -77,7 +77,10 @@ public class AdminRentalRepositoryCustomImpl implements AdminRentalRepositoryCus
                    product.productName,
                    rental.rentalStartDate,
                    rental.rentalEndDate,
-                   rental.rentalNumber))
+                   rental.rentalNumber,
+                   rental.memberId,
+                   rental.ownerNo
+                   ))
            .from(rental)
            .join(rental.adminProduct, product)
            .join(product.adminOwnerInfo, ownerInfo)
