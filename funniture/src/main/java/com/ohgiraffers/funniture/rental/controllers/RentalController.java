@@ -97,6 +97,45 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자 예약 조회 성공", res));
     }
 
+
+    @Operation(summary = "사용자의 예약 전체 조회",
+            description = "사용자 마이페이지 주문/배송에서 사용",
+            parameters = {
+                    @Parameter(name = "memberId", description = "사용자 ID(필수)"),
+                    @Parameter(name = "period", description = "조회 할 개월수(개월수에 orderDate 가 해당되면 조회) ex.1개월전~현재=1MONTH,3개월전~현재=3MONTH (선택)"),
+                    @Parameter(name = "searchDate", description = "조회 할 날짜(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 예약이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "사용자의 사용중인 예약 조회 성공")
+    })
+    // 사용자 사용중인 상품 조회 = 배송완료상태인 예약
+    @GetMapping("/active")
+    public ResponseEntity<ResponseMessage> findActiveRentalListByUser(@RequestParam String memberId,
+                                                                      @RequestParam(name = "offset", defaultValue = "1") String offset) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        Criteria cri = new Criteria(Integer.valueOf(offset), 8);
+
+        Page<ActiveRentalDTO> activeRentalList = rentalService.findActiveRentalListByUser(memberId, cri);
+
+        if (activeRentalList.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("activeRentalList", activeRentalList.getContent());
+        res.put("pageInfo", new PageDTO(cri, (int) activeRentalList.getTotalElements()));
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자의 사용중인 예약 조회 성공", res));
+    }
+
     @Operation(summary = "예약 상세 조회",
             description = "사용자 마이페이지, 제공자 마이페이지에서 사용",
             parameters = {
@@ -255,13 +294,6 @@ public class RentalController {
                     .body(new ResponseMessage(500, "운송장 번호 또는 운송업체명 업데이트 중 오류가 발생했습니다.", null));
         }
     }
-
-
-
-
-
-
-
 
 
 

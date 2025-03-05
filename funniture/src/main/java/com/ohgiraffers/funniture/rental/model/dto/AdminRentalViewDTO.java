@@ -29,5 +29,9 @@ public class AdminRentalViewDTO {
     private LocalDateTime rentalEndDate;     // 대여마감일
 
     private int rentalNumber;       // 대여갯수
+    
+    private String  memberId;       // 대여자
+    
+    private String ownerNo;         // 제공자
 
 }
