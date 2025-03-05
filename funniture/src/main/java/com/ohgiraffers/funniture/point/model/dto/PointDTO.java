@@ -18,13 +18,13 @@ public class PointDTO {
 
     private String memberId;    // 회원번호
 
-    private int used_point;     // 사용 포인트
+    private int usedPoint;     // 사용 포인트
 
     private int addPoint;      // 충전 포인트
 
     private int currentPoint;   // 현재 보유 포인트
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime pointDateTime;    // 포인트 시간
 
 }
