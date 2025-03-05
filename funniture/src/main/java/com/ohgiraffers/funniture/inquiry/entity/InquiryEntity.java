@@ -33,11 +33,11 @@ public class InquiryEntity {
     @Column (name = "inquiry_content")
     private String inquiryContent;
 
-//    @Column (name = "show_status")
-//    private int showStatus;
+    @Column (name = "show_status")
+    private int showStatus;
 
-//    @Column (name = "qna_type")
-//    private int qnaType;
+    @Column (name = "qna_type")
+    private int qnaType;
 
 //    @OneToMany (mappedBy = "ProductEntity")
 //    private List<ProductEntity> productNo;
