@@ -16,6 +16,20 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
 
 
     // 관리자 페이지에서 전체 회원 정보 가져오는 로직 (이렇게 해야 포인트 수정에 따른 결과 하나씩 출력)
+//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+//            "IFNULL(b.current_point, 0) AS current_point, o.is_rejected " +
+//            "FROM tbl_member a " +
+//            "LEFT JOIN (SELECT member_id, current_point " +
+//            "           FROM tbl_point " +
+//            "           WHERE (member_id, point_date_time) IN (SELECT member_id, MAX(point_date_time) " +
+//            "                                                  FROM tbl_point " +
+//            "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
+//            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
+//            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1) " +
+//            "ORDER BY a.member_id ASC",
+//            nativeQuery = true)
+//    List<Object[]> AllUserListByAdmin();
+
     @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
             "IFNULL(b.current_point, 0) AS current_point, o.is_rejected " +
             "FROM tbl_member a " +
@@ -26,28 +40,17 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
             "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
             "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1) " +
-            "ORDER BY a.member_id ASC",
+            "ORDER BY a.member_id ASC " +
+            "LIMIT :offset, :size",
             nativeQuery = true)
-    List<Object[]> AllUserListByAdmin();
+    List<Object[]> AllUserListByAdmin(@Param("offset") int offset, @Param("size") int size);
 
-
-
-    @Query(value = "SELECT a.member_id, a.store_no, a.store_name, a.store_phone, " +
-            "b.user_name, b.email, b.signup_date, b.member_role " +
-            "FROM tbl_ownerinfo a " +
-            "JOIN tbl_member b ON a.member_id = b.member_id " +
-            "WHERE a.is_rejected = 1", nativeQuery = true)
-    List<Object[]> findAllOwnerInfo();
-
-
-
-    @Query(value = "SELECT m.member_id, m.user_name, m.phone_number, m.email, m.signup_date, m.member_role, o.is_rejected " +
-            "FROM tbl_member m " +
-            "JOIN tbl_ownerinfo o ON m.member_id = o.member_id " +
-            "WHERE o.is_rejected = 0",
+    @Query(value = "SELECT COUNT(*) " +
+            "FROM tbl_member a " +
+            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
+            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1)",
             nativeQuery = true)
-    List<Object[]> AllConvertListByAdmin();
-
+    int countAllUsers();
 
     @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
             "IFNULL(b.current_point, 0) AS current_point " +
@@ -58,9 +61,58 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             "                                                  FROM tbl_point " +
             "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
             "WHERE a.member_role = 'LIMIT' " +
-            "ORDER BY a.member_id ASC",
+            "ORDER BY a.member_id ASC " +
+            "LIMIT :offset, :size",
             nativeQuery = true)
-    List<Object[]> AllLeaverListByAdmin();
+    List<Object[]> AllLeaverListByAdmin(@Param("offset") int offset, @Param("size") int size);
+
+    @Query(value = "SELECT COUNT(*) FROM tbl_member WHERE member_role = 'LIMIT'", nativeQuery = true)
+    int countAllLeavers();
+
+
+    @Query(value = "SELECT a.member_id, a.store_no, a.store_name, a.store_phone, " +
+            "b.user_name, b.email, b.signup_date, b.member_role " +
+            "FROM tbl_ownerinfo a " +
+            "JOIN tbl_member b ON a.member_id = b.member_id " +
+            "WHERE a.is_rejected = 1 " +
+            "ORDER BY a.member_id ASC " +
+            "LIMIT :offset, :size", nativeQuery = true)
+    List<Object[]> findAllOwnerInfo(@Param("offset") int offset, @Param("size") int size);
+
+    @Query(value = "SELECT COUNT(*) FROM tbl_ownerinfo WHERE is_rejected = 1", nativeQuery = true)
+    int countAllOwners();
+
+
+
+    @Query(value = "SELECT m.member_id, m.user_name, m.phone_number, m.email, m.signup_date, m.member_role, o.is_rejected " +
+            "FROM tbl_member m " +
+            "JOIN tbl_ownerinfo o ON m.member_id = o.member_id " +
+            "WHERE o.is_rejected = 0 " +
+            "ORDER BY m.member_id ASC " +
+            "LIMIT :offset, :size",
+            nativeQuery = true)
+    List<Object[]> AllConvertListByAdmin(@Param("offset") int offset, @Param("size") int size);
+
+    @Query(value = "SELECT COUNT(*) FROM tbl_member m " +
+            "JOIN tbl_ownerinfo o ON m.member_id = o.member_id " +
+            "WHERE o.is_rejected = 0",
+            nativeQuery = true)
+    int countAllConvertApps();
+
+
+
+//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+//            "IFNULL(b.current_point, 0) AS current_point " +
+//            "FROM tbl_member a " +
+//            "LEFT JOIN (SELECT member_id, current_point " +
+//            "           FROM tbl_point " +
+//            "           WHERE (member_id, point_date_time) IN (SELECT member_id, MAX(point_date_time) " +
+//            "                                                  FROM tbl_point " +
+//            "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
+//            "WHERE a.member_role = 'LIMIT' " +
+//            "ORDER BY a.member_id ASC",
+//            nativeQuery = true)
+//    List<Object[]> AllLeaverListByAdmin();
 
 
     @Query(value = "SELECT new com.ohgiraffers.funniture.member.model.dto.AppOwnerListModalDTO(" +
