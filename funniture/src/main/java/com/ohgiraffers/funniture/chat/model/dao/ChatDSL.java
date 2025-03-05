@@ -24,6 +24,7 @@ public class ChatDSL implements ChatRepository {
         System.out.println("검색 조건 refNum : " + refNum + " , qaLevel : " + qaLevel);
 
         QChatEntity chatEntity = QChatEntity.chatEntity;
+        QChatEntity parentChat = new QChatEntity("parentChat");
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -50,8 +51,10 @@ public class ChatDSL implements ChatRepository {
                         chatEntity.nextQuAbsence,
                         chatEntity.adminConnectAbsence,
                         chatEntity.refQuNo
+//                        parentChat.chatQaQuContent.as("refContent")
                         ))
                 .from(chatEntity)
+//                .leftJoin(parentChat).on(chatEntity.refQuNo.eq(parentChat.chatQaNo))
                 .where(builder)
                 .fetch();
     }

@@ -444,7 +444,7 @@ public class ProductController {
         return uploadResult;
     }
 
-    // 상품 정보 수정
+    // 최근 본 상품 정보
     @Operation(summary = "최근 본 상품 정보 가져오기",
             description = "최근 본 상품 최근 상품 순서 맞춰서 가져오기",
             parameters = {

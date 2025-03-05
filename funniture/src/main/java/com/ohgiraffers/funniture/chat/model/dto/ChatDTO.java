@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 public class ChatDTO {
 
-    private int chatQaNo;
+    private String chatQaNo;
     private int chatQaLevel;
     private String chatQaQuContent;
     private String chatQaAnContent;
