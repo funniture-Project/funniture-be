@@ -1,5 +1,8 @@
 package com.ohgiraffers.funniture.member.model.service;
 
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PageDTO;
+import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.member.entity.MemberAndPointEntity;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
@@ -29,44 +32,127 @@ public class AdminService {
     private final PointRepository pointRepository;
 
     // 관리자 페이지에서 모든 사용자 정보 불러오는 로직
-    public List<MemberAndPointDTO> getUserListByAdmin() {
-        List<Object[]> memberEntityList = adminRepository.AllUserListByAdmin();
-//        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+    public PagingResponseDTO getUserListByAdmin(Criteria cri) {
+        int total = adminRepository.countAllUsers();
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+        List<Object[]> memberEntityList = adminRepository.AllUserListByAdmin(offset, cri.getAmount());
 
-        return memberEntityList.stream()
-                .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
+        List<MemberAndPointDTO> memberAndPointDTOList = memberEntityList.stream()
+                .map(MemberAndPointDTO::new)
                 .collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO pagingResponseDTO = new PagingResponseDTO();
+        pagingResponseDTO.setData(memberAndPointDTOList);
+        pagingResponseDTO.setPageInfo(pageInfo);
+
+        return pagingResponseDTO;
+    }
+
+
+//    // 관리자 페이지에서 모든 사용자 정보 불러오는 로직
+//    public List<MemberAndPointDTO> getUserListByAdmin() {
+//        List<Object[]> memberEntityList = adminRepository.AllUserListByAdmin();
+////        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+//
+//        return memberEntityList.stream()
+//                .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
+//                .collect(Collectors.toList());
+//    }
+
+    // 관리자 페이지에서 모든 탈퇴자 정보 불러오는 로직
+    public PagingResponseDTO getLeaverListByAdmin(Criteria cri) {
+        int total = adminRepository.countAllLeavers();
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+
+        List<Object[]> memberEntityList = adminRepository.AllLeaverListByAdmin(offset, cri.getAmount());
+
+        List<MemberAndPointDTO> memberAndPointDTOList = memberEntityList.stream()
+                .map(MemberAndPointDTO::new)
+                .collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO pagingResponseDTO = new PagingResponseDTO();
+        pagingResponseDTO.setData(memberAndPointDTOList);
+        pagingResponseDTO.setPageInfo(pageInfo);
+
+        return pagingResponseDTO;
     }
 
     // 관리자 페이지에서 모든 제공자 정보 불러오는 로직
-    public List<OwnerInfoAndMemberDTO> getOwnerListByAdmin() {
-        List<Object[]> ownerEntityList = adminRepository.findAllOwnerInfo();
-//        System.out.println("레파지토리에서 잘 조회해 왔는지 ownerEntityList = " + ownerEntityList);
+    public PagingResponseDTO getOwnerListByAdmin(Criteria cri) {
+        int total = adminRepository.countAllOwners();
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
 
-        return ownerEntityList.stream()
-                .map(OwnerInfoAndMemberDTO::new) // 생성자 사용하여 변환
+        List<Object[]> ownerEntityList = adminRepository.findAllOwnerInfo(offset, cri.getAmount());
+
+        List<OwnerInfoAndMemberDTO> ownerInfoList = ownerEntityList.stream()
+                .map(OwnerInfoAndMemberDTO::new)
                 .collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO pagingResponseDTO = new PagingResponseDTO();
+        pagingResponseDTO.setData(ownerInfoList);
+        pagingResponseDTO.setPageInfo(pageInfo);
+
+        return pagingResponseDTO;
     }
+
+
+//
+//    // 관리자 페이지에서 모든 제공자 정보 불러오는 로직
+//    public List<OwnerInfoAndMemberDTO> getOwnerListByAdmin() {
+//        List<Object[]> ownerEntityList = adminRepository.findAllOwnerInfo();
+////        System.out.println("레파지토리에서 잘 조회해 왔는지 ownerEntityList = " + ownerEntityList);
+//
+//        return ownerEntityList.stream()
+//                .map(OwnerInfoAndMemberDTO::new) // 생성자 사용하여 변환
+//                .collect(Collectors.toList());
+//    }
 
     // 관리자 페이지에서 제공자 전환 신청 정보 불러오는 로직 (is_result가 0인 항목)
-    public List<AppOwnerListDTO> getConvertAppListByAdmin() {
-        List<Object[]> memberEntityList = adminRepository.AllConvertListByAdmin();
-//        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+    public PagingResponseDTO getConvertAppListByAdmin(Criteria cri) {
+        int total = adminRepository.countAllConvertApps();
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
 
-        return memberEntityList.stream()
-                .map(AppOwnerListDTO::new) // ✅ 새로운 생성자 활용
+        List<Object[]> memberEntityList = adminRepository.AllConvertListByAdmin(offset, cri.getAmount());
+
+        List<AppOwnerListDTO> appOwnerListDTOs = memberEntityList.stream()
+                .map(AppOwnerListDTO::new)
                 .collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO pagingResponseDTO = new PagingResponseDTO();
+        pagingResponseDTO.setData(appOwnerListDTOs);
+        pagingResponseDTO.setPageInfo(pageInfo);
+
+        return pagingResponseDTO;
     }
+
+
+//    // 관리자 페이지에서 제공자 전환 신청 정보 불러오는 로직 (is_result가 0인 항목)
+//    public List<AppOwnerListDTO> getConvertAppListByAdmin() {
+//        List<Object[]> memberEntityList = adminRepository.AllConvertListByAdmin();
+////        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+//
+//        return memberEntityList.stream()
+//                .map(AppOwnerListDTO::new) // ✅ 새로운 생성자 활용
+//                .collect(Collectors.toList());
+//    }
 
     // 관리자 페이지에서 모든 탈퇴자 정보 불러오는 로직
-    public List<MemberAndPointDTO> getLeaverListByAdmin() {
-        List<Object[]> memberEntityList = adminRepository.AllLeaverListByAdmin();
-//        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
-
-        return memberEntityList.stream()
-                .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
-                .collect(Collectors.toList());
-    }
+//    public List<MemberAndPointDTO> getLeaverListByAdmin() {
+//        List<Object[]> memberEntityList = adminRepository.AllLeaverListByAdmin();
+////        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
+//
+//        return memberEntityList.stream()
+//                .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
+//                .collect(Collectors.toList());
+//    }
 
     // 관리자 페이지에서 탈퇴자를 사용자 권한으로 변경하는 로직
     @Transactional

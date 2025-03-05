@@ -1,6 +1,8 @@
 package com.ohgiraffers.funniture.member.controller;
 
 import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.member.model.dto.*;
 import com.ohgiraffers.funniture.member.model.service.AdminService;
 import com.ohgiraffers.funniture.member.model.service.MemberService;
@@ -36,16 +38,20 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "모든 유저 정보 조회 실패")
     })
     @GetMapping("/userList")
-    public ResponseEntity<ResponseMessage> userListByAdmin () {
+    public ResponseEntity<ResponseMessage> userListByAdmin(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         System.out.println("✅ 관리자 페이지에서 유저 정보 불러오는 컨트롤러 동작");
 
-        List<MemberAndPointDTO> memberAndPointDTO = adminService.getUserListByAdmin();
-//        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = adminService.getUserListByAdmin(cri);
 
         Map<String , Object> result = new HashMap<>();
-        result.put("result" , memberAndPointDTO);
+        result.put("result" , pagingResponseDTO);
 
-        if (memberAndPointDTO.isEmpty()) {
+        if (pagingResponseDTO.getData() == null || ((List<?>) pagingResponseDTO.getData()).isEmpty()) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
                     .body(new ResponseMessage(404, "모든 사용자 정보가 존재하지 않음", null));
@@ -56,6 +62,39 @@ public class AdminController {
                 .body(new ResponseMessage(200, "모든 사용자 정보 조회 성공", result));
     }
 
+    @Operation(summary = "전체 탈퇴자 정보 조회",
+            description = "관리자 페이지에서 모든 탈퇴자 정보 조회"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "모든 탈퇴자 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "모든 탈퇴자 정보 조회 실패")
+    })
+    @GetMapping("/leaverList")
+    public ResponseEntity<ResponseMessage> leaverListByAdmin (
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 불러오는 컨트롤러 동작");
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
+
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = adminService.getLeaverListByAdmin(cri);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("result", pagingResponseDTO);
+
+        if (pagingResponseDTO.getData() == null || ((List<?>) pagingResponseDTO.getData()).isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "모든 탈퇴자 정보가 존재하지 않음.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "모든 탈퇴자 정보 조회 성공", result));
+    }
+
     @Operation(summary = "전체 제공자 정보 조회",
             description = "관리자 페이지에서 모든 제공자 정보 조회"
     )
@@ -64,16 +103,21 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "모든 제공자 정보 조회 실패")
     })
     @GetMapping("/ownerList")
-    public ResponseEntity<ResponseMessage> ownerListByAdmin() {
+    public ResponseEntity<ResponseMessage> ownerListByAdmin(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
         System.out.println("✅ 관리자 페이지에서 제공자 정보 불러오는 컨트롤러 동작");
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
-        List<OwnerInfoAndMemberDTO> ownerInfoAndMemberDTO = adminService.getOwnerListByAdmin();
-//        System.out.println("제공자 정보 서비스에서 잘 넘어 왔는지 ownerInfoAndMemberDTO = " + ownerInfoAndMemberDTO);
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = adminService.getOwnerListByAdmin(cri);
 
         Map<String, Object> result = new HashMap<>();
-        result.put("result", ownerInfoAndMemberDTO);
+        result.put("result", pagingResponseDTO);
 
-        if (ownerInfoAndMemberDTO.isEmpty()) {
+        if (pagingResponseDTO.getData() == null || ((List<?>) pagingResponseDTO.getData()).isEmpty()) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
                     .body(new ResponseMessage(404, "모든 제공자 정보가 존재하지 않음.", null));
@@ -82,6 +126,40 @@ public class AdminController {
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(200, "모든 제공자 정보 조회 성공", result));
+    }
+
+    @Operation(summary = "제공자 전환 요청 조회",
+            description = "관리자 페이지에서 제공자 전환 요청 정보 조회"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 요청 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 정보 조회 실패")
+    })
+    @GetMapping("/convertApp")
+    public ResponseEntity<ResponseMessage> convertListByAdmin (
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        System.out.println("✅ 관리자 페이지에서 제공자 전환 데이터 불러오는 컨트롤러 동작");
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
+
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = adminService.getConvertAppListByAdmin(cri);
+//        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + appOwnerListDTO);
+
+        Map<String , Object> result = new HashMap<>();
+        result.put("result" , pagingResponseDTO);
+
+        if (pagingResponseDTO.getData() == null || ((List<?>) pagingResponseDTO.getData()).isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "모든 제공자 전환신청 정보가 존재하지 않음.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "모든 제공자 전환신청 정보 조회 성공", result));
     }
 
     @Operation(summary = "제공자 상세 조회",
@@ -112,33 +190,33 @@ public class AdminController {
                 .body(new ResponseMessage(200, "제공자 상세 정보 조회 성공", result));
     }
 
-    @Operation(summary = "제공자 전환 요청 조회",
-            description = "관리자 페이지에서 제공자 전환 요청 정보 조회"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "제공자 전환 요청 정보 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 정보 조회 실패")
-    })
-    @GetMapping("/convertApp")
-    public ResponseEntity<ResponseMessage> convertListByAdmin () {
-        System.out.println("✅ 관리자 페이지에서 제공자 전환 데이터 불러오는 컨트롤러 동작");
-
-        List<AppOwnerListDTO> appOwnerListDTO = adminService.getConvertAppListByAdmin();
-//        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + appOwnerListDTO);
-
-        Map<String , Object> result = new HashMap<>();
-        result.put("result" , appOwnerListDTO);
-
-        if (appOwnerListDTO.isEmpty()) {
-            return ResponseEntity.ok()
-                    .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404, "모든 제공자 전환신청 정보가 존재하지 않음.", null));
-        }
-
-        return ResponseEntity.ok()
-                .headers(authController.headersMethod())
-                .body(new ResponseMessage(200, "모든 제공자 전환신청 정보 조회 성공", result));
-    }
+//    @Operation(summary = "제공자 전환 요청 조회",
+//            description = "관리자 페이지에서 제공자 전환 요청 정보 조회"
+//    )
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "제공자 전환 요청 정보 조회 성공"),
+//            @ApiResponse(responseCode = "404", description = "제공자 전환 요청 정보 조회 실패")
+//    })
+//    @GetMapping("/convertApp")
+//    public ResponseEntity<ResponseMessage> convertListByAdmin () {
+//        System.out.println("✅ 관리자 페이지에서 제공자 전환 데이터 불러오는 컨트롤러 동작");
+//
+//        List<AppOwnerListDTO> appOwnerListDTO = adminService.getConvertAppListByAdmin();
+////        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + appOwnerListDTO);
+//
+//        Map<String , Object> result = new HashMap<>();
+//        result.put("result" , appOwnerListDTO);
+//
+//        if (appOwnerListDTO.isEmpty()) {
+//            return ResponseEntity.ok()
+//                    .headers(authController.headersMethod())
+//                    .body(new ResponseMessage(404, "모든 제공자 전환신청 정보가 존재하지 않음.", null));
+//        }
+//
+//        return ResponseEntity.ok()
+//                .headers(authController.headersMethod())
+//                .body(new ResponseMessage(200, "모든 제공자 전환신청 정보 조회 성공", result));
+//    }
 
     @Operation(summary = "제공자 전환 요청 상세 조회",
             description = "관리자 페이지에서 제공자 전환 요청 상세정보 조회"
@@ -221,37 +299,6 @@ public class AdminController {
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(201, "제공자 전환 요청 반려 성공", null));
-    }
-
-
-
-
-    @Operation(summary = "전체 탈퇴자 정보 조회",
-            description = "관리자 페이지에서 모든 탈퇴자 정보 조회"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "모든 탈퇴자 정보 조회 성공"),
-            @ApiResponse(responseCode = "404", description = "모든 탈퇴자 정보 조회 실패")
-    })
-    @GetMapping("/leaverList")
-    public ResponseEntity<ResponseMessage> leaverListByAdmin () {
-        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 불러오는 컨트롤러 동작");
-
-        List<MemberAndPointDTO> memberAndPointDTO = adminService.getLeaverListByAdmin();
-//        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 서비스 갔다가 컨트롤러 = " + memberAndPointDTO);
-
-        Map<String , Object> result = new HashMap<>();
-        result.put("result" , memberAndPointDTO);
-
-        if (memberAndPointDTO.isEmpty()) {
-            return ResponseEntity.ok()
-                    .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404, "모든 탈퇴자 정보가 존재하지 않음.", null));
-        }
-
-        return ResponseEntity.ok()
-                .headers(authController.headersMethod())
-                .body(new ResponseMessage(200, "모든 탈퇴자 정보 조회 성공", result));
     }
 
     @Operation(summary = "탈퇴자 권한 정보 변경",
