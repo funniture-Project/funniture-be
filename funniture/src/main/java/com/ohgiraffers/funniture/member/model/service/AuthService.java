@@ -4,6 +4,8 @@ import com.ohgiraffers.funniture.exception.DuplicatedMemberEmailException;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
+import com.ohgiraffers.funniture.point.entity.PointEntity;
+import com.ohgiraffers.funniture.point.model.dao.PointRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +19,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
+    private final PointRepository pointRepository;
 
     public AuthService(PasswordEncoder passwordEncoder
                     , MemberRepository memberRepository
-                    , ModelMapper modelMapper){
+                    , ModelMapper modelMapper
+                    , PointRepository pointRepository){
         this.passwordEncoder = passwordEncoder;
         this.memberRepository = memberRepository;
         this.modelMapper = modelMapper;
+        this.pointRepository = pointRepository;
     }
 
     @Transactional
@@ -50,9 +55,30 @@ public class AuthService {
         MemberEntity result = memberRepository.save(registMember);
         System.out.println("인코딩한 정보 result = " + result);
 
+        // 인서트 되고 포인트 100000점 추가해주기
+        addPointBySignup(result.getMemberId());
+
         return modelMapper.map(result , MemberDTO.class);
     }
 
+    public void addPointBySignup (String memberId) {
+
+        // 초기 포인트 값 설정
+        int signupBonus = 100000;
+
+        // 포인트 엔티티 생성
+        PointEntity pointEntity = PointEntity.builder()
+                .memberId(memberId)
+                .usedPoint(0)
+                .addPoint(signupBonus)
+                .currentPoint(signupBonus) // 초기 보유 포인트
+                .build();
+
+        // 포인트 저장
+        pointRepository.save(pointEntity);
+        System.out.println("회원가입 보너스 포인트 지급 완료: " + signupBonus);
+
+    }
 
     public String getMaxMember() {
 
