@@ -94,4 +94,31 @@ public class ChatService {
         }
 
     }
+
+    @Transactional
+    public boolean deleteChatItem(Integer chatNo) {
+
+        try{
+            // 해당 번호를 ref로 가지고 있는게 있는지 확인 (2단계 질문)
+            List<ChatEntity> subList = basicChatRepository.findAllByRefNo(chatNo);
+
+            if (!subList.isEmpty()){
+                subList.forEach(subitem ->{
+                    // 3단계 질문
+                    List<ChatEntity> result = basicChatRepository.findAllByRefNo(subitem.getChatQaNo());
+
+                    if (result.size() > 0){
+                        basicChatRepository.deleteAllByRefQuNo(subitem.getChatQaNo());
+                    }
+                });
+                basicChatRepository.deleteAllByRefQuNo(chatNo);
+            }
+
+            basicChatRepository.deleteById(chatNo);
+            return true;
+        } catch (Exception e) {
+            System.out.println("삭제중 에러 e = " + e);
+            return false;
+        }
+    }
 }
