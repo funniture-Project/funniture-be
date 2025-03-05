@@ -29,7 +29,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    // 상세 정보 조회 (상품 상세 페이지, 제공자 상품 수정)
+    // 챗봇 질문 리스트 조회
     @Operation(summary = "질문 리스트 조회",
             description = "챗봇에서 사용할 질문 리스트 조회",
             parameters = {
@@ -42,9 +42,6 @@ public class ChatController {
     })
     @GetMapping("/list")
     public ResponseEntity<ResponseMessage> getChatList(@RequestParam(required = false) Integer refNum, @RequestParam(required = false) Integer qaLevel){
-
-        System.out.println("refNum = " + refNum);
-        System.out.println("qaLevel = " + qaLevel);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
@@ -65,5 +62,32 @@ public class ChatController {
                 .body(new ResponseMessage(200, "전체 질문 리스트 조회 성공", responseMap));
     }
 
+    // 챗봇 질문 수정
+    @Operation(summary = "질문 리스트 수정",
+            description = "챗봇에서 사용할 질문 리스트 답변 등 수정"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "질문 리스트 수정 성공"),
+            @ApiResponse(responseCode = "404", description = "수정 대상 못 찾음")
+    })
+    @PutMapping("modify")
+    public ResponseEntity<ResponseMessage> modifyChatList(@RequestBody List<ChatDTO> updateList){
+        System.out.println("updateList = " + updateList);
+
+        boolean result = chatService.modifyChatList(updateList);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        if (result == true){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "저장 성공", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(404, "수정할 데이터를 찾지 못했습니다.", null));
+    }
 
 }
