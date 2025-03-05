@@ -315,5 +315,21 @@ public class MemberService {
         return ownerRepository.existsByStoreNoAndMemberIdNot(storeNo, memberId);
     }
 
+    @Transactional
+    public boolean modifyConsulting(String memberId) {
 
+        try{
+            MemberEntity findMember = memberRepository.findByMemberId(memberId);
+            findMember.setIsConsulting(!findMember.getIsConsulting());
+            System.out.println("findMember = " + findMember);
+
+            memberRepository.save(findMember);
+
+            return true;
+        } catch (Exception e) {
+            System.out.println("e = " + e);
+
+            return false;
+        }
+    }
 }
