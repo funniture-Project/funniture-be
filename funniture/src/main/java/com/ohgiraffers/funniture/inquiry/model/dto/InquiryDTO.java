@@ -19,8 +19,8 @@ public class InquiryDTO {
     private String memberId;
 
     private String inquiryContent;
-//    private int showStatus;
-//    private int qnaType;
+    private int showStatus;
+    private int qnaType;
     private String productNo;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
