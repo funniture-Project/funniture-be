@@ -33,7 +33,7 @@ public class MemberDTO implements UserDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime signupDate;
 
-    private int isConsulting;
+    private Boolean isConsulting;
 
     private int hasImage;
 

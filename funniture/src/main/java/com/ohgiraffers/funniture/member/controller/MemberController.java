@@ -15,11 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -343,8 +345,6 @@ public class MemberController {
                 .body(new ResponseMessage(200, "제공자 전환 신청 여부 확인 성공", response));
     }
 
-
-
     // 제공자 전환 재신청 (update)
     @Operation(summary = "제공자 전환 재신청", description = "제공자 전환 재신청 시 데이터를 업데이트")
     @ApiResponses({
@@ -434,6 +434,42 @@ public class MemberController {
         } else {
             return ResponseEntity.ok(new ResponseMessage(200, "사용 가능한 사업자 번호입니다.", null));
         }
+    }
+
+    @Operation(summary = "관리자와 상담 상태 변경",
+            description = "관리자와의 상담 상태 변경",
+            parameters = {
+                    @Parameter(name = "memberId", description = "회원번호")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "변경 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 사용자 못찾음")
+    })
+    @PutMapping("/modify/consulting")
+    public ResponseEntity<ResponseMessage> modifyConsulting(@RequestParam String memberId){
+        System.out.println("대상 memberId = " + memberId);
+        boolean result = memberService.modifyConsulting(memberId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType( "application","json", Charset.forName("UTF-8")));
+
+        if (!result){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(404, "변경 대상 사용자 못 찾음", null));
+        }
+
+        MemberEntity findMember = memberService.findByMemberId(memberId);
+        System.out.println("findMember = " + findMember);
+
+        Map<String,Object> resultMap = new HashMap<>();
+
+        resultMap.put("isConsulting",findMember.getIsConsulting());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(204, "변경 성공", resultMap));
     }
 
 }

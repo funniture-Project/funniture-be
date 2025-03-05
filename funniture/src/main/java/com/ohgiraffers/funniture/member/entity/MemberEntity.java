@@ -36,7 +36,7 @@ public class MemberEntity {
     private String memberRole;
 
     @Column(name = "is_consulting")
-    private int isConsulting;
+    private Boolean isConsulting;
 
     // hasImage에 null도 들어가 있을 때 조회하면 에러 발생하므로
     // nullable = true 추가하였고, Integer로 변경 (250218)
