@@ -43,21 +43,17 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
 //            """, nativeQuery = true)
 //   List<InquiryEntity> findAllInquiryOwnerPage(String ownerNo);
 
-        @Query("""
-        SELECT new com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO(
-            a.qnaWriteTime,
-            b.userName,
-            b.memberId,
-            a.inquiryNo,
-            a.productNo, 
-            c.productName,
-            a.inquiryContent
-        )
-        FROM InquiryEntity a
-        JOIN ProductEntity c ON a.productNo = c.productNo
-        JOIN MemberEntity b ON a.memberId = b.memberId
-        WHERE c.ownerNo = :ownerNo
-        """)
-    List<InquiryDTO> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
+    @Query(value = """
+        SELECT i.*, 
+               m.user_name AS userName,
+               m.phone_number AS phoneNumber, 
+               p.product_name AS productName,
+               p.product_image_link AS productImageLink 
+        FROM tbl_inquiry i
+        LEFT JOIN tbl_member m ON i.member_id = m.member_id
+        LEFT JOIN tbl_product p ON i.product_no = p.product_no
+        WHERE p.owner_no = :ownerNo
+        """, nativeQuery = true)
+    List<Object[]> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
 
 }

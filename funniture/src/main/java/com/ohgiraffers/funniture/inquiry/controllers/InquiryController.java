@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.inquiry.controllers;
 
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.service.InquiryService;
 import com.ohgiraffers.funniture.response.ResponseMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -182,7 +183,7 @@ public class InquiryController {
     public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry (@PathVariable String ownerNo) {
 
         System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
-        List<InquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
+        List<OwnerInquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
 
         System.out.println("서비스에서 넘어온 result = " + result);
         Map <String , Object> map = new HashMap<>();
