@@ -54,9 +54,12 @@ public class InquiryEntity {
 
     // InquiryEntity에 해당되지 않는 userName(member)와 productName(product)를
     // 연관관계 형성하지 않고 삽입
-//    @Transient
-//    private String userName;
-//
-//    @Transient
-//    private String productName;
+    @Transient
+    private String userName;
+
+    @Transient
+    private String productName;
+
+    @Transient
+    private String phoneNumber;
 }

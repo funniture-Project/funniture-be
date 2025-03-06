@@ -16,8 +16,21 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
            nativeQuery = true)
     String maxInquiry();
 
-    @Query(value = "SELECT * FROM TBL_INQUIRY WHERE PRODUCT_NO = :productNo", nativeQuery = true)
-    List<InquiryEntity> findByProductNo(String productNo);
+//    @Query(value = "SELECT * FROM TBL_INQUIRY WHERE PRODUCT_NO = :productNo", nativeQuery = true)
+//    List<InquiryEntity> findByProductNo(String productNo);
+    @Query(value = """
+        SELECT i.*, 
+               m.user_name AS userName,
+               m.phone_number AS phoneNumber, 
+               p.product_name AS productName,
+               p.product_image_link AS productImageLink 
+        FROM tbl_inquiry i
+        LEFT JOIN tbl_member m ON i.member_id = m.member_id
+        LEFT JOIN tbl_product p ON i.product_no = p.product_no
+        WHERE i.product_no = :productNo
+        """, nativeQuery = true)
+    List<Object[]> findDetailedByProductNo(@Param("productNo") String productNo);
+
 
 //    @Query(value = "select a.signup_date, a.phone_number, a.password, a.member_role, a.is_consulting, a.image_link, a.image_id, a.email, b.qna_write_time, a.user_name , a.member_id, b.inquiry_no, c.product_no, c.product_name, b.inquiry_content, b.qna_type from tbl_member a join tbl_inquiry b on (a.member_id = b.member_id) join tbl_product c on (a.member_id = c.owner_no)", nativeQuery = true)
 //    List<MemberEntity> findAllInquiryOwnerPage();
