@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.inquiry.model.service;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -128,13 +129,22 @@ public class InquiryService {
 //        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class)).collect(Collectors.toList());
 //    }
 
-    public List<InquiryDTO> findByInquiryOwnerPage(String ownerNo) {
+    public List<OwnerInquiryDTO> findByInquiryOwnerPage(String ownerNo) {
 
-        // 조인하는 엔티티 다시 만들어야 함. Inquiry 말고 조인한 애로
-        List<InquiryDTO> result = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
+        List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
 
-        System.out.println("레파지토리에서 넘어온 result = " + result);
-
-        return result;
+        return results.stream().map(obj -> new OwnerInquiryDTO(
+                (String) obj[0],  // inquiryNo
+                (String) obj[1],  // memberId
+                (String) obj[2],  // inquiryContent
+                (Integer) obj[3], // showStatus
+                (Integer) obj[4], // qnaType
+                (String) obj[5],  // productNo
+                ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
+                (String) obj[7],  // userName (from tbl_member)
+                (String) obj[8],  // productName (from tbl_product)
+                (String) obj[9],  // phoneNumber (from tbl_member)
+                (String) obj[10]  // productImageLink (from tbl_product)
+        )).collect(Collectors.toList());
     }
 }
