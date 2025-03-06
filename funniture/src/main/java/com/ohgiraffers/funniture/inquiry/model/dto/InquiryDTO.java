@@ -19,8 +19,8 @@ public class InquiryDTO {
     private String memberId;
 
     private String inquiryContent;
-//    private int showStatus;
-//    private int qnaType;
+    private int showStatus;
+    private int qnaType;
     private String productNo;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -32,7 +32,11 @@ public class InquiryDTO {
     // InquiryEntity에 해당되지 않는 userName(member)와 productName(product)를
     // 연관관계 형성하지 않고 삽입
     private String userName;
+    private String phoneNumber;
     private String productName;
+
+
+    private String productImageLink;
 
     // JPQL의 쿼리문과 순서 맞아야 함.
     public InquiryDTO(LocalDateTime qnaWriteTime, String userName, String memberId, String inquiryNo, String productNo, String productName, String inquiryContent) {

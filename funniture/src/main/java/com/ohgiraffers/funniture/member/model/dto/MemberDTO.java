@@ -35,7 +35,7 @@ public class MemberDTO implements UserDetails {
 
     private Boolean isConsulting;
 
-    private int hasImage;
+//    private int hasImage;
 
     private String imageLink;
 

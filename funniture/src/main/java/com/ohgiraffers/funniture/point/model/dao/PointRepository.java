@@ -14,4 +14,6 @@ public interface PointRepository extends JpaRepository<PointEntity, String> {
     int findCurrentPointByUser(String memberId);
 
     List<PointEntity> findByMemberIdOrderByPointDateTimeDesc(String memberId);
+
+    String findByMemberId(String memberId);
 }

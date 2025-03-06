@@ -49,7 +49,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
             if (period == null) {
                 endDate = searchDate.atTime(23, 59, 59); // 선택한 날짜 하루만 조회
             } else {
-                endDate = LocalDateTime.now(); // 1개월/3개월 버튼 클릭 시, 현재 날짜까지 조회
+                endDate = LocalDateTime.now();
             }
 
             whereCondition.and(rental.orderDate.between(startDate, endDate));
@@ -77,7 +77,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
                 .from(rental)
                 .join(rental.productEntity, product)
                 .join(rental.rentalOptionInfoEntity, optionInfo)
-                .where(rental.memberId.eq(memberId));
+                .where(whereCondition);
 
         Long countResult = countQuery.fetchOne();
         long totalCount = (countResult != null) ? countResult : 0;

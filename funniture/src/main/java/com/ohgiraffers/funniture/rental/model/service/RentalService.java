@@ -38,6 +38,7 @@ public class RentalService {
     private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
     private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
     private final UserActiveRentalRepositoryCustom userActiveRentalRepositoryCustom;
+    private final UserRentalStateCountRepositoryCustom userRentalStateCountRepositoryCustom;
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
@@ -119,6 +120,11 @@ public class RentalService {
         return userRentalRepositoryCustom.findRentalOrderListByUser(memberId,period, searchDate, pageable);
     }
 
+    // 사용자의 마이페이지 예약진행상태 카운트
+    public List<RentalStateCountDTO> countRentalStatesByUser(String memberId) {
+        return userRentalStateCountRepositoryCustom.countRentalStatesByUser(memberId);
+    }
+
     // 사용자 사용중인 상품 조회 = 배송완료상태인 예약
     public Page<ActiveRentalDTO> findActiveRentalListByUser(String memberId, Criteria cri) {
         Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
@@ -128,6 +134,23 @@ public class RentalService {
     // 사용자,제공자 예약 상세페이지
     public List<RentalDetailDTO> findRentalDetail(String rentalNo) {
         return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
+    }
+
+    // 사용자 예약 배송지 변경
+    @Transactional
+    public void updateRentalDeliveryAddress(String rentalNo, int newDestinationNo) {
+
+        RentalEntity rentalEntity = rentalRepository.findById(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약이 존재하지 않습니다."));
+
+        // 예약 상태가 "예약대기" 또는 "예약완료"인 경우만 변경 가능
+        if (!"예약대기".equals(rentalEntity.getRentalState()) &&
+                !"예약완료".equals(rentalEntity.getRentalState())) {
+            throw new IllegalStateException("현재 상태에서는 배송지를 변경할 수 없습니다.");
+        }
+
+        // 배송지(destinationNo) 변경
+        rentalEntity.changeDestinationNo(newDestinationNo);
     }
 
 /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
@@ -188,5 +211,6 @@ public class RentalService {
         // 운송장 번호와 운송 업체명 업데이트
         rental.changeDelivery(deliveryNo, deliverCom);
     }
+
 
 }
