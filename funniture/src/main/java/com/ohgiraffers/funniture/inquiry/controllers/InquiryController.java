@@ -94,7 +94,7 @@ public class InquiryController {
     public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
         System.out.println("컨트롤러 productNo = " + productNo);
         List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
-
+//        System.out.println("서비스  result = " + result);
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
 
