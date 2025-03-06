@@ -1,6 +1,6 @@
 package com.ohgiraffers.funniture.adminInquiry.model.dto;
 
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,5 +16,7 @@ public class AdminInquiryDTO {
     private String senderNo;
     private String receiveNo;
     private String contents;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDateTime;
 }
