@@ -153,6 +153,24 @@ public class RentalService {
         rentalEntity.changeDestinationNo(newDestinationNo);
     }
 
+    // 예약진행상태 수정 (배송중 -> 배송완료, 수거중 -> 수거완료)
+    @Transactional
+    public void updateRentalState(String rentalNo) {
+
+        RentalEntity rentalEntity = rentalRepository.findById(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약이 존재하지 않습니다."));
+
+        String currentState = rentalEntity.getRentalState();
+
+        // 유효한 상태 변경인지 확인
+        if ("배송중".equals(currentState)) {
+            rentalEntity.changeRentalState("배송완료");
+        } else if ("수거중".equals(currentState)) {
+            rentalEntity.changeRentalState("수거완료");
+        } else {
+            throw new IllegalStateException("잘못된 상태 변경 요청입니다.");
+        }
+    }
 /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
     // 관리자 - 예약 조회(쿼리 DSL)
     public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Criteria cri) {

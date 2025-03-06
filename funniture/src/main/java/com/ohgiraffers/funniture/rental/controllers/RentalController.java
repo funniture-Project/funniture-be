@@ -263,8 +263,8 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자별 예약 조회 성공", res));
     }
 
-    @Operation(summary = "예약대기에서 예약완료 상태 업데이트",
-            description = "제공자 마이페이지에서 사용",
+    @Operation(summary = "다중선택하여 예약대기에서 예약완료 상태 업데이트",
+            description = "제공자 예약/배송/반납페이지에서 사용",
             parameters = {
             @Parameter(name = "rentalNos", description = "다중선택 한 주문번호")
             }
@@ -307,7 +307,7 @@ public class RentalController {
         String rentalState = "예약취소";
 
         try {
-            rentalService.cancelBatch(rentalNo, rentalState);  // 여러 개의 예약번호 처리
+            rentalService.cancelBatch(rentalNo, rentalState);
             return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약취소로 상태 변경되었습니다.", null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -317,8 +317,8 @@ public class RentalController {
 
     }
 
-    @Operation(summary = "운송장 번호와 운송업체명 업데이트",
-            description = "운송장 번호와 운송업체명을 업데이트합니다.",
+    @Operation(summary = "운송장 번호와 운송업체명 수정",
+            description = "제공자 예약/배송/반납페이지에서 사용",
             parameters = {
                     @Parameter(name = "rentalNo", description = "주문번호"),
                     @Parameter(name = "deliveryNo", description = "운송장 번호"),
@@ -326,8 +326,8 @@ public class RentalController {
             }
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "운송장 번호와 운송업체명이 성공적으로 업데이트되었습니다."),
-            @ApiResponse(responseCode = "500", description = "운송장 번호 또는 운송업체명 업데이트 중 오류가 발생했습니다.")
+            @ApiResponse(responseCode = "200", description = "운송장 번호와 운송업체명이 성공적으로 수정되었습니다."),
+            @ApiResponse(responseCode = "500", description = "운송장 번호 또는 운송업체명 수정 중 오류가 발생했습니다.")
     })
     @PutMapping("/{rentalNo}/delivery")
     public ResponseEntity<ResponseMessage> updateDelivery(@PathVariable String rentalNo,
@@ -339,21 +339,40 @@ public class RentalController {
 
         try {
             rentalService.updateDelivery(rentalNo, deliveryNo, deliverCom);  // 운송장 번호와 업체명 업데이트
-            return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "운송장 번호와 운송업체명이 성공적으로 업데이트되었습니다.", null));
+            return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "운송장 번호와 운송업체명이 성공적으로 수정되었습니다.", null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .headers(headers)
-                    .body(new ResponseMessage(500, "운송장 번호 또는 운송업체명 업데이트 중 오류가 발생했습니다.", null));
+                    .body(new ResponseMessage(500, "운송장 번호 또는 운송업체명 수정 중 오류가 발생했습니다.", null));
         }
     }
 
+    @Operation(summary = "예약진행상태 수정",
+            description = "제공자 예약/배송/반납페이지에서 사용",
+            parameters = {
+                    @Parameter(name = "rentalNo", description = "주문번호"),
+                    @Parameter(name = "newState", description = "변경 할 예약진행상태")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "예약 상태가 성공적으로 업데이트되었습니다."),
+            @ApiResponse(responseCode = "500", description = "예약 상태 업데이트 중 오류가 발생했습니다.")
+    })
+    // 예약진행상태 수정 (배송중 -> 배송완료, 수거중 -> 수거완료)
+    @PutMapping("/{rentalNo}/state")
+    public ResponseEntity<ResponseMessage> updateRentalState(@PathVariable String rentalNo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-
-
-
-
-
-
+        try {
+            rentalService.updateRentalState(rentalNo);
+            return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약 상태가 성공적으로 업데이트되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(headers)
+                    .body(new ResponseMessage(500, "예약 상태 업데이트 중 오류가 발생했습니다.", null));
+        }
+    }
 
     /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
 
