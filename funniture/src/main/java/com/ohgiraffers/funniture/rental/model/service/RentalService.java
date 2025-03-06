@@ -136,6 +136,23 @@ public class RentalService {
         return detailRentalRepositoryCustom.findRentalDetail(rentalNo);
     }
 
+    // 사용자 예약 배송지 변경
+    @Transactional
+    public void updateRentalDeliveryAddress(String rentalNo, int newDestinationNo) {
+
+        RentalEntity rentalEntity = rentalRepository.findById(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약이 존재하지 않습니다."));
+
+        // 예약 상태가 "예약대기" 또는 "예약완료"인 경우만 변경 가능
+        if (!"예약대기".equals(rentalEntity.getRentalState()) &&
+                !"예약완료".equals(rentalEntity.getRentalState())) {
+            throw new IllegalStateException("현재 상태에서는 배송지를 변경할 수 없습니다.");
+        }
+
+        // 배송지(destinationNo) 변경
+        rentalEntity.changeDestinationNo(newDestinationNo);
+    }
+
 /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
     // 관리자 - 예약 조회(쿼리 DSL)
     public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Criteria cri) {

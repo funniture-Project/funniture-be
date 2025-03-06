@@ -128,13 +128,10 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자의 예약진행상태별 count 성공", res));
     }
 
-
-    @Operation(summary = "사용자의 예약 전체 조회",
-            description = "사용자 마이페이지 주문/배송에서 사용",
+    @Operation(summary = "사용자 사용중인 상품 조회",
+            description = "사용자 마이페이지 사용상품/반납에서 사용",
             parameters = {
                     @Parameter(name = "memberId", description = "사용자 ID(필수)"),
-                    @Parameter(name = "period", description = "조회 할 개월수(개월수에 orderDate 가 해당되면 조회) ex.1개월전~현재=1MONTH,3개월전~현재=3MONTH (선택)"),
-                    @Parameter(name = "searchDate", description = "조회 할 날짜(선택)"),
                     @Parameter(name = "offset", description = "현재페이지")
             }
     )
@@ -195,6 +192,30 @@ public class RentalController {
         res.put("rentalDetail", rentalDetail);
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "예약 상세 조회 성공", res));
+    }
+
+    @Operation(summary = "주문번호별 예약대기,예약완료 상태인 예약 배송지 수정",
+            description = "사용자 주문상세페이지에서 사용",
+            parameters = {
+                    @Parameter(name = "rentalNo", description = "주문번호"),
+                    @Parameter(name = "destinationNo", description = "새로운 배송지 식별번호")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "배송지 수정이 완료되었습니다.")
+    })
+    // 사용자 예약 배송지 변경
+    @PutMapping("/{rentalNo}/deliveryaddress")
+    public ResponseEntity<ResponseMessage> updateRentalDeliveryAddress(@PathVariable String rentalNo,
+                                                                       @RequestBody String destinationNo) {
+        int newDestinationNo = Integer.parseInt(destinationNo);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        rentalService.updateRentalDeliveryAddress(rentalNo, newDestinationNo);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 수정이 완료되었습니다.", null));
     }
 
     /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
