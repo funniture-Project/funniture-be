@@ -48,17 +48,17 @@ public class AdminInquiryController {
     public ResponseEntity<ResponseMessage> getListById(@PathVariable String memberId){
         List<AdminInquiryDTO> selectResult = adService.getListById(memberId);
 
-        // 사용자가 보낸 데이터
-        List<AdminInquiryDTO> userSendList = selectResult.stream().filter(item -> item.getSenderNo().equals(memberId))
-                                                .collect(Collectors.toList());
-        // 관리자가 보낸 데이터
-        List<AdminInquiryDTO> adminSendList = selectResult.stream().filter(item -> item.getReceiveNo().equals(memberId))
-                                                .collect(Collectors.toList());
+//        // 사용자가 보낸 데이터
+//        List<AdminInquiryDTO> userSendList = selectResult.stream().filter(item -> item.getSenderNo().equals(memberId))
+//                                                .collect(Collectors.toList());
+//        // 관리자가 보낸 데이터
+//        List<AdminInquiryDTO> adminSendList = selectResult.stream().filter(item -> item.getReceiveNo().equals(memberId))
+//                                                .collect(Collectors.toList());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
-        if (userSendList.isEmpty() && adminSendList.isEmpty()){
+        if (selectResult.isEmpty()){
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(new ResponseMessage(204, "문의 기록 없음",null));
@@ -66,8 +66,15 @@ public class AdminInquiryController {
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        responseMap.put("userSendList",userSendList);
-        responseMap.put("adminSendList",adminSendList);
+//        if (!userSendList.isEmpty()){
+//            responseMap.put("userSendList",userSendList);
+//        }
+//
+//        if (!adminSendList.isEmpty()){
+//            responseMap.put("adminSendList",adminSendList);
+//        }
+
+        responseMap.put("result",selectResult);
 
         return ResponseEntity.ok()
                 .headers(headers)
