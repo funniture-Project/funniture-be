@@ -97,6 +97,37 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자 예약 조회 성공", res));
     }
 
+    @Operation(summary = "사용자의 예약진행상태별 Count",
+            description = "사용자 마이페이지에서 사용",
+            parameters = {
+                    @Parameter(name = "memberId", description = "사용자 ID(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 예약이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "사용자의 예약진행상태별 count 성공")
+    })
+    // 사용자의 마이페이지 예약진행상태 카운트
+    @GetMapping("count")
+    public ResponseEntity<ResponseMessage> countRentalStatesByUser(@RequestParam String memberId) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<RentalStateCountDTO> rentalStateCount = rentalService.countRentalStatesByUser(memberId);
+
+        if (rentalStateCount.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("rentalStateCount", rentalStateCount);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "사용자의 예약진행상태별 count 성공", res));
+    }
+
 
     @Operation(summary = "사용자의 예약 전체 조회",
             description = "사용자 마이페이지 주문/배송에서 사용",
