@@ -67,6 +67,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/inquiry/modify",
                 "/api/v1/inquiry/wait",
                 "/api/v1/inquiry/complete",
+                "/api/v1/adinquiry",
+                "/api/v1/adinquiry/.*",
                 "/api/v1/rental",
                 "/api/v1/rental/user",
                 "/api/v1/rental/admin",
