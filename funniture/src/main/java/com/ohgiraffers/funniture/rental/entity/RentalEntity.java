@@ -68,4 +68,8 @@ public class RentalEntity {
         this.deliverCom = newDeliverCom;
     }
 
+    public void changeDestinationNo(int newDestinationNo) {
+        this.destinationNo = newDestinationNo;
+    }
+
 }
