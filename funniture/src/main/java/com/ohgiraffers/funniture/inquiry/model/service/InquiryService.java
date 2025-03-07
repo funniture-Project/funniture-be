@@ -6,6 +6,7 @@ import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.MemberInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
@@ -185,4 +186,38 @@ public PagingResponseDTO findByInquiryOwnerPage(String ownerNo, Criteria cri) {
 
     return response;
 }
+
+    public PagingResponseDTO findByInquiryUserPage(String memberId, Criteria cri) {
+        System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : " + memberId + "  " + cri);
+
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+        int limit = cri.getAmount();
+
+        List<Object[]> results = inquiryRepository.findAllInquiryUserPage(memberId, limit, offset);
+
+        int total = inquiryRepository.countAllInquiryUserPage(memberId);
+
+        List<MemberInquiryDTO> dtos = results.stream().map(obj -> new MemberInquiryDTO(
+                (String) obj[0],  // inquiryNo
+                (String) obj[1],  // memberId
+                (String) obj[2],  // inquiryContent
+                (Integer) obj[3], // showStatus
+                (Integer) obj[4], // qnaType
+                (String) obj[5],  // productNo
+                ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
+                (String) obj[7],  // userName (from tbl_member)
+                (String) obj[8],  // productName (from tbl_product)
+                (String) obj[9],  // phoneNumber (from tbl_member)
+                (String) obj[10]  // productImageLink (from tbl_product)
+        )).collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO response = new PagingResponseDTO();
+        response.setData(dtos);
+        response.setPageInfo(pageInfo);
+
+        return response;
+    }
+
 }

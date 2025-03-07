@@ -205,7 +205,45 @@ public class InquiryController {
 
         return ResponseEntity.ok()
                 .headers(headersMethod())
-                .body(new ResponseMessage(200, "조회 성공", response));
+                .body(new ResponseMessage(200, "문의 조회 성공", response));
+    }
+
+    @Operation(summary = "문의 조회",
+            description = "사용자 페이지 문의 조회",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "사용자 번호로 전체 문의 조회"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "문의 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "문의 조회 실패")
+    })
+    // member_id에 따른 사용자 마이 페이지의 전체 문의들
+    @GetMapping("/member/{memberId}")
+    public ResponseEntity<ResponseMessage> findAllUserPageInquiry(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @PathVariable String memberId) {
+
+        System.out.println("프론트에서 memberId 잘 받아오는지 = " + memberId);
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
+
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = inquiryService.findByInquiryUserPage(memberId, cri);
+
+        Map<String , Object> response = new HashMap<>();
+        response.put("result", pagingResponseDTO);
+
+        if (((List<?>) pagingResponseDTO.getData()).isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(headersMethod())
+                    .body(new ResponseMessage(404, "등록된 문의가 없습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(200, "문의 조회 성공", response));
     }
 
 

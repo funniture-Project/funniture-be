@@ -2,7 +2,9 @@ package com.ohgiraffers.funniture.inquiry.model.dao;
 
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.MemberInquiryDTO;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -68,4 +70,26 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
         WHERE p.owner_no = :ownerNo
         """, nativeQuery = true)
         int countAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
-    }
+
+
+    @Query(value = """
+        SELECT i.inquiry_no, i.member_id, i.inquiry_content, i.show_status, i.qna_type, i.product_no, i.qna_write_time, 
+               m.user_name, m.phone_number, p.product_name, p.product_image_link 
+        FROM tbl_inquiry i
+        LEFT JOIN tbl_member m ON i.member_id = m.member_id
+        LEFT JOIN tbl_product p ON i.product_no = p.product_no
+        WHERE i.member_id = :memberId
+        ORDER BY i.qna_write_time DESC
+        LIMIT :limit OFFSET :offset
+        """, nativeQuery = true)
+    List<Object[]> findAllInquiryUserPage(@Param("memberId") String memberId, @Param("limit") int limit, @Param("offset") int offset);
+
+    @Query(value = """
+        SELECT COUNT(*) 
+        FROM tbl_inquiry i
+        WHERE i.member_id = :memberId
+        """, nativeQuery = true)
+    int countAllInquiryUserPage(@Param("memberId") String memberId);
+
+
+}
