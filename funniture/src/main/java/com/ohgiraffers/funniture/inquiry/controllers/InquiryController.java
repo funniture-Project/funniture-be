@@ -1,5 +1,7 @@
 package com.ohgiraffers.funniture.inquiry.controllers;
 
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.service.InquiryService;
@@ -180,16 +182,22 @@ public class InquiryController {
     })
     // member_id에 따른 제공자 페이지의 전체 문의들
     @GetMapping("/owner/{ownerNo}")
-    public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry (@PathVariable String ownerNo) {
+    public ResponseEntity<ResponseMessage> findAllOwnerPageInquiry(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @PathVariable String ownerNo) {
 
         System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
-        List<OwnerInquiryDTO> result = inquiryService.findByInquiryOwnerPage(ownerNo);
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
-        System.out.println("서비스에서 넘어온 result = " + result);
-        Map <String , Object> map = new HashMap<>();
-        map.put("result", result);
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = inquiryService.findByInquiryOwnerPage(ownerNo, cri);
 
-        if (result.isEmpty()) {
+        Map<String , Object> response = new HashMap<>();
+        response.put("result", pagingResponseDTO);
+
+        if (((List<?>) pagingResponseDTO.getData()).isEmpty()) {
             return ResponseEntity.ok()
                     .headers(headersMethod())
                     .body(new ResponseMessage(404, "등록된 문의가 없습니다.", null));
@@ -197,8 +205,9 @@ public class InquiryController {
 
         return ResponseEntity.ok()
                 .headers(headersMethod())
-                .body(new ResponseMessage(200, "조회 성공", map));
+                .body(new ResponseMessage(200, "조회 성공", response));
     }
+
 
     @Operation(summary = "문의 답변 수정",
             description = "제공자 페이지에서 문의에 대한 답변 수정",
