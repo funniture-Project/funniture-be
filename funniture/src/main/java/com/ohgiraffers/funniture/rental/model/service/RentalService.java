@@ -43,6 +43,7 @@ public class RentalService {
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
 
+
 /* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
     // 사용자 - 예약 등록
     @Transactional
@@ -147,44 +148,6 @@ public class RentalService {
         rentalEntity.changeDestinationNo(newDestinationNo);
     }
 
-    // 운송장번호, 운송 업체명 수정 -> 배송중&수거중으로 상태 업데이트
-    @Transactional
-    public void updateDelivery(String rentalNo, String deliveryNo, String deliverCom) {
-        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
-
-        // 현재 예약 상태(rentalState) 확인
-        String currentState = rental.getRentalState();
-
-        // 상태에 따라 배송중 또는 수거중으로 변경
-        if ("예약완료".equals(currentState)) {
-            rental.changeRentalState("배송중");  // 배송중으로 상태 변경
-        } else if ("반납요청".equals(currentState)) {
-            rental.changeRentalState("수거중");  // 수거중으로 상태 변경
-        }
-
-        // 운송장 번호와 운송 업체명 업데이트
-        rental.changeDelivery(deliveryNo, deliverCom);
-    }
-
-    // 예약진행상태 수정 (배송중 -> 배송완료, 수거중 -> 수거완료)
-    @Transactional
-    public void updateRentalState(String rentalNo) {
-
-        RentalEntity rentalEntity = rentalRepository.findById(rentalNo)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약이 존재하지 않습니다."));
-
-        String currentState = rentalEntity.getRentalState();
-
-        // 유효한 상태 변경인지 확인
-        if ("배송중".equals(currentState)) {
-            rentalEntity.changeRentalState("배송완료");
-        } else if ("수거중".equals(currentState)) {
-            rentalEntity.changeRentalState("수거완료");
-        } else {
-            throw new IllegalStateException("잘못된 상태 변경 요청입니다.");
-        }
-    }
 /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
     // 관리자 - 예약 조회(쿼리 DSL)
     public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Criteria cri) {
@@ -199,7 +162,6 @@ public class RentalService {
         Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());  // 페이지 번호 조정
         return ownerRentalRepositoryCustom.findRentalListByOwner(ownerNo, period, rentalTab, pageable);
     }
-
 
     // 예약 확정
     @Transactional
@@ -222,6 +184,54 @@ public class RentalService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
 
         rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
+    }
+
+    // 예약진행상태 수정 (배송중 -> 배송완료, 수거중 -> 수거완료)
+    @Transactional
+    public void updateRentalState(String rentalNo) {
+
+        RentalEntity rentalEntity = rentalRepository.findById(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약이 존재하지 않습니다."));
+
+        String currentState = rentalEntity.getRentalState();
+
+        // 유효한 상태 변경인지 확인
+        if ("배송중".equals(currentState)) {
+            rentalEntity.changeRentalState("배송완료");
+
+            // rentalTerm 조회
+            RentalOptionInfoEntity rentalOption = rentalOptionInfoRepository.findById(rentalEntity.getRentalInfoNo())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 대여 옵션 정보가 존재하지 않습니다."));
+
+            // 대여 기간 변경
+            rentalEntity.changeRentalPeriod(LocalDateTime.now(), rentalOption.getRentalTerm());
+        } else if ("수거중".equals(currentState)) {
+            rentalEntity.changeRentalState("수거완료");
+        } else if ("배송완료".equals(currentState)) {
+            rentalEntity.changeRentalState("반납요청");
+        } else {
+            throw new IllegalStateException("잘못된 상태 변경 요청입니다.");
+        }
+    }
+
+    // 운송장번호, 운송 업체명 수정 -> 배송중&수거중으로 상태 업데이트
+    @Transactional
+    public void updateDelivery(String rentalNo, String deliveryNo, String deliverCom) {
+        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
+
+        // 현재 예약 상태(rentalState) 확인
+        String currentState = rental.getRentalState();
+
+        // 상태에 따라 배송중 또는 수거중으로 변경
+        if ("예약완료".equals(currentState)) {
+            rental.changeRentalState("배송중");  // 배송중으로 상태 변경
+        } else if ("반납요청".equals(currentState)) {
+            rental.changeRentalState("수거중");  // 수거중으로 상태 변경
+        }
+
+        // 운송장 번호와 운송 업체명 업데이트
+        rental.changeDelivery(deliveryNo, deliverCom);
     }
 
 

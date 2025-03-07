@@ -72,4 +72,12 @@ public class RentalEntity {
         this.destinationNo = newDestinationNo;
     }
 
+    public void changeRentalPeriod(LocalDateTime startDate, int rentalTerm) {
+        if (startDate == null || rentalTerm < 0) {
+            throw new IllegalArgumentException("잘못된 대여 기간 설정입니다.");
+        }
+        this.rentalStartDate = startDate;
+        this.rentalEndDate = startDate.plusMonths(rentalTerm);
+    }
+
 }
