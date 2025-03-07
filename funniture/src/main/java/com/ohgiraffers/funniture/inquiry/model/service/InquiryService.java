@@ -1,5 +1,8 @@
 package com.ohgiraffers.funniture.inquiry.model.service;
 
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PageDTO;
+import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
 import com.ohgiraffers.funniture.inquiry.model.dao.InquiryRepository;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
@@ -8,6 +11,8 @@ import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -129,22 +134,55 @@ public class InquiryService {
 //        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class)).collect(Collectors.toList());
 //    }
 
-    public List<OwnerInquiryDTO> findByInquiryOwnerPage(String ownerNo) {
+//    public List<OwnerInquiryDTO> findByInquiryOwnerPage(String ownerNo, Criteria cri) {
+//        int total = inquiryRepository.countAllinquiryOwnerPage();
+//        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+//
+//        List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
+//
+//        return results.stream().map(obj -> new OwnerInquiryDTO(
+//                (String) obj[0],  // inquiryNo
+//                (String) obj[1],  // memberId
+//                (String) obj[2],  // inquiryContent
+//                (Integer) obj[3], // showStatus
+//                (Integer) obj[4], // qnaType
+//                (String) obj[5],  // productNo
+//                ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
+//                (String) obj[7],  // userName (from tbl_member)
+//                (String) obj[8],  // productName (from tbl_product)
+//                (String) obj[9],  // phoneNumber (from tbl_member)
+//                (String) obj[10]  // productImageLink (from tbl_product)
+//        )).collect(Collectors.toList());
+//    }
+public PagingResponseDTO findByInquiryOwnerPage(String ownerNo, Criteria cri) {
+    System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : "+ ownerNo +"  " + cri);
+    int offset = (cri.getPageNum() - 1) * cri.getAmount();
+    int limit = cri.getAmount();
+    List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo, limit, offset);
 
-        List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
 
-        return results.stream().map(obj -> new OwnerInquiryDTO(
-                (String) obj[0],  // inquiryNo
-                (String) obj[1],  // memberId
-                (String) obj[2],  // inquiryContent
-                (Integer) obj[3], // showStatus
-                (Integer) obj[4], // qnaType
-                (String) obj[5],  // productNo
-                ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
-                (String) obj[7],  // userName (from tbl_member)
-                (String) obj[8],  // productName (from tbl_product)
-                (String) obj[9],  // phoneNumber (from tbl_member)
-                (String) obj[10]  // productImageLink (from tbl_product)
-        )).collect(Collectors.toList());
-    }
+    int total = inquiryRepository.countAllInquiryOwnerPage(ownerNo);
+
+    List<OwnerInquiryDTO> dtos = results.stream().map(obj -> new OwnerInquiryDTO(
+            (String) obj[0],  // inquiryNo
+            (String) obj[1],  // memberId
+            (String) obj[2],  // inquiryContent
+            (Integer) obj[3], // showStatus
+            (Integer) obj[4], // qnaType
+            (String) obj[5],  // productNo
+            ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
+            (String) obj[7],  // userName (from tbl_member)
+            (String) obj[8],  // productName (from tbl_product)
+            (String) obj[9],  // phoneNumber (from tbl_member)
+            (String) obj[10]  // productImageLink (from tbl_product)
+    )).collect(Collectors.toList());
+
+    PageDTO pageInfo = new PageDTO(cri, total);
+
+    PagingResponseDTO response = new PagingResponseDTO();
+    response.setData(dtos);
+    response.setPageInfo(pageInfo);
+
+    return response;
+}
 }

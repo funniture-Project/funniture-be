@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @Repository
@@ -43,17 +44,28 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
 //            """, nativeQuery = true)
 //   List<InquiryEntity> findAllInquiryOwnerPage(String ownerNo);
 
+
     @Query(value = """
-        SELECT i.*, 
-               m.user_name AS userName,
-               m.phone_number AS phoneNumber, 
-               p.product_name AS productName,
-               p.product_image_link AS productImageLink 
+    SELECT i.*, 
+           m.user_name AS userName,
+           m.phone_number AS phoneNumber, 
+           p.product_name AS productName,
+           p.product_image_link AS productImageLink 
+    FROM tbl_inquiry i
+    LEFT JOIN tbl_member m ON i.member_id = m.member_id
+    LEFT JOIN tbl_product p ON i.product_no = p.product_no
+    WHERE p.owner_no = :ownerNo
+    ORDER BY i.qna_write_time DESC
+    LIMIT :limit OFFSET :offset
+    """, nativeQuery = true)
+    List<Object[]> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo, @Param("limit") int limit, @Param("offset") int offset);
+
+
+        @Query(value = """
+        SELECT COUNT(*) 
         FROM tbl_inquiry i
-        LEFT JOIN tbl_member m ON i.member_id = m.member_id
         LEFT JOIN tbl_product p ON i.product_no = p.product_no
         WHERE p.owner_no = :ownerNo
         """, nativeQuery = true)
-    List<Object[]> findAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
-
-}
+        int countAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
+    }
