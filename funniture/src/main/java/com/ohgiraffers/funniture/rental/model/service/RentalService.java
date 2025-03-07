@@ -143,14 +143,28 @@ public class RentalService {
         RentalEntity rentalEntity = rentalRepository.findById(rentalNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 예약이 존재하지 않습니다."));
 
-        // 예약 상태가 "예약대기" 또는 "예약완료"인 경우만 변경 가능
-        if (!"예약대기".equals(rentalEntity.getRentalState()) &&
-                !"예약완료".equals(rentalEntity.getRentalState())) {
-            throw new IllegalStateException("현재 상태에서는 배송지를 변경할 수 없습니다.");
-        }
-
         // 배송지(destinationNo) 변경
         rentalEntity.changeDestinationNo(newDestinationNo);
+    }
+
+    // 운송장번호, 운송 업체명 수정 -> 배송중&수거중으로 상태 업데이트
+    @Transactional
+    public void updateDelivery(String rentalNo, String deliveryNo, String deliverCom) {
+        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
+                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
+
+        // 현재 예약 상태(rentalState) 확인
+        String currentState = rental.getRentalState();
+
+        // 상태에 따라 배송중 또는 수거중으로 변경
+        if ("예약완료".equals(currentState)) {
+            rental.changeRentalState("배송중");  // 배송중으로 상태 변경
+        } else if ("반납요청".equals(currentState)) {
+            rental.changeRentalState("수거중");  // 수거중으로 상태 변경
+        }
+
+        // 운송장 번호와 운송 업체명 업데이트
+        rental.changeDelivery(deliveryNo, deliverCom);
     }
 
     // 예약진행상태 수정 (배송중 -> 배송완료, 수거중 -> 수거완료)
@@ -210,25 +224,7 @@ public class RentalService {
         rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
     }
 
-    // 운송장번호, 운송 업체명 수정 -> 배송중&수거중으로 상태 업데이트
-    @Transactional
-    public void updateDelivery(String rentalNo, String deliveryNo, String deliverCom) {
-        RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
-                .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
 
-        // 현재 예약 상태(rentalState) 확인
-        String currentState = rental.getRentalState();
-
-        // 상태에 따라 배송중 또는 수거중으로 변경
-        if ("예약완료".equals(currentState)) {
-            rental.changeRentalState("배송중");  // 배송중으로 상태 변경
-        } else if ("반납요청".equals(currentState)) {
-            rental.changeRentalState("수거중");  // 수거중으로 상태 변경
-        }
-
-        // 운송장 번호와 운송 업체명 업데이트
-        rental.changeDelivery(deliveryNo, deliverCom);
-    }
 
 
 }
