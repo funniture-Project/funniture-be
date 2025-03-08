@@ -2,8 +2,10 @@ package com.ohgiraffers.funniture.review.controllers;
 
 import com.ohgiraffers.funniture.common.Criteria;
 import com.ohgiraffers.funniture.common.PagingResponseDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.member.controller.AuthController;
 import com.ohgiraffers.funniture.response.ResponseMessage;
+import com.ohgiraffers.funniture.review.model.dto.ReviewProductDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewRegistDTO;
 import com.ohgiraffers.funniture.review.model.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,5 +103,35 @@ public class ReviewController {
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(200, "리뷰 조회 성공", response));
+    }
+
+    @Operation(summary = "상품 번호로 리뷰 조회)",
+            description = "상세페이지에 있는 모든 리뷰 조회",
+            parameters = {
+                    @Parameter(name = "productNo", description = "조회할 상품 번호"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+            @ApiResponse(responseCode = "404",description = "등록된 리뷰 없음")
+    })
+    // 상세 페이지에 해당 상품에 대한 전체 리뷰
+    @GetMapping ("/product/{productNo}")
+    public ResponseEntity<ResponseMessage> findReviewByProductNo (@PathVariable String productNo){
+        System.out.println("컨트롤러 productNo = " + productNo);
+        List<ReviewProductDTO> result = reviewService.findReviewByProductNo(productNo);
+        System.out.println("리뷰 서비스  result = " + result);
+        Map <String , Object> map = new HashMap<>();
+        map.put("map", result);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "등록된 리뷰가 없습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "리뷰 조회에 성공하였습니다.", map));
     }
 }

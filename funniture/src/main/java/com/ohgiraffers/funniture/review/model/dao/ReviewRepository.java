@@ -27,4 +27,22 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity , String> {
     @Query(value = "SELECT COUNT(*) FROM tbl_review WHERE member_id = :memberId", nativeQuery = true)
     int countAllReviewUserPage(@Param("memberId") String memberId);
 
+
+    @Query(value = "SELECT " +
+            "r.review_no, " +
+            "r.review_write_time, " +
+            "r.review_content, " +
+            "r.member_id, " +
+            "r.product_no, " +
+            "r.score, " +
+            "p.product_name, " +
+            "p.product_image_link, " +
+            "m.user_name, " +
+            "ro.rental_term " +
+            "FROM tbl_review r " +
+            "JOIN tbl_product p ON r.product_no = p.product_no " +
+            "JOIN tbl_member m ON r.member_id = m.member_id " +
+            "JOIN tbl_rentaloptioninfo ro ON r.product_no = ro.product_no " +
+            "WHERE r.product_no = ?1", nativeQuery = true)
+    List<Object[]> findDetailedReviewByProductNo(String productNo);
 }
