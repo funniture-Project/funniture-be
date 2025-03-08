@@ -38,6 +38,7 @@ public class AuthService {
 
         memberDTO.setMemberRole("USER");
         memberDTO.setSignupDate(LocalDateTime.now());
+        memberDTO.setIsConsulting(false);
 
         // 이메일 중복 유효성 검사
         if (memberRepository.existsByEmail(memberDTO.getEmail())) {
