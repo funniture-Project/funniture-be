@@ -92,6 +92,15 @@ public class AdminInquiryController {
                 .body(new ResponseMessage(200, "문의자 조회 완료",responseMap));
     }
 
+    // 1:1 문의 보내기 & 답변 보내기
+    @Operation(summary = "1:1 문의 보내기 & 답변 보내기",
+            description = "1:1 문의 보내기 & 답변 보내기, 관리자, 사용자 모두 사용",
+            parameters = {
+                    @Parameter(name = "senderNo", description = "보내는 사람 회원번호"),
+                    @Parameter(name = "receiveNo", description = "받는 사람 번호"),
+                    @Parameter(name = "contents", description = "입력 내용")
+            }
+    )
     @PostMapping("/sendChat")
     public void sendChat(@RequestBody AdminInquiryDTO sendMSG){
         System.out.println("sendMSG = " + sendMSG);

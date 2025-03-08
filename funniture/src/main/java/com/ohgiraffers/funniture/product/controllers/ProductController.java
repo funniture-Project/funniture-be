@@ -382,11 +382,18 @@ public class ProductController {
         product.setProductNo(productNo);
 
         // 사진을 변경하는게 아니라면 기존의 image link 와 id 사용하기
+        System.out.println("화면에서 넘어온 대표 이미지 file = " + file);
         if (file == null || file.isEmpty()){
             ProductDetailDTO findProduct = productService.getProductInfoByNo(productNo);
 
             product.setProductImageLink(findProduct.getProductImageLink());
             product.setProductImageId(findProduct.getProductImageId());
+        } else {
+            Map<String, Object> response = cloudinaryService.uploadFile(file);
+            if (response != null){
+                product.setProductImageLink(response.get("url").toString());
+                product.setProductImageId(response.get("id").toString());
+            }
         }
 
         Integer productUpdateResult =  productService.updateProductInfo(productNo,product);
@@ -418,7 +425,7 @@ public class ProductController {
                 .body(new ResponseMessage(404, "수정 대상 상품을 찾지 못했습니다.", null));
     }
 
-    // 상품 정보 수정
+    // react-quill 이미지 처리
     @Operation(summary = "이미지 cloudinary 에 올리기",
             description = "react - quill 의 base64 대신 url로 변경해서 올리기 위해 추가된 api입니다."
     )
