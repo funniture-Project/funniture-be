@@ -34,6 +34,7 @@ public class RentalService {
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
+    private final AdminSalesRepositoryCustom adminSalesRepositoryCustom;
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
     private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
     private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
@@ -148,11 +149,16 @@ public class RentalService {
         rentalEntity.changeDestinationNo(newDestinationNo);
     }
 
-/* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
+    /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
     // 관리자 - 예약 조회(쿼리 DSL)
     public Page<AdminRentalViewDTO> findRentalAllListByAdmin(AdminRentalSearchCriteria criteria, Criteria cri) {
         Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
         return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria, pageable);
+    }
+
+    public Page<AdminSalesDTO> getSalesByDate(String yearMonth, String day, Criteria cri) {
+        Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
+        return adminSalesRepositoryCustom.findSalesByDate(yearMonth, day, pageable);
     }
 
 /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
@@ -206,7 +212,7 @@ public class RentalService {
             // 대여 기간 변경
             rentalEntity.changeRentalPeriod(LocalDateTime.now(), rentalOption.getRentalTerm());
         } else if ("수거중".equals(currentState)) {
-            rentalEntity.changeRentalState("수거완료");
+            rentalEntity.changeRentalState("반납완료");
         } else if ("배송완료".equals(currentState)) {
             rentalEntity.changeRentalState("반납요청");
         } else {
@@ -233,7 +239,6 @@ public class RentalService {
         // 운송장 번호와 운송 업체명 업데이트
         rental.changeDelivery(deliveryNo, deliverCom);
     }
-
 
 
 
