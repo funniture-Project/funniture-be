@@ -16,4 +16,6 @@ public class ConsultingListDTO {
     private String memberRole;
     private String imageLink;
 
+    // 새로 여기에만 추가 memberEntity에는 없는 내용
+    private boolean meLast;
 }
