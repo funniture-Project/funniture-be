@@ -29,7 +29,7 @@ public class AdminInquiryEntity {
     @Column(name = "contents")
     private String contents;
 
-    @Column(name = "create_date_time")
+    @Column(name = "create_date_time", nullable = true, insertable = false)
     private LocalDateTime createDateTime;
 
 }

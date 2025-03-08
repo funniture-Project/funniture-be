@@ -40,4 +40,7 @@ public interface AdminInquiryRepository extends JpaRepository<AdminInquiryEntity
         ) DESC 
     """)
     List<MemberEntity> getConsultingList();
+
+    @Query(value = "SELECT MAX(inquiry_admin_no) FROM tbl_inquiryadmin", nativeQuery = true)
+    String findMaxNo();
 }

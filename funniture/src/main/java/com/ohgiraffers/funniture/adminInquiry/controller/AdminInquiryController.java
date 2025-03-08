@@ -14,10 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -48,13 +45,6 @@ public class AdminInquiryController {
     public ResponseEntity<ResponseMessage> getListById(@PathVariable String memberId){
         List<AdminInquiryDTO> selectResult = adService.getListById(memberId);
 
-//        // 사용자가 보낸 데이터
-//        List<AdminInquiryDTO> userSendList = selectResult.stream().filter(item -> item.getSenderNo().equals(memberId))
-//                                                .collect(Collectors.toList());
-//        // 관리자가 보낸 데이터
-//        List<AdminInquiryDTO> adminSendList = selectResult.stream().filter(item -> item.getReceiveNo().equals(memberId))
-//                                                .collect(Collectors.toList());
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
@@ -65,14 +55,6 @@ public class AdminInquiryController {
         }
 
         Map<String, Object> responseMap = new HashMap<>();
-
-//        if (!userSendList.isEmpty()){
-//            responseMap.put("userSendList",userSendList);
-//        }
-//
-//        if (!adminSendList.isEmpty()){
-//            responseMap.put("adminSendList",adminSendList);
-//        }
 
         responseMap.put("result",selectResult);
 
@@ -110,4 +92,20 @@ public class AdminInquiryController {
                 .body(new ResponseMessage(200, "문의자 조회 완료",responseMap));
     }
 
+    @PostMapping("/sendChat")
+    public void sendChat(@RequestBody AdminInquiryDTO sendMSG){
+        System.out.println("sendMSG = " + sendMSG);
+
+        String maxNo = adService.findMaxNo();
+
+        if (maxNo == null || maxNo.isEmpty()){
+            sendMSG.setInquiryAdminNo("IAN001");
+        } else {
+            String newNo = String.format("IAN%03d", Integer.parseInt(maxNo.substring(3)) + 1);
+
+            sendMSG.setInquiryAdminNo(newNo);
+        }
+
+        adService.sendChat(sendMSG);
+    }
 }
