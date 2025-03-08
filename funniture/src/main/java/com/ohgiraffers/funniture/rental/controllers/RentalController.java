@@ -433,4 +433,42 @@ public class RentalController {
     }
 
 
+    @Operation(summary = "매출 현황 조회",
+            description = "관리자 마이페이지 매출현황에서 사용",
+            parameters = {
+                    @Parameter(name = "yearMonth", description = "월별 매출현황(필수)"),
+                    @Parameter(name = "day", description = "일별 매출현황(선택)"),
+                    @Parameter(name = "offset", description = "현재페이지")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "매출내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "사용자 예약 조회 성공")
+    })
+    // 관리자 - 매출 현황 조회
+    @GetMapping("/admin/sales")
+    public ResponseEntity<ResponseMessage> getSalesByDate(@RequestParam("yearMonth") String yearMonth,
+                                                    @RequestParam(value = "day", required = false) String day,
+                                                    @RequestParam(name = "offset", defaultValue = "1") String offset) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        Criteria cri = new Criteria(Integer.valueOf(offset), 6);
+
+        Page<AdminSalesDTO> salesData = rentalService.getSalesByDate(yearMonth, day, cri);
+
+        if (salesData.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "월별 매출내역이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("salesData", salesData.getContent());
+        res.put("pageInfo", new PageDTO(cri, (int) salesData.getTotalElements()));
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "월별 매출내역 조회 성공", res));
+    }
+
 }

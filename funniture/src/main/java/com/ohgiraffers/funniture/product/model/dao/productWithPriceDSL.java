@@ -88,7 +88,7 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
                 .leftJoin(ownerInfo).on(productPrice.ownerNo.eq(ownerInfo.memberId))
                 .leftJoin(category).on(productPrice.categoryCode.eq(category.categoryCode))
                 .where(builder)
-                .groupBy(productPrice.productNo);
+                .groupBy(productPrice.productNo, ownerInfo.storeName);
 
         if (pageable != null){
             query.offset(pageable.getOffset());
