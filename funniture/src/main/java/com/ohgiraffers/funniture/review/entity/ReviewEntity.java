@@ -39,4 +39,10 @@ public class ReviewEntity {
 
     @Transient
     private String productImageLink;
+
+    @Transient
+    private String userName;
+
+    @Transient
+    private int rentalTerm;
 }

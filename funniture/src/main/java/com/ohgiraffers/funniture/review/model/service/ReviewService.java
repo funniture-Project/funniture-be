@@ -4,12 +4,14 @@ import com.ohgiraffers.funniture.common.Criteria;
 import com.ohgiraffers.funniture.common.PageDTO;
 import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
+import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.MemberInquiryDTO;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.review.entity.ReviewEntity;
 import com.ohgiraffers.funniture.review.model.dao.ReviewRepository;
 import com.ohgiraffers.funniture.review.model.dto.ReviewDTO;
+import com.ohgiraffers.funniture.review.model.dto.ReviewProductDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewRegistDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -84,4 +86,20 @@ public class ReviewService {
     }
 
 
+    public List<ReviewProductDTO> findReviewByProductNo(String productNo) {
+        List<Object[]> results = reviewRepository.findDetailedReviewByProductNo(productNo);
+
+        return results.stream().map(obj -> new ReviewProductDTO(
+                (String) obj[0], // reviewNo
+                ((Timestamp) obj[1]).toLocalDateTime(), // reviewWriteTime
+                (String) obj[2], // reviewContent
+                (String) obj[3], // memberId
+                (String) obj[4], // productNo
+                (float) obj[5], // score
+                (String) obj[6], // productName
+                (String) obj[7], // productImageLink
+                (String) obj[8], // userName
+                (int) obj[9] // rentalTerm
+        )).collect(Collectors.toList());
+    }
 }
