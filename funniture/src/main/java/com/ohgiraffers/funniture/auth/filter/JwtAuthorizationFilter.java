@@ -100,6 +100,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 "/api/v1/review/product/\\d+",
                 "/api/v1/product/search?s=\\w+",
                 "/api/v1/review",
+                "/api/v1/review/.*",
                 "/api/v1/review/\\d++",
                 "/api/v1/review/(\\d+)?offset=\\d+",
                 "/swagger-ui/(.*)",        //swagger 설정
