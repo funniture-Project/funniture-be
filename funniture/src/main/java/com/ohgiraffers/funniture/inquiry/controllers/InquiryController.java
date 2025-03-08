@@ -211,7 +211,7 @@ public class InquiryController {
     @Operation(summary = "문의 조회",
             description = "사용자 페이지 문의 조회",
             parameters = {
-                    @Parameter(name = "ownerNo", description = "사용자 번호로 전체 문의 조회"),
+                    @Parameter(name = "memberId", description = "사용자 번호로 전체 문의 조회"),
             }
     )
     @ApiResponses({

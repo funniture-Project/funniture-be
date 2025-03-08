@@ -1,9 +1,6 @@
 package com.ohgiraffers.funniture.review.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -36,4 +33,10 @@ public class ReviewEntity {
 
     @Column (name = "score")
     private float score;
+
+    @Transient
+    private String productName;
+
+    @Transient
+    private String productImageLink;
 }
