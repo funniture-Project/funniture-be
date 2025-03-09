@@ -55,37 +55,6 @@ public class ReviewService {
         reviewRepository.save(modelMapper.map(reviewRegistDTO , ReviewEntity.class));
     }
 
-//    public PagingResponseDTO findByReviewUserPage(String memberId, Criteria cri) {
-//        System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : " + memberId + "  " + cri);
-//
-//        int offset = (cri.getPageNum() - 1) * cri.getAmount();
-//        int limit = cri.getAmount();
-//
-//        List<Object[]> results = reviewRepository.findAllReviewUserPage(memberId, limit, offset);
-//
-//        int total = reviewRepository.countAllReviewUserPage(memberId);
-//
-//        List<ReviewDTO> dtos = results.stream().map(obj -> new ReviewDTO(
-//                (String) obj[0],  // reviewNo
-//                ((Timestamp) obj[1]).toLocalDateTime(),  // reviewWriteTime
-//                (String) obj[2],  // reviewContent
-//                (String) obj[3],  // memberId
-//                (String) obj[4],  // productNo
-//                (Float) obj[5],   // score
-//                (String) obj[6],   // productName
-//                (String) obj[7],   // productImageLink
-//                (String) obj[8]     // rentalState 예약 확정된 애들만 가져오기
-//        )).collect(Collectors.toList());
-//
-//        System.out.println("리뷰 조회 매핑 잘 됐는지?");
-//        PageDTO pageInfo = new PageDTO(cri, total);
-//
-//        PagingResponseDTO response = new PagingResponseDTO();
-//        response.setData(dtos);
-//        response.setPageInfo(pageInfo);
-//
-//        return response;
-//    }
 
     //  작성 가능한 리뷰 항목들
     public PagingResponseDTO findWritableReviews(String memberId, Criteria cri) {
@@ -195,4 +164,20 @@ public class ReviewService {
 
         return response;
     }
+
+    public List<ReviewMainDTO> findReviewByMain() {
+        List<Object[]> results = reviewRepository.findAllReviewByMain();
+
+        return results.stream().map(obj -> new ReviewMainDTO(
+                (String) obj[0], // reviewNo
+                ((Timestamp) obj[1]).toLocalDateTime(), // reviewWriteTime
+                (String) obj[2], // reviewContent
+                (String) obj[3], // memberId
+                (String) obj[4], // productNo
+                (float) obj[5], // score
+                (String) obj[6], // productName
+                (String) obj[7]  // userName
+        )).collect(Collectors.toList());
+    }
+
 }

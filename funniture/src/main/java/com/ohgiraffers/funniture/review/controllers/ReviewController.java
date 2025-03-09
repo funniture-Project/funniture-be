@@ -5,6 +5,7 @@ import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.member.controller.AuthController;
 import com.ohgiraffers.funniture.response.ResponseMessage;
+import com.ohgiraffers.funniture.review.model.dto.ReviewMainDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewProductDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewRegistDTO;
 import com.ohgiraffers.funniture.review.model.service.ReviewService;
@@ -211,5 +212,30 @@ public class ReviewController {
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(200, "리뷰 조회 성공", response));
+    }
+
+    @Operation(summary = "메인 페이지 베스트 리뷰 조회",
+            description = "메인 페이지 리뷰 조회" )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "리뷰 조회 실패")
+    })
+    @GetMapping("/main")
+    public ResponseEntity<ResponseMessage> findAllMainPageReview() {
+        System.out.println("메인 페이지, 리뷰 컨트롤러 동작 " );
+        List<ReviewMainDTO> result = reviewService.findReviewByMain();
+//        System.out.println("메인 페이지, 리뷰 서비스 다녀온 result = " + result);
+        Map <String , Object> map = new HashMap<>();
+        map.put("map", result);
+
+        if (result.isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "등록된 리뷰가 없습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "리뷰 조회에 성공하였습니다.", map));
     }
 }
