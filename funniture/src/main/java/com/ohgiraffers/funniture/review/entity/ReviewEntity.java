@@ -45,4 +45,16 @@ public class ReviewEntity {
 
     @Transient
     private int rentalTerm;
+
+    @Transient
+    private String rentalState;
+
+    @Transient
+    private String rentalNo;
+
+    @Transient
+    private String orderDate;
+
+    @Transient
+    private int rentalPrice;
 }

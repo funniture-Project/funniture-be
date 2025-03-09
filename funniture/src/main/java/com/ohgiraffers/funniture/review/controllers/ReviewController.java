@@ -65,10 +65,10 @@ public class ReviewController {
         }
     }
 
-    @Operation(summary = "리뷰 조회",
-            description = "사용자 페이지 리뷰 조회",
+    @Operation(summary = "작성 가능한 리뷰 조회",
+            description = "사용자 페이지 작성 가능한 리뷰 조회",
             parameters = {
-                    @Parameter(name = "ownerNo", description = "사용자 번호로 전체 리뷰 조회"),
+                    @Parameter(name = "memberNo", description = "사용자 번호로 전체 리뷰 조회"),
             }
     )
     @ApiResponses({
@@ -87,7 +87,7 @@ public class ReviewController {
         System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
         Criteria cri = new Criteria(page, size);
-        PagingResponseDTO pagingResponseDTO = reviewService.findByReviewUserPage(memberId, cri);
+        PagingResponseDTO pagingResponseDTO = reviewService.findWritableReviews(memberId, cri);
 
         System.out.println("서비스에서 리뷰랑 페이지 정보 잘 넘어 왔는지 pagingResponseDTO = " + pagingResponseDTO);
 
@@ -102,8 +102,48 @@ public class ReviewController {
 
         return ResponseEntity.ok()
                 .headers(authController.headersMethod())
-                .body(new ResponseMessage(200, "리뷰 조회 성공", response));
+                .body(new ResponseMessage(200, "작성 가능한 리뷰 조회 성공", response));
     }
+
+    @Operation(summary = "작성한 리뷰 조회",
+            description = "사용자 페이지 작성한  리뷰 조회",
+            parameters = {
+                    @Parameter(name = "memberNo", description = "사용자 번호로 작성한 리뷰 조회"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "리뷰 조회 실패")
+    })
+    @GetMapping("/member/{memberId}/written")
+    public ResponseEntity<ResponseMessage> findAllUserWrittenReviews(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @PathVariable String memberId) {
+
+        System.out.println("프론트에서 memberId 잘 받아오는지 = " + memberId);
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
+
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = reviewService.findWrittenReviews(memberId, cri);
+
+        System.out.println("서비스에서 작성한 리뷰랑 페이지 정보 잘 넘어 왔는지 pagingResponseDTO = " + pagingResponseDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("result", pagingResponseDTO);
+
+        if (((List<?>) pagingResponseDTO.getData()).isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "작성된 리뷰가 없습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "작성된 리뷰 조회 성공", response));
+    }
+
 
     @Operation(summary = "상품 번호로 리뷰 조회)",
             description = "상세페이지에 있는 모든 리뷰 조회",

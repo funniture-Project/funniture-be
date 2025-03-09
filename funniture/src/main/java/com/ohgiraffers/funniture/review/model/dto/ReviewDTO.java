@@ -25,4 +25,6 @@ public class ReviewDTO {
     // 추가
     private String productName;
     private String productImageLink;
+
+    private String rentalState;
 }
