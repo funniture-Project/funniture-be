@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface AdminSalesRepositoryCustom {
-    Page<AdminSalesDTO> findSalesByDate(String yearMonth, String day, Pageable pageable);
+    Page<AdminSalesDTO> findSalesByDate(String yearMonth, String storeName, Pageable pageable);
 }

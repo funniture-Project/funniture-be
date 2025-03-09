@@ -29,7 +29,7 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<AdminSalesDTO> findSalesByDate(String yearMonth, String day, Pageable pageable) {
+    public Page<AdminSalesDTO> findSalesByDate(String yearMonth, String storeName, Pageable pageable) {
         QAdminSalesEntity rental = QAdminSalesEntity.adminSalesEntity;
         QRentalOptionInfoEntity rentalOptionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
         QAdminProductEntity product = QAdminProductEntity.adminProductEntity;
@@ -39,11 +39,12 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
         BooleanBuilder whereClause = new BooleanBuilder();
         whereClause.and(rental.orderDate.stringValue().like(yearMonth + "%"));
 
-        if (day != null && !day.isEmpty()) {
-            whereClause.and(rental.orderDate.stringValue().eq(yearMonth + "-" + day));
-        }
-
         whereClause.and(rental.rentalState.in("예약완료", "배송중", "배송완료", "반납요청", "수거중", "반납완료"));
+
+        if (storeName != null && !storeName.trim().isEmpty()) {
+            // 한글 검색 가능
+            whereClause.and(ownerInfo.storeName.contains(storeName)); // contains로 검색어 포함 조건 추가
+        }
 
         // 날짜 포맷 추가
         StringTemplate formattedOrderDate = Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d')", rental.orderDate);
@@ -54,8 +55,7 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
                         product.productName,
                         category.categoryName,
                         ownerInfo.storeName,
-                        rentalOptionInfo.rentalPrice.multiply(rental.rentalNumber).sum().as("totalAmount"),
-                        formattedOrderDate.as("orderDate")  // 날짜 형식 수정
+                        rentalOptionInfo.rentalPrice.multiply(rental.rentalNumber).sum().as("totalAmount")
                 ))
                 .from(rental)
                 .join(rental.rentalOptionInfo, rentalOptionInfo)
@@ -65,20 +65,22 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
                 .where(whereClause)
                 .groupBy(product.productNo, product.productName, category.categoryName, ownerInfo.storeName, formattedOrderDate)
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+                .limit(pageable.getPageSize())
+                .orderBy(product.productNo.asc());
 
         List<AdminSalesDTO> salesData = query.fetch();
 
-        JPAQuery<Long> countQuery = jpaQueryFactory
-                .select(rental.count())
+        JPAQuery<Integer> countQuery = jpaQueryFactory
+                .select(Expressions.ONE)  // 그룹화된 개수를 구할 땐 .select(Expressions.ONE) 사용
                 .from(rental)
                 .join(rental.rentalOptionInfo, rentalOptionInfo)
                 .join(rental.adminProduct, product)
                 .join(product.adminCategory, category)
                 .join(product.adminOwnerInfo, ownerInfo)
-                .where(whereClause);
+                .where(whereClause)
+                .groupBy(product.productNo, product.productName, category.categoryName, ownerInfo.storeName, formattedOrderDate);
 
-        Long countResult = countQuery.fetchOne();
+        Integer countResult = countQuery.fetchOne();
         long totalCount = (countResult != null) ? countResult : 0;
 
         return new PageImpl<>(salesData, pageable, totalCount);

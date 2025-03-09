@@ -37,6 +37,7 @@ public class RentalService {
     private final AdminSalesRepositoryCustom adminSalesRepositoryCustom;
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
     private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
+    private final OwnerSalesRepositoryCustom ownerSalesRepositoryCustom;
     private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
     private final UserActiveRentalRepositoryCustom userActiveRentalRepositoryCustom;
     private final UserRentalStateCountRepositoryCustom userRentalStateCountRepositoryCustom;
@@ -156,9 +157,9 @@ public class RentalService {
         return adminRentalRepositoryCustom.findRentalAllListByAdmin(criteria, pageable);
     }
 
-    public Page<AdminSalesDTO> getSalesByDate(String yearMonth, String day, Criteria cri) {
+    public Page<AdminSalesDTO> getSalesByDate(String yearMonth, String storeName, Criteria cri) {
         Pageable pageable = PageRequest.of(cri.getPageNum() - 1, cri.getAmount());
-        return adminSalesRepositoryCustom.findSalesByDate(yearMonth, day, pageable);
+        return adminSalesRepositoryCustom.findSalesByDate(yearMonth, storeName, pageable);
     }
 
 /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
@@ -240,6 +241,8 @@ public class RentalService {
         rental.changeDelivery(deliveryNo, deliverCom);
     }
 
-
-
+    // 제공자별 매출 현황 조회
+    public List<OwnerSalesDTO> getSalesByOwner(String ownerNo, String yearMonth, String productNo) {
+        return ownerSalesRepositoryCustom.getSalesByOwner(ownerNo, yearMonth, productNo);
+    }
 }

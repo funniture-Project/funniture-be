@@ -2,8 +2,6 @@ package com.ohgiraffers.funniture.rental.model.dto;
 
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -20,8 +18,6 @@ public class AdminSalesDTO {
     private String storeName;
 
     private Integer totalAmount;  // 매출
-
-    private String orderDate;   // 주문일
 
 
 }
