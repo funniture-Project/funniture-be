@@ -9,12 +9,10 @@ import com.ohgiraffers.funniture.inquiry.model.dto.MemberInquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
+import com.ohgiraffers.funniture.rental.model.dao.RentalRepository;
 import com.ohgiraffers.funniture.review.entity.ReviewEntity;
 import com.ohgiraffers.funniture.review.model.dao.ReviewRepository;
-import com.ohgiraffers.funniture.review.model.dto.OwnerReviewDTO;
-import com.ohgiraffers.funniture.review.model.dto.ReviewDTO;
-import com.ohgiraffers.funniture.review.model.dto.ReviewProductDTO;
-import com.ohgiraffers.funniture.review.model.dto.ReviewRegistDTO;
+import com.ohgiraffers.funniture.review.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -32,6 +30,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
+    private final RentalRepository rentalRepository;
 
     public String getMaxReview() {
         System.out.println("리뷰넘버 최대 찾아오는 애 ");
@@ -56,28 +55,58 @@ public class ReviewService {
         reviewRepository.save(modelMapper.map(reviewRegistDTO , ReviewEntity.class));
     }
 
-    public PagingResponseDTO findByReviewUserPage(String memberId, Criteria cri) {
-        System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : " + memberId + "  " + cri);
+//    public PagingResponseDTO findByReviewUserPage(String memberId, Criteria cri) {
+//        System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : " + memberId + "  " + cri);
+//
+//        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+//        int limit = cri.getAmount();
+//
+//        List<Object[]> results = reviewRepository.findAllReviewUserPage(memberId, limit, offset);
+//
+//        int total = reviewRepository.countAllReviewUserPage(memberId);
+//
+//        List<ReviewDTO> dtos = results.stream().map(obj -> new ReviewDTO(
+//                (String) obj[0],  // reviewNo
+//                ((Timestamp) obj[1]).toLocalDateTime(),  // reviewWriteTime
+//                (String) obj[2],  // reviewContent
+//                (String) obj[3],  // memberId
+//                (String) obj[4],  // productNo
+//                (Float) obj[5],   // score
+//                (String) obj[6],   // productName
+//                (String) obj[7],   // productImageLink
+//                (String) obj[8]     // rentalState 예약 확정된 애들만 가져오기
+//        )).collect(Collectors.toList());
+//
+//        System.out.println("리뷰 조회 매핑 잘 됐는지?");
+//        PageDTO pageInfo = new PageDTO(cri, total);
+//
+//        PagingResponseDTO response = new PagingResponseDTO();
+//        response.setData(dtos);
+//        response.setPageInfo(pageInfo);
+//
+//        return response;
+//    }
+
+    //  작성 가능한 리뷰 항목들
+    public PagingResponseDTO findWritableReviews(String memberId, Criteria cri) {
+        System.out.println("작성 가능한 리뷰 데이터 요청: memberId=" + memberId + ", cri=" + cri);
 
         int offset = (cri.getPageNum() - 1) * cri.getAmount();
         int limit = cri.getAmount();
 
-        List<Object[]> results = reviewRepository.findAllReviewUserPage(memberId, limit, offset);
+        List<Object[]> results = rentalRepository.findWritableReviews(memberId, limit, offset);
+        int total = rentalRepository.countWritableReviews(memberId);
 
-        int total = reviewRepository.countAllReviewUserPage(memberId);
-
-        List<ReviewDTO> dtos = results.stream().map(obj -> new ReviewDTO(
-                (String) obj[0],  // reviewNo
-                ((Timestamp) obj[1]).toLocalDateTime(),  // reviewWriteTime
-                (String) obj[2],  // reviewContent
-                (String) obj[3],  // memberId
-                (String) obj[4],  // productNo
-                (Float) obj[5],   // score
-                (String) obj[6],   // productName
-                (String) obj[7]   // productImageLink
+        List<WritableReviewDTO> dtos = results.stream().map(obj -> new WritableReviewDTO(
+                (String) obj[0],  // rentalNo
+                ((Timestamp) obj[1]).toLocalDateTime(),  // orderDate
+                (String) obj[2],  // productNo
+                (String) obj[3],  // productName
+                (String) obj[4],  // productImageLink
+                (Integer) obj[5], // rentalTerm
+                (Integer) obj[6]  // rentalPrice
         )).collect(Collectors.toList());
 
-        System.out.println("리뷰 조회 매핑 잘 됐는지?");
         PageDTO pageInfo = new PageDTO(cri, total);
 
         PagingResponseDTO response = new PagingResponseDTO();
@@ -86,6 +115,39 @@ public class ReviewService {
 
         return response;
     }
+
+
+    // 작성한 리뷰 항목들
+    public PagingResponseDTO findWrittenReviews(String memberId, Criteria cri) {
+        System.out.println("작성한 리뷰 데이터 요청: memberId=" + memberId + ", cri=" + cri);
+
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+        int limit = cri.getAmount();
+
+        List<Object[]> results = reviewRepository.findWrittenReviews(memberId, limit, offset);
+        int total = reviewRepository.countWrittenReviews(memberId);
+
+        List<ReviewDTO> dtos = results.stream().map(obj -> new ReviewDTO(
+                (String) obj[0],  // reviewNo
+                ((Timestamp) obj[1]).toLocalDateTime(),  // reviewWriteTime
+                (String) obj[2],  // reviewContent (작성된 내용)
+                (String) obj[3],  // memberId
+                (String) obj[4],  // productNo
+                (Float) obj[5],   // score
+                (String) obj[6],  // productName
+                (String) obj[7],  // productImageLink
+                (String) obj[8]   // rentalState
+        )).collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO response = new PagingResponseDTO();
+        response.setData(dtos);
+        response.setPageInfo(pageInfo);
+
+        return response;
+    }
+
 
 
     public List<ReviewProductDTO> findReviewByProductNo(String productNo) {

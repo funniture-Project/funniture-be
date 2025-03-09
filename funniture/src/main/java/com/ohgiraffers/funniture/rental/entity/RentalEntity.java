@@ -80,4 +80,16 @@ public class RentalEntity {
         this.rentalEndDate = startDate.plusMonths(rentalTerm);
     }
 
+    @Transient
+    private String rentalPrice;
+
+    @Transient
+    private int rentalTerm;
+
+    @Transient
+    private String productName;
+
+    @Transient
+    private String productImageLink;
+
 }
