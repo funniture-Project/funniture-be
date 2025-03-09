@@ -45,4 +45,35 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity , String> {
             "JOIN tbl_rentaloptioninfo ro ON r.product_no = ro.product_no " +
             "WHERE r.product_no = ?1", nativeQuery = true)
     List<Object[]> findDetailedReviewByProductNo(String productNo);
+
+    @Query(value = "SELECT DISTINCT " +
+            "r.review_no, " +
+            "r.review_write_time, " +
+            "r.review_content, " +
+            "r.member_id, " +
+            "r.product_no, " +
+            "r.score, " +
+            "p.product_name, " +
+            "p.product_image_link, " +
+            "m.user_name, " +
+            "MIN(ro.rental_term) AS rental_term " +
+            "FROM tbl_review r " +
+            "JOIN tbl_product p ON r.product_no = p.product_no " +
+            "JOIN tbl_member m ON r.member_id = m.member_id " +
+            "JOIN tbl_rentaloptioninfo ro ON r.product_no = ro.product_no " +
+            "WHERE p.owner_no = ?1 " +
+            "GROUP BY r.review_no, r.review_write_time, r.review_content, r.member_id, r.product_no, r.score, p.product_name, p.product_image_link, m.user_name " +
+            "ORDER BY r.review_write_time DESC " +
+            "LIMIT ?2 OFFSET ?3", nativeQuery = true)
+    List<Object[]> findReviewsOfProductsByOwner(String ownerNo, int limit, int offset);
+
+
+    @Query(value = "SELECT COUNT(*) " +
+            "FROM tbl_review r " +
+            "JOIN tbl_product p ON r.product_no = p.product_no " +
+            "JOIN tbl_member m ON r.member_id = m.member_id " +
+            "JOIN tbl_rentaloptioninfo ro ON r.product_no = ro.product_no " +
+            "WHERE p.owner_no = ?1", nativeQuery = true)
+    int countReviewsOfProductsByOwner(String ownerNo);
 }
+

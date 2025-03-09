@@ -134,4 +134,42 @@ public class ReviewController {
                 .headers(authController.headersMethod())
                 .body(new ResponseMessage(200, "리뷰 조회에 성공하였습니다.", map));
     }
+
+    @Operation(summary = "리뷰 조회",
+            description = "제공자 페이지 리뷰 조회",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 번호로 전체 리뷰 조회"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "리뷰 조회 실패")
+    })
+    // member_id에 따른 제공자 페이지의 전체 리뷰들
+    @GetMapping("/owner/{ownerNo}")
+    public ResponseEntity<ResponseMessage> findAllOwnerPageReview(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @PathVariable String ownerNo) {
+
+        System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
+        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
+        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
+
+        Criteria cri = new Criteria(page, size);
+        PagingResponseDTO pagingResponseDTO = reviewService.findReviewsOfProductsByOwner(ownerNo, cri);
+
+        Map<String , Object> response = new HashMap<>();
+        response.put("result", pagingResponseDTO);
+
+        if (((List<?>) pagingResponseDTO.getData()).isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "등록된 리뷰가 없습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "리뷰 조회 성공", response));
+    }
 }
