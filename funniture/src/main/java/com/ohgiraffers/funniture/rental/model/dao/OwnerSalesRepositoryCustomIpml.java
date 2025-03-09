@@ -57,6 +57,7 @@ public class OwnerSalesRepositoryCustomIpml implements OwnerSalesRepositoryCusto
                 .join(rental.productEntity, product)
                 .join(rental.rentalOptionInfoEntity, rentalOptionInfo)
                 .where(builder)
+                .orderBy(rental.rentalNo.asc())
                 .fetch();
     }
 }
