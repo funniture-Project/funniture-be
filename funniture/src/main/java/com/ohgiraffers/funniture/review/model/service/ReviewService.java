@@ -6,10 +6,12 @@ import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.inquiry.entity.InquiryEntity;
 import com.ohgiraffers.funniture.inquiry.model.dto.InquiryDTO;
 import com.ohgiraffers.funniture.inquiry.model.dto.MemberInquiryDTO;
+import com.ohgiraffers.funniture.inquiry.model.dto.OwnerInquiryDTO;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.review.entity.ReviewEntity;
 import com.ohgiraffers.funniture.review.model.dao.ReviewRepository;
+import com.ohgiraffers.funniture.review.model.dto.OwnerReviewDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewProductDTO;
 import com.ohgiraffers.funniture.review.model.dto.ReviewRegistDTO;
@@ -101,5 +103,34 @@ public class ReviewService {
                 (String) obj[8], // userName
                 (int) obj[9] // rentalTerm
         )).collect(Collectors.toList());
+    }
+
+    public PagingResponseDTO findReviewsOfProductsByOwner(String ownerNo, Criteria cri) {
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+        int limit = cri.getAmount();
+        List<Object[]> results = reviewRepository.findReviewsOfProductsByOwner(ownerNo, limit, offset);
+
+        int total = reviewRepository.countReviewsOfProductsByOwner(ownerNo);
+
+        List<OwnerReviewDTO> dtos = results.stream().map(obj -> new OwnerReviewDTO(
+                (String) obj[0], // reviewNo
+                ((Timestamp) obj[1]).toLocalDateTime(), // reviewWriteTime
+                (String) obj[2], // reviewContent
+                (String) obj[3], // memberId
+                (String) obj[4], // productNo
+                (float) obj[5], // score
+                (String) obj[6], // productName
+                (String) obj[7], // productImageLink
+                (String) obj[8], // userName
+                (int) obj[9] // rentalTerm
+        )).collect(Collectors.toList());
+
+        PageDTO pageInfo = new PageDTO(cri, total);
+
+        PagingResponseDTO response = new PagingResponseDTO();
+        response.setData(dtos);
+        response.setPageInfo(pageInfo);
+
+        return response;
     }
 }
