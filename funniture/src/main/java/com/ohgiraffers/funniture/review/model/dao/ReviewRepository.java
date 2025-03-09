@@ -114,5 +114,13 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity , String> {
             "JOIN tbl_rentaloptioninfo ro ON r.product_no = ro.product_no " +
             "WHERE p.owner_no = ?1", nativeQuery = true)
     int countReviewsOfProductsByOwner(String ownerNo);
+
+    // 메인 페이지 리뷰 달릴 애
+    @Query(value = "SELECT r.review_no, r.review_write_time, r.review_content, r.member_id, r.product_no, r.score, p.product_name, m.user_name " +
+            "FROM tbl_review r " +
+            "JOIN tbl_product p ON r.product_no = p.product_no " +
+            "JOIN tbl_member m ON r.member_id = m.member_id " +
+            "ORDER BY r.review_write_time DESC", nativeQuery = true)
+    List<Object[]> findAllReviewByMain();
 }
 
