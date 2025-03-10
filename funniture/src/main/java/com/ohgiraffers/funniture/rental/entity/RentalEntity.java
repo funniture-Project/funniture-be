@@ -1,10 +1,7 @@
 package com.ohgiraffers.funniture.rental.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder(toBuilder = true)
 public class RentalEntity {
 
     @Id
@@ -58,5 +56,40 @@ public class RentalEntity {
 
     @Column(name = "product_no")
     private String productNo;       // 상품번호 (fk)
+
+    // 상태 변경 메서드 추가
+    public void changeRentalState(String newState) {
+        this.rentalState = newState;
+    }
+
+    // 운송장번호, 운송업체명 변경 메서드 추가
+    public void changeDelivery(String newDeliveryNo, String newDeliverCom) {
+        this.deliveryNo = newDeliveryNo;
+        this.deliverCom = newDeliverCom;
+    }
+
+    public void changeDestinationNo(int newDestinationNo) {
+        this.destinationNo = newDestinationNo;
+    }
+
+    public void changeRentalPeriod(LocalDateTime startDate, int rentalTerm) {
+        if (startDate == null || rentalTerm < 0) {
+            throw new IllegalArgumentException("잘못된 대여 기간 설정입니다.");
+        }
+        this.rentalStartDate = startDate;
+        this.rentalEndDate = startDate.plusMonths(rentalTerm);
+    }
+
+    @Transient
+    private String rentalPrice;
+
+    @Transient
+    private int rentalTerm;
+
+    @Transient
+    private String productName;
+
+    @Transient
+    private String productImageLink;
 
 }

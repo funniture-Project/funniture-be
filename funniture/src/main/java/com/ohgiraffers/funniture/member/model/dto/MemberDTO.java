@@ -33,9 +33,9 @@ public class MemberDTO implements UserDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime signupDate;
 
-    private int isConsulting;
+    private Boolean isConsulting;
 
-    private int hasImage;
+//    private int hasImage;
 
     private String imageLink;
 
@@ -44,6 +44,9 @@ public class MemberDTO implements UserDetails {
 
     // 25-02-24, 사용자 기본 주소 추가
     private String address;
+
+//    // 25-03-02, 반려 사유 컬럼 추가
+    private String reasonRejection;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

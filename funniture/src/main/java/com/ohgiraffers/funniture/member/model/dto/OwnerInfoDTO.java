@@ -12,9 +12,14 @@ public class OwnerInfoDTO {
     private String storeNo;
     private String memberId;
     private String storeName;
-    private String storeAdress;
+    private String storeAddress;
     private String account;
     private String bank;
     private String attechmentLink;
+
+    // 컬럼 추가 25-02-27
+    private int isRejected;
+    private String storeImage;
+    private String storePhone;
 
 }

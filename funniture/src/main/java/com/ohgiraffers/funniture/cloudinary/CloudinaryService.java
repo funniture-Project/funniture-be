@@ -51,4 +51,32 @@ public class CloudinaryService {
         return convFile;
     }
 
+    // pdf 처리용
+    public Map<String, Object> uploadPdfFile(MultipartFile file) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            File uploadedFile = convertMultiPartToFile(file);
+            System.out.println("uploadedFile (PDF) = " + uploadedFile);
+
+            // PDF는 resource_type을 "raw"로 설정
+            Map<String, Object> uploadOptions = ObjectUtils.asMap("resource_type", "raw");
+
+            Map uploadResult = cloudinary.uploader().upload(uploadedFile, uploadOptions);
+
+            System.out.println("uploadResult (PDF) = " + uploadResult);
+
+            response.put("url", uploadResult.get("secure_url").toString());
+            response.put("id", uploadResult.get("public_id").toString());
+
+            // 로컬 파일 삭제
+            uploadedFile.delete();
+
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("PDF 파일 업로드 실패", e);
+        }
+    }
+
+
 }

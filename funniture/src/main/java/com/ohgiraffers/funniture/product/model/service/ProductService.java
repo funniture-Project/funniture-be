@@ -1,11 +1,14 @@
 package com.ohgiraffers.funniture.product.model.service;
 
+import com.ohgiraffers.funniture.common.Criteria;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.product.entity.*;
 import com.ohgiraffers.funniture.product.model.dao.*;
 import com.ohgiraffers.funniture.product.model.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ public class ProductService {
     private final ProductWithPriceRepository ProductWithPriceRepository;
     private final CategoryRepository categoryRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
+    private final ProductWithPriceRepository productWithPriceRepository;
 
     // 전체 상품 조회, 카테고리별 상품 조회(상품 + 가격 리스트)
     public List<ProductWithPriceDTO> getProductAll(ProductSearchCondition condition) {
@@ -231,6 +235,25 @@ public class ProductService {
         }
     }
 
+    public List<RecentProductDTO> findAllProductInfo(List<String> productList) {
+        List<RecentProductDTO> infoList = productWithPriceRepository.findAllProductInfo(productList);
+
+        infoList.sort(Comparator.comparing(item -> productList.indexOf(item.getProductNo())));
+
+        return infoList;
+    }
+
+    // 페이징 코드
+    public Page<ProductWithPriceDTO> getPagingProductAll(ProductSearchCondition condition, Criteria cri) {
+
+        Page<ProductWithPriceEntity> productPagingEntityList = ProductWithPriceRepository.findSearchPagingProductList(condition,cri);
+
+        List<ProductWithPriceDTO> productPagingDTOList= productPagingEntityList.getContent().stream().map(product -> modelMapper.map(product, ProductWithPriceDTO.class))
+                .collect(Collectors.toList());
+
+        // PageImpl을 사용하여 Page<ProductWithPriceDTO> 생성 후 반환
+        return new PageImpl<>(productPagingDTOList, productPagingEntityList.getPageable(), productPagingEntityList.getTotalElements());
+    }
 
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {

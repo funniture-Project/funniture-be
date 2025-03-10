@@ -114,14 +114,31 @@ public class DeliveryAddressController {
             @ApiResponse(responseCode = "200", description = "배송지 수정이 완료되었습니다.")
     })
     // 배송지 수정
-    @PutMapping("/update")
-    public ResponseEntity<ResponseMessage> deliveryAddressUpdate(@RequestBody DeliveryAddressDTO deliveryAddressDTO) {
+    @PutMapping("/{destinationNo}/update")
+    public ResponseEntity<ResponseMessage> deliveryAddressUpdate(@PathVariable int destinationNo, @RequestBody DeliveryAddressDTO deliveryAddressDTO) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
 
-        deliveryAddressService.deliveryAddressUpdate(deliveryAddressDTO);
+        deliveryAddressService.deliveryAddressUpdate(destinationNo,deliveryAddressDTO);
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "배송지 수정이 완료되었습니다.", null));
+    }
+
+    @Operation(summary = "사용자 기본 배송지 수정",
+            description = "사용자 마이페이지에서 사용"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "기본 배송지 수정이 완료되었습니다.")
+    })
+    // 기본 배송지 수정 API
+    @PutMapping("/{destinationNo}/setDefault")
+    public ResponseEntity<ResponseMessage> setDefaultDeliveryAddress(@PathVariable int destinationNo) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        deliveryAddressService.setDefaultDeliveryAddress(destinationNo);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "기본 배송지가 수정되었습니다.", null));
     }
 
     @Operation(summary = "배송지 비활성화",
@@ -131,7 +148,7 @@ public class DeliveryAddressController {
             @ApiResponse(responseCode = "200", description = "배송지가 비활성화되었습니다.")
     })
     // 사용자 배송지 삭제(사용자 입장에서 안보이게하기 -> 과거 예약에서 배송지가 확인 되어야하기때문에)
-    @PutMapping("/delete/{destinationNo}")
+    @PutMapping("/{destinationNo}/delete")
     public ResponseEntity<ResponseMessage> deliveryAddressDelete(@PathVariable int destinationNo){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));

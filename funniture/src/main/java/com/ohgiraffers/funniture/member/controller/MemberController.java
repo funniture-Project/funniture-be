@@ -2,7 +2,9 @@ package com.ohgiraffers.funniture.member.controller;
 
 import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
+import com.ohgiraffers.funniture.member.model.dto.AppOwnerInfoDTO;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
+import com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO;
 import com.ohgiraffers.funniture.member.model.service.MemberService;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -13,11 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -269,4 +273,203 @@ public class MemberController {
                     .body(new ResponseMessage(400, "회원 탈퇴 실패", null));
         }
     }
+
+    // 제공자 전환 신청
+    @Operation(summary = "제공자 전환 신청", description = "제공자 전환 신청 데이터를 처리")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "제공자 전환 신청 성공"),
+            @ApiResponse(responseCode = "400", description = "제공자 전환 신청 실패")
+    })
+    @PostMapping(value = "/owner/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseMessage> registerOwner(
+            @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
+            @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
+            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
+
+        System.out.println("제공자 전환 신청 잘 들어왔는지 = " + appOwnerInfoDTO);
+
+        try {
+            // Cloudinary에 이미지 업로드
+            if (storeImage != null && !storeImage.isEmpty()) {
+                Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
+                appOwnerInfoDTO.setStoreImage(imageResponse.get("url").toString());
+            }
+
+            // Cloudinary에 첨부파일 업로드
+            if (attachmentFile != null && !attachmentFile.isEmpty()) {
+                Map<String, Object> fileResponse = cloudinaryService.uploadPdfFile(attachmentFile);
+                appOwnerInfoDTO.setAttechmentLink(fileResponse.get("url").toString());
+            }
+
+            // 서비스 호출 후 저장된 데이터를 가져옴
+            AppOwnerInfoDTO savedOwnerInfo = memberService.registerOwner(appOwnerInfoDTO);
+
+            Map <String , Object> result = new HashMap<>();
+            result.put("result", savedOwnerInfo);
+
+            // 응답 객체 생성 및 반환
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "제공자 전환 신청 성공", result));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "제공자 전환 신청 실패", null));
+        }
+    }
+
+
+    // 기존 제공자 신청 여부 확인하기 ( 여기에는 400 을 작성하면 에러가 발생해서
+    @Operation(summary = "제공자 전환 신청 여부 확인",
+            description = "제공자 전환 재신청 시 최초 신청인지 재신청인지 여부 확인",
+            parameters = {
+                    @Parameter(name = "memberId", description = "회원 ID를 이용하여 제공자 신청여부 확인"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 신청 여부 확인 성공")
+    })
+    @GetMapping("/owner/status/{memberId}")
+    public ResponseEntity<ResponseMessage> checkOwnerStatus(@PathVariable String memberId) {
+//        boolean isRegistered = memberService.existsByMemberId(memberId);
+        String status = memberService.getOwnerStatus(memberId);
+        System.out.println("제공자 전환 신청 여부 확인 컨트롤러 - memberId: " + memberId + ", isRegistered: " + status);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status);
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "제공자 전환 신청 여부 확인 성공", response));
+    }
+
+    // 제공자 전환 재신청 (update)
+    @Operation(summary = "제공자 전환 재신청", description = "제공자 전환 재신청 시 데이터를 업데이트")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "제공자 전환 재신청 성공"),
+            @ApiResponse(responseCode = "400", description = "제공자 전환 재신청 실패")
+    })
+    @PostMapping(value = "/owner/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseMessage> upsertOwner(
+            @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
+            @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
+            @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
+
+        try {
+            // Cloudinary에 이미지 업로드
+            if (storeImage != null && !storeImage.isEmpty()) {
+                Map<String, Object> imageResponse = cloudinaryService.uploadFile(storeImage);
+                appOwnerInfoDTO.setStoreImage(imageResponse.get("url").toString());
+            }
+
+            // Cloudinary에 첨부파일 업로드
+            if (attachmentFile != null && !attachmentFile.isEmpty()) {
+                Map<String, Object> fileResponse = cloudinaryService.uploadPdfFile(attachmentFile);
+                appOwnerInfoDTO.setAttechmentLink(fileResponse.get("url").toString());
+            }
+
+            // 서비스 호출 후 저장된 데이터를 가져옴
+            AppOwnerInfoDTO savedOwnerInfo = memberService.upsertOwner(appOwnerInfoDTO);
+
+            Map <String , Object> result = new HashMap<>();
+            result.put("result", savedOwnerInfo);
+
+            // 응답 객체 생성 및 반환
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(201, "제공자 정보 저장 성공", result));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(400, "제공자 정보 저장 실패", null));
+        }
+    }
+
+    // 재공자 신청 반려 됐을 때 반려 메시지 가져오는 애)
+    @Operation(summary = "제공자 전환 반려 메시지", description = "제공자 전환 반려 됐을 때 반려 메시지 불러오기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 반려 메시지 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "제공자 전환 반려 메시지 조회 실패")
+    })
+    @GetMapping(value = "/rejected/{memberId}")
+    public ResponseEntity<ResponseMessage> rejectedMessageMypage(@PathVariable String memberId)  {
+
+        System.out.println("✅ 반려 메시지 조회, 화면에서 넘어온 memberId"+ memberId);
+        MemberDTO memberDTO = memberService.getRejectedMessage(memberId);
+        System.out.println("✅ 서비스에서 넘어온 반려 메시지 DTO = " + memberDTO);
+
+        Map<String , Object> result = new HashMap<>();
+        result.put("result" , memberDTO);
+
+        if (memberDTO == null) {
+            return ResponseEntity.ok()
+                    .headers(authController.headersMethod())
+                    .body(new ResponseMessage(404, "제공자 전환 반려 메시지가 존재하지 않습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(authController.headersMethod())
+                .body(new ResponseMessage(200, "제공자 전환 반려 메시지 조회 성공", result));
+    }
+
+    // 재공자 전환 신청에서 중복된 store_no 있는지 확인하는 로직
+    @Operation(summary = "제공자 전환 중복 데이터 확인", description = "제공자 전환 시 중복 데이터 여부 확인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "제공자 전환 사업자등록번호 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "제공자 전환 사업자등록번호 중복")
+    })
+    @GetMapping("/check-store-no")
+    public ResponseEntity<ResponseMessage> checkStoreNoDuplicate(@RequestParam String storeNo, @RequestParam String memberId) {
+        boolean isDuplicateOrOwned = memberService.isStoreNoDuplicateOrOwnedByUser(storeNo, memberId);
+
+        System.out.println("storeNo = " + storeNo);
+        System.out.println("memberId = " + memberId);
+
+        if (isDuplicateOrOwned) {
+            return ResponseEntity.ok(new ResponseMessage(400, "중복된 사업자 번호입니다.", null));
+        } else {
+            return ResponseEntity.ok(new ResponseMessage(200, "사용 가능한 사업자 번호입니다.", null));
+        }
+    }
+
+    @Operation(summary = "관리자와 상담 상태 변경",
+            description = "관리자와의 상담 상태 변경",
+            parameters = {
+                    @Parameter(name = "memberId", description = "회원번호")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "변경 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 사용자 못찾음")
+    })
+    @PutMapping("/modify/consulting")
+    public ResponseEntity<ResponseMessage> modifyConsulting(@RequestParam String memberId){
+        System.out.println("대상 memberId = " + memberId);
+        boolean result = memberService.modifyConsulting(memberId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType( "application","json", Charset.forName("UTF-8")));
+
+        if (!result){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(404, "변경 대상 사용자 못 찾음", null));
+        }
+
+        MemberEntity findMember = memberService.findByMemberId(memberId);
+        System.out.println("findMember = " + findMember);
+
+        Map<String,Object> resultMap = new HashMap<>();
+
+        resultMap.put("isConsulting",findMember.getIsConsulting());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(204, "변경 성공", resultMap));
+    }
+
 }

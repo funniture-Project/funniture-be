@@ -19,4 +19,6 @@ public class ProductSearchCondition {
 
     private String searchText;
 
+    private Integer pageNum;
+
 }

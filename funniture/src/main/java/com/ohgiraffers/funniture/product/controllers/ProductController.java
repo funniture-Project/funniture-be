@@ -1,6 +1,8 @@
 package com.ohgiraffers.funniture.product.controllers;
 
 import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
+import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.common.PageDTO;
 import com.ohgiraffers.funniture.common.ProductSearchCondition;
 import com.ohgiraffers.funniture.member.model.service.CustomUserDetailsService;
 import com.ohgiraffers.funniture.product.model.dto.*;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,9 +42,6 @@ public class ProductController {
     private final CustomUserDetailsService customUserDetailsService;
     private final CloudinaryService cloudinaryService;
 
-    // ?categoryCode=10로 작성 시 해당 카테고리 상품만 출력, 없으면 전체
-    // pathVariable 로 작성 시 {"/", "/{categoryCode}"}로 경로 작성해야 한다.
-
     // product 조회 (전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회)
     @Operation(summary = "상품 조회 (상품 정보 + 가격 리스트)",
             description = "전체 상품 조회 및 categoryCode 별 조회, 제공자 별 상품 조회, 검색명으로 조회",
@@ -59,12 +59,40 @@ public class ProductController {
     @GetMapping({"", "/"})
     public ResponseEntity<ResponseMessage> getProductAll(@ModelAttribute ProductSearchCondition condition){
 
+        System.out.println("컨트롤러 단의 제품 검색 조건 = " + condition);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
         Map<String, Object> responseMap = new HashMap<>();
 
+        // 관리자 페이지에서만 페이징 처리 동작
+        if (condition.getPageNum() != null) {
+            Criteria cri = new Criteria(Integer.valueOf(condition.getPageNum()), 10);
+            System.out.println("cri = " + cri);
+
+            System.out.println("페이징 할꺼임!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            Page<ProductWithPriceDTO> pagingResults = productService.getPagingProductAll(condition,cri);
+
+            if (pagingResults.isEmpty()){
+                return ResponseEntity.ok()
+                        .headers(headers)
+                        .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+            }
+
+            responseMap.put("result", pagingResults.getContent());  // 실제 데이터 (content) 가져오기
+            responseMap.put("pageInfo", new PageDTO(cri, (int) pagingResults.getTotalElements()));  // PageDTO 정보 포함
+            System.out.println("results.size() = " + pagingResults.getContent().size());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(200, "전체 상품 리스트 조회 성공", responseMap));
+        }
+
+        // 페이징 처리가 없을때의 제품 정보 가져오기
+        System.out.println("페이징 안해!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         List<ProductWithPriceDTO> results = productService.getProductAll(condition);
+        System.out.println("results.size() = " + results.size());
 
         if (results.isEmpty()){
             return ResponseEntity.ok()
@@ -354,11 +382,18 @@ public class ProductController {
         product.setProductNo(productNo);
 
         // 사진을 변경하는게 아니라면 기존의 image link 와 id 사용하기
+        System.out.println("화면에서 넘어온 대표 이미지 file = " + file);
         if (file == null || file.isEmpty()){
             ProductDetailDTO findProduct = productService.getProductInfoByNo(productNo);
 
             product.setProductImageLink(findProduct.getProductImageLink());
             product.setProductImageId(findProduct.getProductImageId());
+        } else {
+            Map<String, Object> response = cloudinaryService.uploadFile(file);
+            if (response != null){
+                product.setProductImageLink(response.get("url").toString());
+                product.setProductImageId(response.get("id").toString());
+            }
         }
 
         Integer productUpdateResult =  productService.updateProductInfo(productNo,product);
@@ -390,6 +425,13 @@ public class ProductController {
                 .body(new ResponseMessage(404, "수정 대상 상품을 찾지 못했습니다.", null));
     }
 
+    // react-quill 이미지 처리
+    @Operation(summary = "이미지 cloudinary 에 올리기",
+            description = "react - quill 의 base64 대신 url로 변경해서 올리기 위해 추가된 api입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 업로드 후 url 과 id가 반환됩니다.")
+    })
     @PostMapping("/quillimg")
     private Map<String, Object> quillImgUpload(@RequestParam("file") MultipartFile file){
         System.out.println("프론트에서 넘겨받은 file = " + file);
@@ -407,6 +449,33 @@ public class ProductController {
         }
 
         return uploadResult;
+    }
+
+    // 최근 본 상품 정보
+    @Operation(summary = "최근 본 상품 정보 가져오기",
+            description = "최근 본 상품 최근 상품 순서 맞춰서 가져오기",
+            parameters = {
+            @Parameter(name = "productList", description = "상품 번호 리스트 (필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미지 업로드 후 url 과 id가 반환됩니다.")
+    })
+    @PostMapping("/recentlist")
+    private ResponseEntity<ResponseMessage> recentProductListInfo(@RequestBody List<String> productList){
+
+        List<RecentProductDTO> infoList = productService.findAllProductInfo(productList);
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("infoList", infoList);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "상품 정보 정상 조회", result));
     }
 
 }

@@ -29,4 +29,6 @@ public class PointService {
                 .map(pointLog -> modelMapper.map(pointLog, PointDTO.class))
                 .collect(Collectors.toList());
     }
+
+
 }

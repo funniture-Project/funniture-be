@@ -73,11 +73,11 @@ public class DeliveryAddressService {
 
     // 배송지 수정
     @Transactional
-    public void deliveryAddressUpdate(DeliveryAddressDTO deliveryAddressDTO) {
+    public void deliveryAddressUpdate(int destinationNo, DeliveryAddressDTO deliveryAddressDTO) {
 
         // 수정할 배송지 찾기
         DeliveryAddressEntity deliveryAddressEntity =
-                deliveryAddressRepository.findById(deliveryAddressDTO.getDestinationNo())
+                deliveryAddressRepository.findById(destinationNo)
                         .orElseThrow(() -> new IllegalArgumentException("해당 배송지가 존재하지 않습니다."));
 
         // 만약 사용자가 기본 배송지를 설정하려는 경우
@@ -136,6 +136,32 @@ public class DeliveryAddressService {
                 deliveryAddressRepository.save(newDefault);
             });
         }
+    }
+
+    @Transactional
+    // 기본 배송지로 수정 API
+    public void setDefaultDeliveryAddress(int destinationNo) {
+
+        // 수정할 배송지 찾기
+        DeliveryAddressEntity deliveryAddressEntity =
+                deliveryAddressRepository.findById(destinationNo)
+                        .orElseThrow(() -> new IllegalArgumentException("해당 배송지가 존재하지 않습니다."));
+
+        // 기본 배송지로 설정하려는 경우
+        if (!deliveryAddressEntity.isDefault()) {
+            // 해당 회원(memberId)의 기존 기본 배송지 찾기
+            Optional<DeliveryAddressEntity> existingDefaultAddress =
+                    deliveryAddressRepository.findByMemberIdAndIsDefaultTrue(deliveryAddressEntity.getMemberId());
+
+            // 기존 기본 배송지가 있다면 기본 배송지 해제
+            existingDefaultAddress.ifPresent(address -> address.setDefault(false));
+
+            // 새로운 배송지를 기본 배송지로 설정
+            deliveryAddressEntity.setDefault(true);
+        }
+
+        // 변경된 배송지 저장 (자동으로 업데이트됨)
+        deliveryAddressRepository.save(deliveryAddressEntity);
     }
 
 }
