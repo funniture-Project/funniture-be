@@ -224,7 +224,7 @@ public class ReviewController {
     public ResponseEntity<ResponseMessage> findAllMainPageReview() {
         System.out.println("메인 페이지, 리뷰 컨트롤러 동작 " );
         List<ReviewMainDTO> result = reviewService.findReviewByMain();
-//        System.out.println("메인 페이지, 리뷰 서비스 다녀온 result = " + result);
+        System.out.println("메인 페이지, 리뷰 서비스 다녀온 result = " + result);
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
 

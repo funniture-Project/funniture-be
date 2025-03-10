@@ -3,8 +3,10 @@ package com.ohgiraffers.funniture.member.controller;
 import com.ohgiraffers.funniture.cloudinary.CloudinaryService;
 import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.model.dto.AppOwnerInfoDTO;
+import com.ohgiraffers.funniture.member.model.dto.ConnectCountDTO;
 import com.ohgiraffers.funniture.member.model.dto.MemberDTO;
 import com.ohgiraffers.funniture.member.model.dto.OwnerInfoDTO;
+import com.ohgiraffers.funniture.member.model.service.CountNumService;
 import com.ohgiraffers.funniture.member.model.service.MemberService;
 import com.ohgiraffers.funniture.product.model.dto.ProductDTO;
 import com.ohgiraffers.funniture.response.ResponseMessage;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,6 +38,7 @@ public class MemberController {
     private final MemberService memberService;
     private final AuthController authController;
     private final CloudinaryService cloudinaryService;
+    private final CountNumService countNumService;
 
     @Operation(summary = "로그인 회원 정보 조회",
             description = "로그인 시, 로그인 한 회원에 대한 정보 조회",
@@ -470,6 +474,34 @@ public class MemberController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(204, "변경 성공", resultMap));
+    }
+
+    @PostMapping("/updateCount")
+    public void updateCount(@RequestBody Map<String, String> mapRole){
+        String role = mapRole.get("role");
+
+        countNumService.updateCount(role);
+    }
+
+    @GetMapping("/connectCount")
+    public ResponseEntity<ResponseMessage> getConnectCount(){
+       List<ConnectCountDTO> result = countNumService.getThisMonth();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType( "application","json", Charset.forName("UTF-8")));
+        Map<String,Object> resultMap = new HashMap<>();
+
+        if (result == null){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "이번달 접속자 기록 없음", null));
+        }else {
+            resultMap.put("result",result);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "이번달 접속자 기록", resultMap));
+        }
     }
 
 }

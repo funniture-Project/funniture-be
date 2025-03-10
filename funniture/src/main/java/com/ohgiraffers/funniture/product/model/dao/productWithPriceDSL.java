@@ -75,6 +75,7 @@ public class productWithPriceDSL implements ProductWithPriceRepository {
                         productPrice.productStatus,
                         productPrice.productImageLink,
                         productPrice.productImageId,
+                        productPrice.registerData,
                         ownerInfo.storeName,
                         // rentalOption의 rentalPrice를 여러 값으로 이어붙이기
 //                        Expressions.stringTemplate("GROUP_CONCAT({0}) ", rentalOption.rentalPrice).as("priceList")))  // GROUP_CONCAT 사용List"))) // stringTemplate 사용
