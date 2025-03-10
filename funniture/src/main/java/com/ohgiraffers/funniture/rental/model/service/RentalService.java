@@ -1,9 +1,6 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
 import com.ohgiraffers.funniture.common.Criteria;
-import com.ohgiraffers.funniture.deliveryaddress.entity.DeliveryAddressEntity;
-import com.ohgiraffers.funniture.member.entity.MemberEntity;
-import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.point.entity.PointEntity;
 import com.ohgiraffers.funniture.point.model.dao.PointRepository;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
@@ -35,12 +32,15 @@ public class RentalService {
     private final ModelMapper modelMapper;
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
     private final AdminSalesRepositoryCustom adminSalesRepositoryCustom;
+    private final SalesRepositoryCustom salesRepositoryCustom;
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
     private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
     private final OwnerSalesRepositoryCustom ownerSalesRepositoryCustom;
     private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
     private final UserActiveRentalRepositoryCustom userActiveRentalRepositoryCustom;
     private final UserRentalStateCountRepositoryCustom userRentalStateCountRepositoryCustom;
+    private final OwnerCurrentMonthSalesRepositoryCustom ownerCurrentMonthSalesRepositoryCustom;
+    private final OwnerMonthlySalesRepositoryCustom ownerMonthlySalesRepositoryCustom;
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
@@ -176,6 +176,11 @@ public class RentalService {
         return adminSalesRepositoryCustom.findSalesByDate(yearMonth, storeName, pageable);
     }
 
+    // 관리자 - 매출 합산 조회(차트)
+    public List<AdminMonthlySalesDTO> getSales(String yearMonth, String groupBy) {
+        return salesRepositoryCustom.getSales(yearMonth, groupBy);
+    }
+
 /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
 
     // 제공자 - 예약 조회(쿼리 DSL)
@@ -258,5 +263,16 @@ public class RentalService {
     // 제공자별 매출 현황 조회
     public List<OwnerSalesDTO> getSalesByOwner(String ownerNo, String yearMonth, String productNo) {
         return ownerSalesRepositoryCustom.getSalesByOwner(ownerNo, yearMonth, productNo);
+    }
+
+
+    // 이번 달 매출 API
+    public List<CurrentMonthSalesDTO> getCurrentMonthSales(String ownerNo, String yearMonth) {
+        return ownerCurrentMonthSalesRepositoryCustom.getCurrentMonthSales(ownerNo, yearMonth);
+    }
+
+    // 월별 매출 API
+    public List<MonthlySalesDTO> getMonthlySales(String ownerNo, String yearMonth) {
+        return ownerMonthlySalesRepositoryCustom.getMonthlySales(ownerNo, yearMonth);
     }
 }
