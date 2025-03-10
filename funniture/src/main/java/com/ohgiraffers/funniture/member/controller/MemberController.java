@@ -477,8 +477,8 @@ public class MemberController {
     }
 
     @PostMapping("/updateCount")
-    public void updateCount(@RequestBody String role){
-        System.out.println("role = " + role);
+    public void updateCount(@RequestBody Map<String, String> mapRole){
+        String role = mapRole.get("role");
 
         countNumService.updateCount(role);
     }

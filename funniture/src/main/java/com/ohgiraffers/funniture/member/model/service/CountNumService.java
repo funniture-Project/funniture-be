@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.member.model.service;
 import com.ohgiraffers.funniture.member.entity.CountEntity;
 import com.ohgiraffers.funniture.member.model.dao.CountRepository;
 import com.ohgiraffers.funniture.member.model.dto.ConnectCountDTO;
+import jakarta.persistence.Transient;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,30 @@ public class CountNumService {
     private final ModelMapper modelMapper;
     private final CountRepository countRepository;
 
+    @Transient
     public void updateCount(String role) {
+        LocalDate today = LocalDate.now();
 
+        try{
+            CountEntity countEntity = countRepository.findTodayData(today,role);
 
+            System.out.println("countList = " + countEntity);
 
+            if (countEntity == null){
+                CountEntity count = new CountEntity(today,role.toString(),1);
+                countRepository.save(count);
+            } else {
+                countEntity = countEntity.toBuilder()
+                        .connectCount(countEntity.getConnectCount() + 1)
+                        .build();
+
+                System.out.println("수정된 countEntity = " + countEntity);
+                countRepository.save(countEntity);
+            }
+
+        }catch (Exception e){
+            System.out.println("저장중 에러 e = " + e);
+        }
     }
 
     public List<ConnectCountDTO> getThisMonth() {

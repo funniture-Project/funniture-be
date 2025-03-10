@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @IdClass(CountCombinedKey.class)
+@Builder(toBuilder = true)
 public class CountEntity {
 
     @Id
