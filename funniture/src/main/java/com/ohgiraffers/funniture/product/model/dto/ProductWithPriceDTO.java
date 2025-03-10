@@ -1,7 +1,9 @@
 package com.ohgiraffers.funniture.product.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +42,10 @@ public class ProductWithPriceDTO {
 
     // 가격 리스트
     private String priceList;
+
+    // 등록 일시
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime registerTime;
 
     public List<Integer> getPriceListAsIntegers() {
         if (priceList == null || priceList.isEmpty()) {
