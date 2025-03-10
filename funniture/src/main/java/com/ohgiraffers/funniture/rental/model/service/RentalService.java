@@ -75,7 +75,8 @@ public class RentalService {
         RentalOptionInfoEntity rentalOption = rentalOptionInfoRepository.findById(rentalDTO.getRentalInfoNo())
                 .orElseThrow(() -> new RuntimeException("대여 조건 정보 없음"));
 
-        int rentalPrice = rentalDTO.getRentalNumber() * rentalOption.getRentalPrice(); // 렌탈 가격 계산
+        int rentalPrice = (int)Math.floor(rentalDTO.getRentalNumber() * rentalOption.getRentalPrice() * 0.9); // 렌탈 가격 계산
+
 
         // 포인트 부족 여부 확인
         if (currentPoints < rentalPrice) {
@@ -92,6 +93,19 @@ public class RentalService {
                 .build();
 
         pointRepository.save(pointUsage);
+
+        int pointEvent = (int)Math.floor(rentalDTO.getRentalNumber() * rentalOption.getRentalPrice() * 0.01); // 렌탈 가격 계산
+
+        // 포인트이벤트 저장
+        PointEntity pointAdd = PointEntity.builder()
+                .memberId(rentalDTO.getMemberId())
+                .usedPoint(0)
+                .addPoint(pointEvent)
+                .currentPoint(currentPoints + pointEvent) // 포인트 이벤트 금액 추가
+                .pointDateTime(LocalDateTime.now().plusSeconds(1))
+                .build();
+
+        pointRepository.save(pointAdd);
 
         // 상품 정보 조회
         ProductEntity product = productRepository.findById(rentalDTO.getProductNo())

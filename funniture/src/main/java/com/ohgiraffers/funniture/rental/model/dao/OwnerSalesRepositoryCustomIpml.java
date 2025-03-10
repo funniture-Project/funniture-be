@@ -35,6 +35,8 @@ public class OwnerSalesRepositoryCustomIpml implements OwnerSalesRepositoryCusto
         builder.and(rental.ownerNo.eq(ownerNo))
                 .and(rental.orderDate.between(startDate, endDate));
 
+        builder.and(rental.rentalState.in("예약완료", "배송중", "배송완료", "반납요청", "수거중", "반납완료"));
+
         // productNo 조건 추가 (비동기 필터링 대비)
         if(productNo != null && !productNo.isEmpty()) {
             builder.and(product.productNo.eq(productNo));
