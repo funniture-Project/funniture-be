@@ -173,9 +173,10 @@ public PagingResponseDTO findByInquiryOwnerPage(String ownerNo, Criteria cri) {
             (String) obj[5],  // productNo
             ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
             (String) obj[7],  // userName (from tbl_member)
-            (String) obj[8],  // productName (from tbl_product)
-            (String) obj[9],  // phoneNumber (from tbl_member)
-            (String) obj[10]  // productImageLink (from tbl_product)
+            (String) obj[8],  // phoneNumber (from tbl_member)
+            (String) obj[9],  // productName (from tbl_product)
+            (String) obj[10],  // productImageLink (from tbl_product)
+            (String) obj[11]  // answerStatus
     )).collect(Collectors.toList());
 
     PageDTO pageInfo = new PageDTO(cri, total);

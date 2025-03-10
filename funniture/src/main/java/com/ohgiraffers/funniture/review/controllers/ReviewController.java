@@ -98,7 +98,7 @@ public class ReviewController {
         if (((List<?>) pagingResponseDTO.getData()).isEmpty()) {
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
-                    .body(new ResponseMessage(404, "등록된 리뷰가 없습니다.", null));
+                    .body(new ResponseMessage(404, "작성 가능한 리뷰가 없습니다.", null));
         }
 
         return ResponseEntity.ok()

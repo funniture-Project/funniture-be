@@ -62,4 +62,10 @@ public class InquiryEntity {
 
     @Transient
     private String phoneNumber;
+
+    @Transient
+    private int commentNo;
+
+    @Transient
+    private String answerStatus;
 }
