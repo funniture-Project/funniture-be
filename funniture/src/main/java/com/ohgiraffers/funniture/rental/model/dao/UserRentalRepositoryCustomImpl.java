@@ -60,6 +60,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
                         rental.rentalNo,
                         rental.orderDate,
                         rental.rentalState,
+                        rental.rentalNumber,
                         product.productName,
                         optionInfo.rentalPrice))
                 .from(rental)
