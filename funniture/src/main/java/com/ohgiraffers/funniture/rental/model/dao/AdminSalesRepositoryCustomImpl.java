@@ -42,12 +42,11 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
         whereClause.and(rental.rentalState.in("예약완료", "배송중", "배송완료", "반납요청", "수거중", "반납완료"));
 
         if (storeName != null && !storeName.trim().isEmpty()) {
-            // 한글 검색 가능
-            whereClause.and(ownerInfo.storeName.contains(storeName)); // contains로 검색어 포함 조건 추가
+            whereClause.and(ownerInfo.storeName.contains(storeName));
         }
 
-        // 날짜 포맷 추가
-        StringTemplate formattedOrderDate = Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m-%d')", rental.orderDate);
+        // 날짜를 'YYYY-MM' 형식으로 변환
+        StringTemplate formattedOrderDate = Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", rental.orderDate);
 
         JPAQuery<AdminSalesDTO> query = jpaQueryFactory
                 .select(Projections.constructor(AdminSalesDTO.class,
@@ -63,7 +62,11 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
                 .join(product.adminCategory, category)
                 .join(product.adminOwnerInfo, ownerInfo)
                 .where(whereClause)
-                .groupBy(product.productNo, product.productName, category.categoryName, ownerInfo.storeName, formattedOrderDate)
+                .groupBy(product.productNo,
+                        product.productName,
+                        category.categoryName,
+                        ownerInfo.storeName,
+                        formattedOrderDate)  // 월별 그룹화
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(product.productNo.asc());
@@ -71,19 +74,22 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
         List<AdminSalesDTO> salesData = query.fetch();
 
         JPAQuery<Integer> countQuery = jpaQueryFactory
-                .select(Expressions.ONE)  // 그룹화된 개수를 구할 땐 .select(Expressions.ONE) 사용
+                .select(Expressions.ONE)
                 .from(rental)
                 .join(rental.rentalOptionInfo, rentalOptionInfo)
                 .join(rental.adminProduct, product)
                 .join(product.adminCategory, category)
                 .join(product.adminOwnerInfo, ownerInfo)
                 .where(whereClause)
-                .groupBy(product.productNo, product.productName, category.categoryName, ownerInfo.storeName, formattedOrderDate);
+                .groupBy(product.productNo,
+                        product.productName,
+                        category.categoryName,
+                        ownerInfo.storeName,
+                        formattedOrderDate);
 
         Integer countResult = countQuery.fetchOne();
         long totalCount = (countResult != null) ? countResult : 0;
 
         return new PageImpl<>(salesData, pageable, totalCount);
-
     }
 }
