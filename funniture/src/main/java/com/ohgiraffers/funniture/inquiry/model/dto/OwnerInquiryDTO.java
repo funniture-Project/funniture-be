@@ -34,5 +34,8 @@ public class OwnerInquiryDTO {
 
     private String productImageLink;
 
+//    private int commentNo;
+
+    private String answerStatus;
 
 }
