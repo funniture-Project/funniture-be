@@ -19,8 +19,6 @@ public interface RentalRepository extends JpaRepository<RentalEntity, String> {
 
     Optional<RentalEntity> findByRentalNo(String rentalNo);
 
-
-
     @Query(value = "SELECT rt.rental_no" +
             " , rt.order_date" +
             " , p.product_no" +
@@ -38,7 +36,7 @@ public interface RentalRepository extends JpaRepository<RentalEntity, String> {
             " ON rt.product_no = r.product_no " +
             " AND rt.member_id = r.member_id " + // 수정된 조인 조건
             "WHERE rt.member_id = :memberId" +
-            " AND rt.rental_state = '예약완료' " +
+            " AND rt.rental_state IN ('배송완료', '반납요청', '수거중', '반납완료') " + // 여러 상태 필터링
             " AND r.review_no IS NULL " + // 조건: 예약완료 + 리뷰 없음
             "ORDER BY rt.order_date DESC " +
             "LIMIT :limit OFFSET :offset", nativeQuery = true)
@@ -48,8 +46,11 @@ public interface RentalRepository extends JpaRepository<RentalEntity, String> {
     @Query(value = "SELECT COUNT(*) FROM tbl_rental rt " +
             "LEFT JOIN tbl_review r ON rt.product_no = r.product_no " +
             " AND rt.member_id = r.member_id " +
-            "WHERE rt.member_id = :memberId AND rt.rental_state = '예약완료' AND r.review_no IS NULL", nativeQuery = true)
+            "WHERE rt.member_id = :memberId" +
+            " AND rt.rental_state IN ('배송완료', '반납요청', '수거중', '반납완료') " + // 여러 상태 필터링
+            " AND r.review_no IS NULL", nativeQuery = true)
     int countWritableReviews(@org.apache.ibatis.annotations.Param("memberId") String memberId);
+
 
 
 }

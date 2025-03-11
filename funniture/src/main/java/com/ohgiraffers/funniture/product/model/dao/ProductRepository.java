@@ -66,6 +66,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
     @Query("UPDATE ProductEntity p SET p.usedStock = p.usedStock + :rentalNumber WHERE p.productNo = :productNo")
     void incrementUsedStock(String productNo, int rentalNumber);
 
+    // 수거중 -> 반납 완료 시 사용 재고 감소
+    @Modifying
+    @Query("UPDATE ProductEntity p SET p.usedStock = p.usedStock - :rentalNumber WHERE p.productNo = :productNo")
+    void decrementUsedStock(String productNo, int rentalNumber);;
+
     @Query(value = """
         SELECT c.category_name, count(p.product_no)
         FROM 

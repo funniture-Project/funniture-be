@@ -15,4 +15,9 @@ public interface CommentRepository extends JpaRepository<CommentEntity , String>
     // CommentRepository에 추가할 메서드
     @Query(value = "SELECT comment_level FROM tbl_comment WHERE comment_no = :parentCommentNo", nativeQuery = true)
     Integer getCommentLevel(int parentCommentNo);
+
+    @Query(value = "SELECT comment_no, member_id, comment_write_time," +
+            " comment_content, comment_level, parent_comment_no, inquiry_no" +
+            " FROM tbl_comment WHERE inquiry_no = :inquiryNo", nativeQuery = true)
+    CommentEntity findCommentByInquiryNo(String inquiryNo);
 }

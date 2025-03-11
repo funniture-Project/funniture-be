@@ -78,17 +78,33 @@ public interface InquiryRepository extends JpaRepository<InquiryEntity, String> 
     int countAllInquiryOwnerPage(@Param("ownerNo") String ownerNo);
 
 
+//    @Query(value = """
+//        SELECT i.inquiry_no, i.member_id, i.inquiry_content, i.show_status, i.qna_type, i.product_no, i.qna_write_time,
+//               m.user_name, m.phone_number, p.product_name, p.product_image_link
+//        FROM tbl_inquiry i
+//        LEFT JOIN tbl_member m ON i.member_id = m.member_id
+//        LEFT JOIN tbl_product p ON i.product_no = p.product_no
+//        WHERE i.member_id = :memberId
+//        ORDER BY i.qna_write_time DESC
+//        LIMIT :limit OFFSET :offset
+//        """, nativeQuery = true)
+//    List<Object[]> findAllInquiryUserPage(@Param("memberId") String memberId, @Param("limit") int limit, @Param("offset") int offset);
     @Query(value = """
         SELECT i.inquiry_no, i.member_id, i.inquiry_content, i.show_status, i.qna_type, i.product_no, i.qna_write_time, 
-               m.user_name, m.phone_number, p.product_name, p.product_image_link 
+               m.user_name, m.phone_number, p.product_name, p.product_image_link,
+               CASE WHEN EXISTS (
+                   SELECT 1 FROM tbl_comment c 
+                   WHERE c.inquiry_no = i.inquiry_no AND c.parent_comment_no = 0
+               ) THEN 'complete' ELSE 'waiting' END AS answerStatus
         FROM tbl_inquiry i
         LEFT JOIN tbl_member m ON i.member_id = m.member_id
         LEFT JOIN tbl_product p ON i.product_no = p.product_no
         WHERE i.member_id = :memberId
         ORDER BY i.qna_write_time DESC
         LIMIT :limit OFFSET :offset
-        """, nativeQuery = true)
+    """, nativeQuery = true)
     List<Object[]> findAllInquiryUserPage(@Param("memberId") String memberId, @Param("limit") int limit, @Param("offset") int offset);
+
 
     @Query(value = """
         SELECT COUNT(*) 

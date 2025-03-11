@@ -478,7 +478,69 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 월별 매출 조회 성공", res));
     }
 
+    @Operation(summary = "제공자의 예약진행상태별 Count",
+            description = "제공자 마이페이지의 메인에서 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 ID(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 예약이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자의 예약진행상태별 count 성공")
+    })
+    // 제공자의 마이페이지 예약진행상태 카운트
+    @GetMapping("/{ownerNo}/count")
+    public ResponseEntity<ResponseMessage> countRentalStatesByOwner(@PathVariable String ownerNo) {
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<RentalStateCountDTO> rentalStateCount = rentalService.countRentalStatesByOwner(ownerNo);
+
+        if (rentalStateCount.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("rentalStateCount", rentalStateCount);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 예약진행상태별 count 성공", res));
+    }
+
+    @Operation(summary = "제공자의 마이페이지 만료기간별 카운트 Count",
+            description = "제공자 마이페이지의 메인에서 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
+                    @Parameter(name = "period", description = "기간(3MONTH/1MONTH/1WEEK)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 예약이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자의 마이페이지 만료기간별 카운트 count 성공")
+    })
+    // 제공자의 마이페이지 만료기간별 카운트
+    @GetMapping("/{ownerNo}/period/count")
+    public ResponseEntity<ResponseMessage> countRentalsByPeriod(@PathVariable String ownerNo,
+                                                                @RequestParam String period) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<RentalPeriodCountDTO> rentalStateCount = rentalService.countRentalsByPeriod(ownerNo, period);
+
+        if (rentalStateCount.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("rentalStateCount", rentalStateCount);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 마이페이지 만료기간별 카운트 count 성공", res));
+    }
 
 
     /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
