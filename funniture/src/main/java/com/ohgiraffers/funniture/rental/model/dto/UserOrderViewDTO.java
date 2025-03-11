@@ -21,6 +21,8 @@ public class UserOrderViewDTO {
 
     private int rentalNumber;
 
+    private String productImageLink;
+
     private String productName;
 
     private String productNo;
