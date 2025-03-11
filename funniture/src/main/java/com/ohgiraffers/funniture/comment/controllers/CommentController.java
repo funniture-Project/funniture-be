@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.comment.controllers;
 
 import com.ohgiraffers.funniture.comment.model.dto.CommentByMyPageDTO;
+import com.ohgiraffers.funniture.comment.model.dto.CommentByProductDTO;
 import com.ohgiraffers.funniture.comment.model.dto.CommentRegistDTO;
 import com.ohgiraffers.funniture.comment.model.service.CommentService;
 import com.ohgiraffers.funniture.common.Criteria;
@@ -112,5 +113,36 @@ public class CommentController {
         return ResponseEntity.ok()
                 .headers(headersMethod())
                 .body(new ResponseMessage(200, "문의 답변 조회에 성공하였습니다.", map));
+    }
+
+    @Operation(summary = "문의 답변 조회",
+            description = "상세페이지 문의 답변 조회",
+            parameters = {
+                    @Parameter(name = "inquiryNo", description = "문의 번호로 개별 답변 조회"),
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "상세페이지 문의 답변 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "상세페이지 문의 답변 조회 실패")
+    })
+    // inquiryNo에 따른 상세페이지 개별 문의 답변 조회(일단 대댓글은 안 하고 답글만 할 거기 때문에 이렇게 조회)
+    @GetMapping("/product/{inquiryNo}")
+    public ResponseEntity<ResponseMessage> findCommentProductPageInquiry(@PathVariable String inquiryNo) {
+
+        System.out.println("프론트에서 inquiryNo 잘 받아오는지 = " + inquiryNo);
+
+        CommentByProductDTO result = commentService.findCommentByProduct(inquiryNo);
+        Map<String, Object> map = new HashMap<>();
+        map.put("map", result);
+
+        if (result == null) {
+            return ResponseEntity.ok()
+                    .headers(headersMethod())
+                    .body(new ResponseMessage(404, "상세페이지 등록된 문의 답변이 없습니다.", null));
+        }
+
+        return ResponseEntity.ok()
+                .headers(headersMethod())
+                .body(new ResponseMessage(200, "상세페이지 문의 답변 조회에 성공하였습니다.", map));
     }
 }
