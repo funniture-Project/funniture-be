@@ -43,6 +43,7 @@ public class DetailRentalRepositoryCustomImpl implements DetailRentalRepositoryC
                         rental.deliveryMemo,
                         ownerInfo.storeName,
                         product.productName,
+                        product.productImageLink,
                         rentalOptionInfo.rentalPrice,
                         rentalOptionInfo.rentalTerm,
                         rentalOptionInfo.asNumber,

@@ -61,6 +61,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
                         rental.orderDate,
                         rental.rentalState,
                         rental.rentalNumber,
+                        product.productImageLink,
                         product.productName,
                         product.productNo,
                         optionInfo.rentalPrice))
