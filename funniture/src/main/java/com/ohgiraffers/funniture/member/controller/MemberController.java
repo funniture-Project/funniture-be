@@ -500,7 +500,7 @@ public class MemberController {
 
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(new ResponseMessage(204, "이번달 접속자 기록", resultMap));
+                    .body(new ResponseMessage(200, "이번달 접속자 기록", resultMap));
         }
     }
 
