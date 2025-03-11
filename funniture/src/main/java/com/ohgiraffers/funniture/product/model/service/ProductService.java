@@ -255,6 +255,24 @@ public class ProductService {
         return new PageImpl<>(productPagingDTOList, productPagingEntityList.getPageable(), productPagingEntityList.getTotalElements());
     }
 
+    public List<Map<String,Integer>> getProductCountByCategory() {
+
+        List<Object[]> result = productRepository.countByCategory();
+
+        List<Map<String,Integer>> responseData = new ArrayList<>();
+
+        for (Object[] row : result) {
+            Map<String, Integer> item = new HashMap<>();
+            item.put(row[0].toString(),Integer.parseInt(row[1].toString()));
+
+            responseData.add(item);
+        }
+
+        System.out.println("responseData = " + responseData);
+
+        return responseData;
+    }
+
     // 특이한 방법이라 추후 정리할 예정 그냥 둬주세요!!
 //    public List<ProductWithPriceDTO> getAllProductsWithPrices() {
 //        List<Object[]> results = productRepository.findAllProductsWithPriceList();

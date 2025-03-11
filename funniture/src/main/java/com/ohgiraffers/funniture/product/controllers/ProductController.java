@@ -478,4 +478,34 @@ public class ProductController {
                 .body(new ResponseMessage(200, "상품 정보 정상 조회", result));
     }
 
+    // 카테고리별 등록 현황
+    @Operation(summary = "카테고리별 등록 현황",
+            description = "판매 중이거나 품절인 상품을 포함한 카테고리별 상품 등록 현황(개수)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "카테고리별 등록 수 반환"),
+            @ApiResponse(responseCode = "204", description = "등록된 상품 없음")
+    })
+    @GetMapping("/count")
+    public ResponseEntity<ResponseMessage> getProductCount(){
+        List<Map<String,Integer>> result = productService.getProductCountByCategory();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        if (result.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+        }
+
+        resultMap.put("result", result);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "상품 정보 정상 조회", resultMap));
+    }
+
 }
