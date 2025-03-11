@@ -10,6 +10,7 @@ import com.ohgiraffers.funniture.product.model.dao.RentalOptionInfoRepository;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
 import com.ohgiraffers.funniture.rental.model.dao.*;
 import com.ohgiraffers.funniture.rental.model.dto.*;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,7 @@ public class RentalService {
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
+    private final EntityManager entityManager;
 
 
 /* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
@@ -233,6 +235,14 @@ public class RentalService {
             rentalEntity.changeRentalPeriod(LocalDateTime.now(), rentalOption.getRentalTerm());
         } else if ("수거중".equals(currentState)) {
             rentalEntity.changeRentalState("반납완료");
+
+            // 상품 정보 조회
+            ProductEntity product = productRepository.findById(rentalEntity.getProductNo())
+                    .orElseThrow(() -> new RuntimeException("상품 정보 없음"));
+
+            // 사용 중 재고 감소
+            productRepository.decrementUsedStock(product.getProductNo(), rentalEntity.getRentalNumber());
+
         } else if ("배송완료".equals(currentState)) {
             rentalEntity.changeRentalState("반납요청");
         } else {
