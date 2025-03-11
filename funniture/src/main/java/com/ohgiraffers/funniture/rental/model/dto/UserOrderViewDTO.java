@@ -23,5 +23,8 @@ public class UserOrderViewDTO {
 
     private String productName;
 
+    private String productNo;
+
     private int rentalPrice;
+
 }

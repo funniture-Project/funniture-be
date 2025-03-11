@@ -28,25 +28,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RentalService {
 
-    private final RentalMapper rentalMapper;
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
+
+    // 관리자 레파지토리
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
     private final AdminSalesRepositoryCustom adminSalesRepositoryCustom;
     private final SalesRepositoryCustom salesRepositoryCustom;
+
+    // 사용자 레파지토리
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
-    private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
-    private final OwnerSalesRepositoryCustom ownerSalesRepositoryCustom;
-    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
     private final UserActiveRentalRepositoryCustom userActiveRentalRepositoryCustom;
     private final UserRentalStateCountRepositoryCustom userRentalStateCountRepositoryCustom;
+    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
+
+    // 제공자 레파지토리
     private final OwnerCurrentMonthSalesRepositoryCustom ownerCurrentMonthSalesRepositoryCustom;
     private final OwnerMonthlySalesRepositoryCustom ownerMonthlySalesRepositoryCustom;
     private final OwnerRentalStateCountRepositoryCustom ownerRentalStateCountRepositoryCustom;
+    private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
+    private final OwnerSalesRepositoryCustom ownerSalesRepositoryCustom;
+    private final OwnerPeriodCountRepositoryCustom ownerPeriodCountRepositoryCustom;
+
+    // 다른쪽 레파지토리
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
-    private final EntityManager entityManager;
 
 
 /* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
@@ -104,7 +111,7 @@ public class RentalService {
                 .memberId(rentalDTO.getMemberId())
                 .usedPoint(0)
                 .addPoint(pointEvent)
-                .currentPoint(currentPoints + pointEvent) // 포인트 이벤트 금액 추가
+                .currentPoint(currentPoints - rentalPrice + pointEvent) // 포인트 이벤트 금액 추가
                 .pointDateTime(LocalDateTime.now().plusSeconds(1))
                 .build();
 
@@ -290,5 +297,10 @@ public class RentalService {
     // 제공자의 마이페이지 예약진행상태 카운트
     public List<RentalStateCountDTO> countRentalStatesByOwner(String ownerNo) {
         return ownerRentalStateCountRepositoryCustom.countRentalStatesByOwner(ownerNo);
+    }
+
+    // 제공자의 마이페이지 만료기간별 카운트
+    public List<RentalPeriodCountDTO> countRentalsByPeriod(String ownerNo, String period) {
+        return ownerPeriodCountRepositoryCustom.countRentalsByPeriod(ownerNo, period);
     }
 }

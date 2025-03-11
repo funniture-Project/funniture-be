@@ -62,6 +62,7 @@ public class UserRentalRepositoryCustomImpl implements UserRentalRepositoryCusto
                         rental.rentalState,
                         rental.rentalNumber,
                         product.productName,
+                        product.productNo,
                         optionInfo.rentalPrice))
                 .from(rental)
                 .join(rental.productEntity, product)
