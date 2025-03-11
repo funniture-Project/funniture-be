@@ -28,4 +28,6 @@ public class MemberInquiryDTO {
     private String productName;
 
     private String productImageLink;
+
+    private String answerStatus;
 }
