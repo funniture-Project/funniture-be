@@ -42,6 +42,7 @@ public class RentalService {
     private final UserRentalStateCountRepositoryCustom userRentalStateCountRepositoryCustom;
     private final OwnerCurrentMonthSalesRepositoryCustom ownerCurrentMonthSalesRepositoryCustom;
     private final OwnerMonthlySalesRepositoryCustom ownerMonthlySalesRepositoryCustom;
+    private final OwnerRentalStateCountRepositoryCustom ownerRentalStateCountRepositoryCustom;
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
@@ -284,5 +285,10 @@ public class RentalService {
     // 월별 매출 API
     public List<MonthlySalesDTO> getMonthlySales(String ownerNo, String yearMonth) {
         return ownerMonthlySalesRepositoryCustom.getMonthlySales(ownerNo, yearMonth);
+    }
+
+    // 제공자의 마이페이지 예약진행상태 카운트
+    public List<RentalStateCountDTO> countRentalStatesByOwner(String ownerNo) {
+        return ownerRentalStateCountRepositoryCustom.countRentalStatesByOwner(ownerNo);
     }
 }
