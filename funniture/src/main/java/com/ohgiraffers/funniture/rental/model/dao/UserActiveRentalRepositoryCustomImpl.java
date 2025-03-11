@@ -42,7 +42,9 @@ public class UserActiveRentalRepositoryCustomImpl implements UserActiveRentalRep
                         rental.rentalEndDate,
                         product.productName,
                         optionInfo.rentalTerm,
-                        optionInfo.asNumber
+                        optionInfo.asNumber,
+                        optionInfo.rentalPrice,
+                        product.productImageLink
                 ))
                 .from(rental)
                 .join(rental.productEntity, product)

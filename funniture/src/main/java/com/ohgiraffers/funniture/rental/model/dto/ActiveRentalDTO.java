@@ -28,6 +28,9 @@ public class ActiveRentalDTO {
 
     private int asNumber;           // A/S 갯수
 
+    private Integer rentalPrice;           // 렌탈 가격
+
+    private String productImageLink;           // 상품 이미지
 
 
 }

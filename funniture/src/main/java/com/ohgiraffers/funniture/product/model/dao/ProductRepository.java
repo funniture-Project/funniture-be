@@ -70,4 +70,14 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
     @Modifying
     @Query("UPDATE ProductEntity p SET p.usedStock = p.usedStock - :rentalNumber WHERE p.productNo = :productNo")
     void decrementUsedStock(String productNo, int rentalNumber);;
+
+    @Query(value = """
+        SELECT c.category_name, count(p.product_no)
+        FROM 
+            tbl_product p
+        JOIN tbl_category c ON p.category_code = c.category_code
+        WHERE p.product_status = "판매중" OR p.product_status = "품절"
+        GROUP BY p.category_code
+        """, nativeQuery = true)
+    List<Object[]> countByCategory();
 }
