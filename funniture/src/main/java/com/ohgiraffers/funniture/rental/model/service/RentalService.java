@@ -1,15 +1,22 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
 import com.ohgiraffers.funniture.common.Criteria;
+import com.ohgiraffers.funniture.member.entity.QOwnerInfoEntity;
 import com.ohgiraffers.funniture.point.entity.PointEntity;
 import com.ohgiraffers.funniture.point.model.dao.PointRepository;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
+import com.ohgiraffers.funniture.product.entity.QProductEntity;
+import com.ohgiraffers.funniture.product.entity.QRentalOptionInfoEntity;
 import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
 import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
 import com.ohgiraffers.funniture.product.model.dao.RentalOptionInfoRepository;
+import com.ohgiraffers.funniture.rental.entity.QUserRentalEntity;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
 import com.ohgiraffers.funniture.rental.model.dao.*;
 import com.ohgiraffers.funniture.rental.model.dto.*;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -54,6 +62,7 @@ public class RentalService {
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
 
 /* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
@@ -191,6 +200,39 @@ public class RentalService {
         return salesRepositoryCustom.getSales(yearMonth, groupBy);
     }
 
+    public List<OwnerTopDTO> getTopMonthlySales(String yearMonth) {
+        QUserRentalEntity rental = QUserRentalEntity.userRentalEntity;
+        QProductEntity product = QProductEntity.productEntity;
+        QRentalOptionInfoEntity rentalOptionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
+        QOwnerInfoEntity ownerInfo = QOwnerInfoEntity.ownerInfoEntity;
+
+        YearMonth targetMonth = YearMonth.parse(yearMonth);
+        LocalDateTime startDate = targetMonth.atDay(1).atStartOfDay();
+        LocalDateTime endDate = targetMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(rental.orderDate.between(startDate, endDate))
+                .and(rental.rentalState.in("예약완료", "배송중", "배송완료", "반납요청", "수거중", "반납완료"));
+
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        OwnerTopDTO.class,
+                        rental.ownerNo,
+                        ownerInfo.storeName, // 제공자 회사명 추가
+                        rentalOptionInfo.rentalPrice.multiply(rental.rentalNumber).sum().as("totalSales")
+                ))
+                .from(rental)
+                .join(rental.productEntity, product)
+                .join(rental.rentalOptionInfoEntity, rentalOptionInfo)
+                .join(ownerInfo).on(rental.ownerNo.eq(ownerInfo.memberId)) // storeNo 기준 조인
+                .where(builder)
+                .groupBy(rental.ownerNo, ownerInfo.storeName) // 제공자명 포함 그룹화
+                .orderBy(rentalOptionInfo.rentalPrice.multiply(rental.rentalNumber).sum().desc()) // 매출 내림차순 정렬
+                .limit(5) // TOP 5 제한
+                .fetch();
+    }
+
+
 /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
 
     // 제공자 - 예약 조회(쿼리 DSL)
@@ -303,4 +345,6 @@ public class RentalService {
     public List<RentalPeriodCountDTO> countRentalsByPeriod(String ownerNo, String period) {
         return ownerPeriodCountRepositoryCustom.countRentalsByPeriod(ownerNo, period);
     }
+
+
 }
