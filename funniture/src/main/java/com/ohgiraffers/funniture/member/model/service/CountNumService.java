@@ -27,8 +27,6 @@ public class CountNumService {
         try{
             CountEntity countEntity = countRepository.findTodayData(today,role);
 
-            System.out.println("countList = " + countEntity);
-
             if (countEntity == null){
                 CountEntity count = new CountEntity(today,role.toString(),1);
                 countRepository.save(count);
@@ -37,7 +35,6 @@ public class CountNumService {
                         .connectCount(countEntity.getConnectCount() + 1)
                         .build();
 
-                System.out.println("수정된 countEntity = " + countEntity);
                 countRepository.save(countEntity);
             }
 
@@ -56,8 +53,6 @@ public class CountNumService {
         String yearMonth = year +"-"+formattedMonth;
 
         List<CountEntity> connectList = countRepository.getCountByMonth(yearMonth);
-
-        System.out.println("connectList = " + connectList);
 
         if (connectList.isEmpty()) {
             return null;

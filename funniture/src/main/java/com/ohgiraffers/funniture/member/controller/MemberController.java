@@ -476,6 +476,12 @@ public class MemberController {
                 .body(new ResponseMessage(204, "변경 성공", resultMap));
     }
 
+    @Operation(summary = "접속자 수 업데이트",
+            description = "로그인과 동시에 권한별 접속자 수 증가",
+            parameters = {
+                    @Parameter(name = "mapRole", description = "회원권한")
+            }
+    )
     @PostMapping("/updateCount")
     public void updateCount(@RequestBody Map<String, String> mapRole){
         String role = mapRole.get("role");
@@ -483,6 +489,13 @@ public class MemberController {
         countNumService.updateCount(role);
     }
 
+    @Operation(summary = "이번달 접속자 수 조회",
+            description = "이번달 접속자 수 조회"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이번달 접속자 기록 조회 성공"),
+            @ApiResponse(responseCode = "204", description = "이번달 접속자 기록 없음")
+    })
     @GetMapping("/connectCount")
     public ResponseEntity<ResponseMessage> getConnectCount(){
        List<ConnectCountDTO> result = countNumService.getThisMonth();
