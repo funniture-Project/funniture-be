@@ -674,4 +674,36 @@ public class RentalController {
     }
 
 
+    @Operation(summary = "TOP 5 제공자 월별 매출 조회",
+            description = "TOP 5 제공자의 월별 매출을 차트 데이터로 반환",
+            parameters = {
+                    @Parameter(name = "yearMonth", description = "월별 필터링(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "매출내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "TOP 5 제공자의 월별 매출 조회 성공")
+    })
+    // 전체 제공자 매출 TOP5
+    @GetMapping("/chart/monthly/top")
+    public ResponseEntity<ResponseMessage> getTopMonthlySales(@RequestParam String yearMonth) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        // TOP 5 매출 데이터 조회
+        List<OwnerTopDTO> topSalesData = rentalService.getTopMonthlySales(yearMonth);
+
+        if (topSalesData.isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "매출내역이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("topSalesData", topSalesData);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "TOP 5 제공자의 월별 매출 조회 성공", res));
+    }
+
 }
