@@ -17,7 +17,7 @@ public class ReviewEntity {
 
     @Id
     @Column (name = "review_no")
-    private String ReviewNo;
+    private String reviewNo;
 
     @Column (name = "review_write_time")
     private LocalDateTime reviewWriteTime;
