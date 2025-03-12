@@ -1,6 +1,7 @@
 package com.ohgiraffers.funniture.review.model.dao;
 
 import com.ohgiraffers.funniture.review.entity.ReviewEntity;
+import com.ohgiraffers.funniture.review.model.dto.ReviewAvgScoreDTO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -92,5 +93,15 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity , String> {
             "JOIN tbl_member m ON r.member_id = m.member_id " +
             "ORDER BY r.review_write_time DESC", nativeQuery = true)
     List<Object[]> findAllReviewByMain();
+
+    // 제공자 메인 페이지 평점 조회
+    @Query(value = "SELECT p.product_no, p.product_name, AVG(r.score) AS score " +
+            "FROM tbl_review r " +
+            "JOIN tbl_product p ON r.product_no = p.product_no " +
+            "WHERE p.owner_no = :ownerNo " +
+            "GROUP BY p.product_no, p.product_name " +
+            "ORDER BY AVG(r.score) DESC", nativeQuery = true)
+    List<Object[]> findReviewAverageByOwnerNative(@Param("ownerNo") String ownerNo);
+
 }
 

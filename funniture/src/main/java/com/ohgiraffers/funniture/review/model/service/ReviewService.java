@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,4 +181,19 @@ public class ReviewService {
         )).collect(Collectors.toList());
     }
 
+    public List<ReviewAvgScoreDTO> findReviewAverageByOwner(String ownerNo) {
+        List<Object[]> results = reviewRepository.findReviewAverageByOwnerNative(ownerNo);
+        List<ReviewAvgScoreDTO> dtos = new ArrayList<>();
+
+        for (Object[] obj : results) {
+            ReviewAvgScoreDTO dto = new ReviewAvgScoreDTO(
+                    (String) obj[0], // productNo
+                    (Double) obj[2], // score
+                    (String) obj[1]  // productName
+            );
+            dtos.add(dto);
+        }
+
+        return dtos;
+    }
 }
