@@ -261,6 +261,45 @@ public class RentalService {
         RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
 
+        // 최신 포인트 가져오기
+        int currentPoints = pointRepository.findCurrentPointByUser(rental.getMemberId());
+
+        // 렌탈 옵션 정보 조회
+        RentalOptionInfoEntity rentalOption = rentalOptionInfoRepository.findById(rental.getRentalInfoNo())
+                .orElseThrow(() -> new RuntimeException("대여 조건 정보 없음"));
+
+        int rentalPrice = (int)Math.floor(rental.getRentalNumber() * rentalOption.getRentalPrice() * 0.9); // 렌탈 가격 계산
+        int pointEvent = (int)Math.floor(rental.getRentalNumber() * rentalOption.getRentalPrice() * 0.01); // 포인트 이벤트 계산
+
+        // 렌탈 금액만큼 포인트 추가
+        PointEntity pointAdd = PointEntity.builder()
+                .memberId(rental.getMemberId())
+                .usedPoint(0)
+                .addPoint(rentalPrice)
+                .currentPoint(currentPoints + rentalPrice) // 포인트 추가
+                .pointDateTime(LocalDateTime.now())
+                .build();
+
+        pointRepository.save(pointAdd);
+
+        // 이벤트 포인트만큼 포인트 차감
+        PointEntity pointUsage = PointEntity.builder()
+                .memberId(rental.getMemberId())
+                .usedPoint(pointEvent)
+                .addPoint(0)
+                .currentPoint(currentPoints + rentalPrice - pointEvent) // 이벤트 포인트 차감
+                .pointDateTime(LocalDateTime.now().plusSeconds(1))
+                .build();
+
+        pointRepository.save(pointUsage);
+
+        // 상품 정보 조회
+        ProductEntity product = productRepository.findById(rental.getProductNo())
+                .orElseThrow(() -> new RuntimeException("상품 정보 없음"));
+
+        // 사용 중 재고 감소
+        productRepository.decrementUsedStock(product.getProductNo(), rental.getRentalNumber());
+
         rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
     }
 
