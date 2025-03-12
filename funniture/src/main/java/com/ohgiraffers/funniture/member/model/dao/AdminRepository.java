@@ -30,7 +30,38 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
 //            nativeQuery = true)
 //    List<Object[]> AllUserListByAdmin();
 
-    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+//            "IFNULL(b.current_point, 0) AS current_point, o.is_rejected " +
+//            "FROM tbl_member a " +
+//            "LEFT JOIN (SELECT member_id, current_point " +
+//            "           FROM tbl_point " +
+//            "           WHERE (member_id, point_date_time) IN (SELECT member_id, MAX(point_date_time) " +
+//            "                                                  FROM tbl_point " +
+//            "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
+//            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
+//            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1) " +
+//            "ORDER BY a.member_id ASC " +
+//            "LIMIT :offset, :size",
+//            nativeQuery = true)
+//    List<Object[]> AllUserListByAdmin(@Param("offset") int offset, @Param("size") int size);
+//
+//
+//    @Query(value = "SELECT COUNT(*) " +
+//            "FROM tbl_member a " +
+//            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
+//            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1)",
+//            nativeQuery = true)
+//    int countAllUsers();
+
+    @Query(value = "SELECT COUNT(DISTINCT a.member_id) " +
+            "FROM tbl_member a " +
+            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
+            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1)",
+
+            nativeQuery = true)
+    int countAllUsers();
+
+    @Query(value = "SELECT DISTINCT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
             "IFNULL(b.current_point, 0) AS current_point, o.is_rejected " +
             "FROM tbl_member a " +
             "LEFT JOIN (SELECT member_id, current_point " +
@@ -45,14 +76,23 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             nativeQuery = true)
     List<Object[]> AllUserListByAdmin(@Param("offset") int offset, @Param("size") int size);
 
-    @Query(value = "SELECT COUNT(*) " +
-            "FROM tbl_member a " +
-            "LEFT JOIN tbl_ownerinfo o ON a.member_id = o.member_id " +
-            "WHERE a.member_role = 'USER' AND (o.is_rejected IS NULL OR o.is_rejected = -1)",
-            nativeQuery = true)
-    int countAllUsers();
 
-    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+
+//    @Query(value = "SELECT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
+//            "IFNULL(b.current_point, 0) AS current_point " +
+//            "FROM tbl_member a " +
+//            "LEFT JOIN (SELECT member_id, current_point " +
+//            "           FROM tbl_point " +
+//            "           WHERE (member_id, point_date_time) IN (SELECT member_id, MAX(point_date_time) " +
+//            "                                                  FROM tbl_point " +
+//            "                                                  GROUP BY member_id)) b ON a.member_id = b.member_id " +
+//            "WHERE a.member_role = 'LIMIT' " +
+//            "ORDER BY a.member_id ASC " +
+//            "LIMIT :offset, :size",
+//            nativeQuery = true)
+//    List<Object[]> AllLeaverListByAdmin(@Param("offset") int offset, @Param("size") int size);
+
+    @Query(value = "SELECT DISTINCT a.member_id, a.user_name, a.phone_number, a.email, a.signup_date, a.member_role, " +
             "IFNULL(b.current_point, 0) AS current_point " +
             "FROM tbl_member a " +
             "LEFT JOIN (SELECT member_id, current_point " +
@@ -66,7 +106,11 @@ public interface AdminRepository extends JpaRepository<MemberAndPointEntity, Str
             nativeQuery = true)
     List<Object[]> AllLeaverListByAdmin(@Param("offset") int offset, @Param("size") int size);
 
-    @Query(value = "SELECT COUNT(*) FROM tbl_member WHERE member_role = 'LIMIT'", nativeQuery = true)
+
+//    @Query(value = "SELECT COUNT(*) FROM tbl_member WHERE member_role = 'LIMIT'", nativeQuery = true)
+//    int countAllLeavers();
+
+    @Query(value = "SELECT COUNT(DISTINCT a.member_id) FROM tbl_member a WHERE a.member_role = 'LIMIT'", nativeQuery = true)
     int countAllLeavers();
 
 
