@@ -54,7 +54,8 @@ public class FavoriteDetailInfoDSL implements FavoriteDetailInfoRepository {
                 .leftJoin(category).on(product.categoryCode.eq(category.categoryCode))
                 .leftJoin(rentalOption).on(product.productNo.eq(rentalOption.productNo))
                 .where(builder)
-                .groupBy(favoriteEntity.memberId, favoriteEntity.productNo)
+                .groupBy(favoriteEntity.memberId, favoriteEntity.productNo,
+                        ownerInfo.storeName, category.categoryName)
                 .fetch();
     }
 }
