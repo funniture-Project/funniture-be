@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface PointRepository extends JpaRepository<PointEntity, String> {
 
-    @Query("SELECT p.currentPoint FROM point p WHERE p.memberId = :memberId ORDER BY p.pointDateTime DESC , p.currentPoint desc LIMIT 1")
+    @Query("SELECT p.currentPoint FROM point p WHERE p.memberId = :memberId ORDER BY p.pointDateTime DESC, p.pointId DESC LIMIT 1")
     int findCurrentPointByUser(String memberId);
 
     List<PointEntity> findByMemberIdOrderByPointDateTimeDesc(String memberId);
