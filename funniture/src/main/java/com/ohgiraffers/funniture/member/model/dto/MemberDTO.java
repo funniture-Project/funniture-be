@@ -35,8 +35,6 @@ public class MemberDTO implements UserDetails {
 
     private Boolean isConsulting;
 
-//    private int hasImage;
-
     private String imageLink;
 
     private String imageId;
@@ -54,7 +52,6 @@ public class MemberDTO implements UserDetails {
         if (memberRole != null) {
             // memberRole이 쉼표로 구분된 String이라고 가정
              String[] roles = memberRole.split(","); // 쉼표로 역할을 나눔
-//            authorities.add(() -> memberRole); // 이게 맞나?
 
             for (String role : roles) {
                 authorities.add(new SimpleGrantedAuthority(role.trim())); // 각 역할을 GrantedAuthority로 변환

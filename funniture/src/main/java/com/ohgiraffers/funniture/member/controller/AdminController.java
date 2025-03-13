@@ -28,7 +28,6 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AuthController authController;
-    private final CloudinaryService cloudinaryService;
 
     @Operation(summary = "전체 유저 정보 조회",
             description = "관리자 페이지에서 모든 유저 정보 조회"
@@ -41,10 +40,7 @@ public class AdminController {
     public ResponseEntity<ResponseMessage> userListByAdmin(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        System.out.println("✅ 관리자 페이지에서 유저 정보 불러오는 컨트롤러 동작");
 
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = adminService.getUserListByAdmin(cri);
 
@@ -74,9 +70,6 @@ public class AdminController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        System.out.println("✅ 관리자 페이지에서 탈퇴자 데이터 불러오는 컨트롤러 동작");
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = adminService.getLeaverListByAdmin(cri);
@@ -107,9 +100,6 @@ public class AdminController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        System.out.println("✅ 관리자 페이지에서 제공자 정보 불러오는 컨트롤러 동작");
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = adminService.getOwnerListByAdmin(cri);
@@ -140,13 +130,9 @@ public class AdminController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        System.out.println("✅ 관리자 페이지에서 제공자 전환 데이터 불러오는 컨트롤러 동작");
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = adminService.getConvertAppListByAdmin(cri);
-//        System.out.println("✅ 관리자 페이지에서 유저 정보 서비스 갔다가 컨트롤러 = " + appOwnerListDTO);
 
         Map<String , Object> result = new HashMap<>();
         result.put("result" , pagingResponseDTO);
@@ -171,10 +157,8 @@ public class AdminController {
     })
     @GetMapping("/ownerDetail/{memberId}")
     public ResponseEntity<ResponseMessage> getOwnerDetailByAdmin(@PathVariable String memberId) {
-        System.out.println("✅ 관리자 페이지에서 제공자 상세 데이터 불러오는 컨트롤러 동작 memberId : " + memberId);
 
         AppOwnerListModalDTO appOwnerListModalDTO = adminService.getOwnerDetailByAdmin(memberId);
-        System.out.println("✅ 관리자 페이지에서 제공자 요청 상세 정보 = " + appOwnerListModalDTO);
 
         Map <String , Object> result = new HashMap<>();
         result.put("result", appOwnerListModalDTO);
@@ -199,10 +183,8 @@ public class AdminController {
     })
     @GetMapping("/convertApp/{memberId}")
     public ResponseEntity<ResponseMessage> getConvertDetailByAdmin(@PathVariable String memberId) {
-        System.out.println("✅ 관리자 페이지에서 제공자 전환 상세 데이터 불러오는 컨트롤러 동작 memberId : " + memberId);
 
         AppOwnerListModalDTO appOwnerListModalDTO = adminService.getConvertAppDetailByAdmin(memberId);
-        System.out.println("✅ 관리자 페이지에서 전환 요청 상세 정보 = " + appOwnerListModalDTO);
 
         Map <String , Object> result = new HashMap<>();
         result.put("result", appOwnerListModalDTO);
@@ -227,10 +209,8 @@ public class AdminController {
     })
     @PutMapping("/approve/{memberId}")
     public ResponseEntity<ResponseMessage> approveUserToOwnerByAdmin(@PathVariable String memberId) {
-        System.out.println("✅ 관리자 페이지에서 제공자 전환 승인 컨트롤러 동작 memberId : "+ memberId);
 
         Boolean isSuccess = adminService.approveUserToOwnerByAdmin(memberId);
-        System.out.println("✅ 관리자 페이지에서 전환 승인 서비스 다녀왔나 = " + isSuccess);
 
         if (!isSuccess) {
             return ResponseEntity.ok()
@@ -255,12 +235,10 @@ public class AdminController {
             @PathVariable String memberId,
             @RequestBody Map<String, String> payload
     ) {
-        System.out.println("✅ 관리자 페이지에서 제공자 전환 반려 컨트롤러 동작 memberId : " + memberId);
 
         String rejectReason = payload.get("rejectReason");
         Boolean isSuccess = adminService.rejectUserToOwnerByAdmin(memberId, rejectReason);
 
-        System.out.println("✅ 관리자 페이지에서 전환 반려 서비스 다녀왔나 = " + isSuccess);
 
         if (!isSuccess) {
             return ResponseEntity.ok()
@@ -282,7 +260,6 @@ public class AdminController {
     })
     @PostMapping("/reactivate")
     public ResponseEntity<ResponseMessage> leaverToUserApproveByAdmin (@RequestBody List<String> userIds) {
-        System.out.println("✅ 관리자 페이지에서 탈퇴자 → 유저 권한 변경 컨트롤러 userIds 잘 받아왔나 : " + userIds);
 
         Boolean isSuccess = adminService.leaverToUserApproveService(userIds);
 
@@ -308,7 +285,6 @@ public class AdminController {
     })
     @PostMapping("/deactivate")
     public ResponseEntity<ResponseMessage> userToLeaverApproveByAdmin (@RequestBody List<String> userIds) {
-        System.out.println("✅ 관리자 페이지에서 유저 → 탈퇴자 권한 변경 컨트롤러 userIds 잘 받아왔나 : " + userIds);
 
         Boolean isSuccess = adminService.userToLeaverApproveService(userIds);
 
@@ -338,8 +314,6 @@ public class AdminController {
 
         String memberId = pointUpdateDTO.getMemberId();
         int newPoint = pointUpdateDTO.getNewPoint();
-        System.out.println("memberId = " + memberId);
-        System.out.println("newPoint = " + newPoint);
 
         Boolean isSuccess = adminService.userPointUpdateService(memberId , newPoint);
 

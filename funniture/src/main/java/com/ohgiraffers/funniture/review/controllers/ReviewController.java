@@ -42,10 +42,7 @@ public class ReviewController {
     @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> reviewRegist(@RequestBody ReviewRegistDTO reviewRegistDTO){
 
-        System.out.println("프런트에서 들어온 reviewRegistDTO = " + reviewRegistDTO);
-
         String maxReview = reviewService.getMaxReview();
-        System.out.println("서비스 갔다온 maxReview = " + maxReview);
 
         String newNo = returnReviewNo(maxReview);
         reviewRegistDTO.setReviewNo(newNo);
@@ -84,14 +81,8 @@ public class ReviewController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @PathVariable String memberId) {
 
-        System.out.println("프론트에서 memberId 잘 받아오는지 = " + memberId);
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
-
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = reviewService.findWritableReviews(memberId, cri);
-
-        System.out.println("서비스에서 리뷰랑 페이지 정보 잘 넘어 왔는지 pagingResponseDTO = " + pagingResponseDTO);
 
         Map<String , Object> response = new HashMap<>();
         response.put("result", pagingResponseDTO);
@@ -123,14 +114,8 @@ public class ReviewController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @PathVariable String memberId) {
 
-        System.out.println("프론트에서 memberId 잘 받아오는지 = " + memberId);
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
-
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = reviewService.findWrittenReviews(memberId, cri);
-
-        System.out.println("서비스에서 작성한 리뷰랑 페이지 정보 잘 넘어 왔는지 pagingResponseDTO = " + pagingResponseDTO);
 
         Map<String, Object> response = new HashMap<>();
         response.put("result", pagingResponseDTO);
@@ -160,9 +145,7 @@ public class ReviewController {
     // 상세 페이지에 해당 상품에 대한 전체 리뷰
     @GetMapping ("/product/{productNo}")
     public ResponseEntity<ResponseMessage> findReviewByProductNo (@PathVariable String productNo){
-        System.out.println("컨트롤러 productNo = " + productNo);
         List<ReviewProductDTO> result = reviewService.findReviewByProductNo(productNo);
-        System.out.println("리뷰 서비스  result = " + result);
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
 
@@ -194,10 +177,6 @@ public class ReviewController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @PathVariable String ownerNo) {
 
-        System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
-
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = reviewService.findReviewsOfProductsByOwner(ownerNo, cri);
 
@@ -225,7 +204,6 @@ public class ReviewController {
     public ResponseEntity<ResponseMessage> findAllMainPageReview() {
         System.out.println("메인 페이지, 리뷰 컨트롤러 동작 " );
         List<ReviewMainDTO> result = reviewService.findReviewByMain();
-//        System.out.println("메인 페이지, 리뷰 서비스 다녀온 result = " + result);
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
 
@@ -248,9 +226,7 @@ public class ReviewController {
     })
     @GetMapping("/main/{ownerNo}")
     public ResponseEntity<ResponseMessage> findAverageMainPageReview(@PathVariable String ownerNo) {
-        System.out.println("메인 페이지, 평균 별점 리뷰 컨트롤러 동작 " );
         List<ReviewAvgScoreDTO> result = reviewService.findReviewAverageByOwner(ownerNo);
-//        System.out.println("메인 페이지, 리뷰 서비스 다녀온 result = " + result);
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
 

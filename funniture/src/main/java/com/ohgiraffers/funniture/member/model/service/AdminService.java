@@ -4,10 +4,8 @@ import com.ohgiraffers.funniture.common.Criteria;
 import com.ohgiraffers.funniture.common.PageDTO;
 import com.ohgiraffers.funniture.common.PagingResponseDTO;
 import com.ohgiraffers.funniture.member.entity.MemberAndPointEntity;
-import com.ohgiraffers.funniture.member.entity.MemberEntity;
 import com.ohgiraffers.funniture.member.entity.OwnerInfoEntity;
 import com.ohgiraffers.funniture.member.model.dao.AdminRepository;
-import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
 import com.ohgiraffers.funniture.member.model.dao.OwnerRepository;
 import com.ohgiraffers.funniture.member.model.dto.*;
 import com.ohgiraffers.funniture.point.entity.PointEntity;
@@ -15,7 +13,6 @@ import com.ohgiraffers.funniture.point.model.dao.PointRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,17 +46,6 @@ public class AdminService {
 
         return pagingResponseDTO;
     }
-
-
-//    // 관리자 페이지에서 모든 사용자 정보 불러오는 로직
-//    public List<MemberAndPointDTO> getUserListByAdmin() {
-//        List<Object[]> memberEntityList = adminRepository.AllUserListByAdmin();
-////        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
-//
-//        return memberEntityList.stream()
-//                .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
-//                .collect(Collectors.toList());
-//    }
 
     // 관리자 페이지에서 모든 탈퇴자 정보 불러오는 로직
     public PagingResponseDTO getLeaverListByAdmin(Criteria cri) {
@@ -101,18 +87,6 @@ public class AdminService {
         return pagingResponseDTO;
     }
 
-
-//
-//    // 관리자 페이지에서 모든 제공자 정보 불러오는 로직
-//    public List<OwnerInfoAndMemberDTO> getOwnerListByAdmin() {
-//        List<Object[]> ownerEntityList = adminRepository.findAllOwnerInfo();
-////        System.out.println("레파지토리에서 잘 조회해 왔는지 ownerEntityList = " + ownerEntityList);
-//
-//        return ownerEntityList.stream()
-//                .map(OwnerInfoAndMemberDTO::new) // 생성자 사용하여 변환
-//                .collect(Collectors.toList());
-//    }
-
     // 관리자 페이지에서 제공자 전환 신청 정보 불러오는 로직 (is_result가 0인 항목)
     public PagingResponseDTO getConvertAppListByAdmin(Criteria cri) {
         int total = adminRepository.countAllConvertApps();
@@ -134,33 +108,12 @@ public class AdminService {
     }
 
 
-//    // 관리자 페이지에서 제공자 전환 신청 정보 불러오는 로직 (is_result가 0인 항목)
-//    public List<AppOwnerListDTO> getConvertAppListByAdmin() {
-//        List<Object[]> memberEntityList = adminRepository.AllConvertListByAdmin();
-////        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
-//
-//        return memberEntityList.stream()
-//                .map(AppOwnerListDTO::new) // ✅ 새로운 생성자 활용
-//                .collect(Collectors.toList());
-//    }
-
-    // 관리자 페이지에서 모든 탈퇴자 정보 불러오는 로직
-//    public List<MemberAndPointDTO> getLeaverListByAdmin() {
-//        List<Object[]> memberEntityList = adminRepository.AllLeaverListByAdmin();
-////        System.out.println("레파지토리에서 잘 조회해 왔는지 memberEntityList = " + memberEntityList);
-//
-//        return memberEntityList.stream()
-//                .map(MemberAndPointDTO::new) // ✅ 새로운 생성자 활용
-//                .collect(Collectors.toList());
-//    }
-
     // 관리자 페이지에서 탈퇴자를 사용자 권한으로 변경하는 로직
     @Transactional
     public boolean leaverToUserApproveService(List<String> userIds) {
         boolean isSuccess = true;
 
         for (String userId : userIds) {
-            System.out.println("✅ 권한 변경 처리 중: 사용자 ID = " + userId);
 
             // 1. 기존 회원 정보 조회
             MemberAndPointEntity member = adminRepository.findById(userId)
@@ -190,7 +143,6 @@ public class AdminService {
         boolean isSuccess = true;
 
         for (String userId : userIds) {
-            System.out.println("✅ 권한 변경 처리 중: 사용자 ID = " + userId);
 
             // 1. 기존 회원 정보 조회
             MemberAndPointEntity member = adminRepository.findById(userId)
@@ -216,15 +168,13 @@ public class AdminService {
 
     // 관리자 페이지에서 제공자 전환 신청한 애들 눌렀을 때 모달에 표시될 데이터 부르는 로직
     public AppOwnerListModalDTO getConvertAppDetailByAdmin(String memberId) {
-//        System.out.println("제공자 , 전환 상세 모달 서비스member Id = " + memberId);
-//        System.out.println("제공자 , 전환 상세 모달 서비스member result = " + result);
+
         return adminRepository.findConvertAppDetailByMemberId(memberId);
     }
 
     // 관리자 페이지에서 제공자 애들 눌렀을 때 모달에 표시될 데이터 부르는 로직
     public AppOwnerListModalDTO getOwnerDetailByAdmin(String memberId) {
-//        System.out.println("제공자 , 전환 상세 모달 서비스member Id = " + memberId);
-//        System.out.println("제공자 , 전환 상세 모달 서비스member result = " + result);
+
         return adminRepository.findOwnerDetailByMemberId(memberId);
     }
 
@@ -317,10 +267,4 @@ public class AdminService {
         }
     }
 
-
-
-
-//    public List<AppOwnerListModalDTO> getConvertAppListByAdminModal() {
-//            return adminRepository.findConvertAppListByAdminModal();
-//    }
 }

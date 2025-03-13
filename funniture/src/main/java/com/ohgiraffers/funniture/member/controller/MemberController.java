@@ -52,11 +52,8 @@ public class MemberController {
     })
     @GetMapping("/{memberId}")
     public ResponseEntity<ResponseMessage> memberList (@PathVariable String memberId) {
-        System.out.println("화면에서 넘어온 memberId"+ memberId);
-        System.out.println("✅ memberList 조회를 위한 memberList 컨트롤러 동작..");
 
         MemberDTO memberDTO = memberService.getMemberList(memberId);
-        System.out.println("✅ 서비스에서 넘어온 로그인 회원 목록 = " + memberDTO);
 
         memberDTO.setPassword(null);
         Map<String , Object> result = new HashMap<>();
@@ -82,11 +79,7 @@ public class MemberController {
     @PostMapping ("/findPass")
     public ResponseEntity<ResponseMessage> changePasswordByLogin (@RequestBody MemberDTO memberDTO) {
 
-        System.out.println("프론트에서 패스워드 변경 요청 잘 들어 왔나? email = " + memberDTO.getEmail());
-        System.out.println("프론트에서 패스워드 변경 요청 잘 들어 왔나? password = " + memberDTO.getPassword());
-
         MemberEntity memberEntity = memberService.findByEmail(memberDTO.getEmail());
-        System.out.println("이메일에 해당하는 값이 있나? memberEntity = " + memberEntity);
 
         // 서비스로 비밀번호 바꿀 정보 넘겨주기
         MemberEntity result = memberService.changePassword(memberEntity, memberDTO.getPassword());
@@ -110,12 +103,9 @@ public class MemberController {
     })
     @PostMapping("/conform")
     public ResponseEntity<ResponseMessage> confirmToMyPage (@RequestBody MemberDTO memberDTO) {
-        System.out.println(" 서버에 잘 들어왔나 memberDTO = " + memberDTO);
 
         String memberId = memberDTO.getMemberId();
         String password = memberDTO.getPassword();
-        System.out.println("memberId = " + memberId);
-        System.out.println("password = " + password);
 
         boolean result = memberService.comparePassword(memberId, password);
 
@@ -138,7 +128,6 @@ public class MemberController {
     })
     @PutMapping("modify/phone")
     public ResponseEntity<ResponseMessage> modifyPhoneNumber (@RequestBody MemberDTO memberDTO) {
-        System.out.println("전화번호 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
 
         String memberId = memberDTO.getMemberId();
         String phoneNumber = memberDTO.getPhoneNumber();
@@ -163,7 +152,6 @@ public class MemberController {
     })
     @PutMapping("modify/password")
     public ResponseEntity<ResponseMessage> modifyPassword (@RequestBody MemberDTO memberDTO) {
-        System.out.println("비밀번호 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
 
         String memberId = memberDTO.getMemberId();
         String password = memberDTO.getPassword();
@@ -190,7 +178,6 @@ public class MemberController {
     })
     @PutMapping("modify/address")
     public ResponseEntity<ResponseMessage> modifyAddress (@RequestBody MemberDTO memberDTO) {
-        System.out.println("주소 변경 로직 서버에 잘 들어왔나 = " + memberDTO);
 
         String memberId = memberDTO.getMemberId();
         String address = memberDTO.getAddress();
@@ -222,18 +209,13 @@ public class MemberController {
             @Valid @RequestPart (value = "formData") MemberDTO memberDTO,
             @RequestPart(value = "imageLink") MultipartFile file) { // 파일 데이터
 
-        System.out.println("memberDTO = " + memberDTO);
-        System.out.println("file = " + file);
-
         String memberId = memberDTO.getMemberId();
-        MemberEntity memberEntity = memberService.findByMemberId(memberId);
+        memberService.findByMemberId(memberId);
 
         // Cloudinary에 파일 업로드
         Map<String, Object> response = cloudinaryService.uploadFile(file);
-        System.out.println("response = " + response);
 
         memberDTO.setImageLink(response.get("url").toString());
-//        memberDTO.setMemberId(response.get("id").toString());
 
         memberService.updateMemberImage(memberDTO);
 
@@ -262,11 +244,9 @@ public class MemberController {
     })
     @PutMapping("/withdraw/{memberId}")
     public ResponseEntity<ResponseMessage> withdrawByMemberId(@PathVariable String memberId){
-        System.out.println("최초 프론트에서 회원 탈퇴 요청 들왔나 memberId = " + memberId);
 
         MemberDTO result = memberService.withdrawService(memberId);
 
-        System.out.println("result.getMemberRole() = " + result.getMemberRole());
         if (result.getMemberRole() == "LIMIT"){
             return ResponseEntity.ok()
                     .headers(authController.headersMethod())
@@ -289,8 +269,6 @@ public class MemberController {
             @RequestPart("ownerData") @Valid AppOwnerInfoDTO appOwnerInfoDTO,
             @RequestPart(value = "storeImage", required = false) MultipartFile storeImage,
             @RequestPart(value = "attachmentFile", required = false) MultipartFile attachmentFile) {
-
-        System.out.println("제공자 전환 신청 잘 들어왔는지 = " + appOwnerInfoDTO);
 
         try {
             // Cloudinary에 이미지 업로드
@@ -339,7 +317,6 @@ public class MemberController {
     public ResponseEntity<ResponseMessage> checkOwnerStatus(@PathVariable String memberId) {
 //        boolean isRegistered = memberService.existsByMemberId(memberId);
         String status = memberService.getOwnerStatus(memberId);
-        System.out.println("제공자 전환 신청 여부 확인 컨트롤러 - memberId: " + memberId + ", isRegistered: " + status);
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", status);
@@ -402,9 +379,7 @@ public class MemberController {
     @GetMapping(value = "/rejected/{memberId}")
     public ResponseEntity<ResponseMessage> rejectedMessageMypage(@PathVariable String memberId)  {
 
-        System.out.println("✅ 반려 메시지 조회, 화면에서 넘어온 memberId"+ memberId);
         MemberDTO memberDTO = memberService.getRejectedMessage(memberId);
-        System.out.println("✅ 서비스에서 넘어온 반려 메시지 DTO = " + memberDTO);
 
         Map<String , Object> result = new HashMap<>();
         result.put("result" , memberDTO);
@@ -429,9 +404,6 @@ public class MemberController {
     @GetMapping("/check-store-no")
     public ResponseEntity<ResponseMessage> checkStoreNoDuplicate(@RequestParam String storeNo, @RequestParam String memberId) {
         boolean isDuplicateOrOwned = memberService.isStoreNoDuplicateOrOwnedByUser(storeNo, memberId);
-
-        System.out.println("storeNo = " + storeNo);
-        System.out.println("memberId = " + memberId);
 
         if (isDuplicateOrOwned) {
             return ResponseEntity.ok(new ResponseMessage(400, "중복된 사업자 번호입니다.", null));

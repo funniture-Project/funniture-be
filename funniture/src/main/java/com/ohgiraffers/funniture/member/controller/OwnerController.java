@@ -28,7 +28,6 @@ public class OwnerController {
 
     private final AuthController authController;
     private final OwnerInfoService ownerInfoService;
-    private final CloudinaryService cloudinaryService;
 
     @Operation(summary = "제공자 전환 신청",
             description = "제공자 전환 시 사업자 정보 저장"
@@ -39,10 +38,6 @@ public class OwnerController {
     })
     @GetMapping("/register")
     public ResponseEntity<ResponseMessage> memberList (@RequestBody OwnerInfoDTO ownerInfoDTO) {
-        System.out.println("화면에서 넘어온 ownerInfoDTO"+ ownerInfoDTO);
-
-//        OwnerInfoDTO ownerInfoDTO = memberService.getMemberList(memberId);
-//        System.out.println("✅ 서비스에서 넘어온 로그인 회원 목록 = " + memberDTO);
 
         if (ownerInfoDTO == null) {
             return ResponseEntity.ok()
@@ -67,7 +62,6 @@ public class OwnerController {
     })
     @GetMapping("/{ownerNo}")
     public ResponseEntity<ResponseMessage> getOwnerInfo(@PathVariable String ownerNo){
-        System.out.println("ownerNo = " + ownerNo);
         OwnerInfoDTO result =  ownerInfoService.getOwnerInfo(ownerNo);
 
         HttpHeaders headers=  new HttpHeaders();
