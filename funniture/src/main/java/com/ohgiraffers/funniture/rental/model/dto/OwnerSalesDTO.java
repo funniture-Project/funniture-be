@@ -14,7 +14,7 @@ public class OwnerSalesDTO {
 
     private String rentalNo;
 
-    private String memberId;
+    private String userName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime orderDate;
