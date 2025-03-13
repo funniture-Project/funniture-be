@@ -34,7 +34,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        System.out.println("✅ jwtAuthorizationFilter - 요청 처리 중: " + request.getRequestURI());
         /*
         * 권한이 필요없는 리소스 (여기에 로그인 필요 없는 rest-api url 넣어야 함)
         * */
@@ -122,18 +121,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String header = request.getHeader(AuthConstants.AUTH_HEADER);
-        System.out.println("✅ header");
-        System.out.println(header); // Bearer {{accessToken}
-
-        System.out.println("✅ request");
-        System.out.println(request);
 
         try {
             if(header != null && !header.equalsIgnoreCase("")){
                 String token = TokenUtils.splitHeader(header);
-
-                System.out.println("✅ token");
-                System.out.println(token); // {{accessToken}
 
                 if(TokenUtils.isValidToken(token)){
                     Claims claims = TokenUtils.getClaimsFromToken(token);
@@ -141,7 +132,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     MemberDTO authentication = new MemberDTO();
                     authentication.setUserName(claims.get("userName").toString());
                     authentication.setEmail(claims.get("email").toString());
-                    System.out.println("claims ==================== " + claims.get("memberRole"));
 
                     AbstractAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(authentication, token, authentication.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetails(request));

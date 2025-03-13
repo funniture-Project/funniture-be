@@ -9,10 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 public class ReviewAvgScoreDTO {
 
-//    private String reviewNo;
-
-//    private String reviewContent;
-//    private String memberId;
     private String productNo;
     private double score; // 캐스팅 에러 때문에 double로
 

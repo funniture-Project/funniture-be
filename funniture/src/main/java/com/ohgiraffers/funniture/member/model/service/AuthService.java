@@ -34,8 +34,6 @@ public class AuthService {
     @Transactional
     public MemberDTO authSignupService(MemberDTO memberDTO) {
 
-//        System.out.println("서비스 : 컨트롤러에서 온 memberDTO = " + memberDTO);
-
         memberDTO.setMemberRole("USER");
         memberDTO.setSignupDate(LocalDateTime.now());
         memberDTO.setIsConsulting(false);
@@ -50,11 +48,9 @@ public class AuthService {
 
         // 패스워드 인코딩해서 registMember에 담음
         registMember = registMember.password(passwordEncoder.encode(registMember.getPassword())).create();
-        System.out.println("패스워드 인코딩 한 registMember = " + registMember);
 
         // 인코딩한 패스워드와 회원가입 정보 저장하여 result에 담기
         MemberEntity result = memberRepository.save(registMember);
-        System.out.println("인코딩한 정보 result = " + result);
 
         // 인서트 되고 포인트 100000점 추가해주기
         addPointBySignup(result.getMemberId());
@@ -77,24 +73,19 @@ public class AuthService {
 
         // 포인트 저장
         pointRepository.save(pointEntity);
-        System.out.println("회원가입 보너스 포인트 지급 완료: " + signupBonus);
 
     }
 
     public String getMaxMember() {
 
         String maxNo = memberRepository.maxMemberNo();
-        System.out.println("maxNo 잘 받아 오는지 = " + maxNo);
         return maxNo;
     }
 
     // 회원 가입 시 중복 이메일 있는지 검증 서비스
     public Boolean validationDuplicateEmail(String email) {
-//        System.out.println("서비스에 email 잘들어 왔나. = " + email);
 
        Boolean result = memberRepository.existsByEmail(email);
-
-        System.out.println("서비스에서 이메일이 존재하는지 여부 result = " + result);
 
        return result;
     }

@@ -43,11 +43,8 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ResponseMessage> signup (@RequestBody MemberDTO memberDTO) {
 
-//        System.out.println("회원가입 프론트에서 들어온 memberDTO = " + memberDTO);
-
         String newMemberNo = authService.getMaxMember();
         String newNo = returnMemberNo(newMemberNo);
-        System.out.println("신규 생성된 newNo = " + newNo);
         memberDTO.setMemberId(newNo);
 
         MemberDTO member = authService.authSignupService(memberDTO);
@@ -80,7 +77,6 @@ public class AuthController {
     })
     @GetMapping("/validation/{email}")
     public ResponseEntity<ResponseMessage> withdrawByMemberId(@PathVariable String email){
-//        System.out.println("최초 프론트에서 회원가입 이메일 들어왔나 = " + email);
 
         Boolean result = authService.validationDuplicateEmail(email);
 

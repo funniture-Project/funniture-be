@@ -38,11 +38,6 @@ public class MemberEntity {
     @Column(name = "is_consulting")
     private Boolean isConsulting;
 
-    // hasImage에 null도 들어가 있을 때 조회하면 에러 발생하므로
-    // nullable = true 추가하였고, Integer로 변경 (250218)
-//    @Column (name = "has_image", nullable = true)
-//    private Integer hasImage;
-
     @Column(name = "image_id")
     private String imageId;
 
@@ -67,11 +62,4 @@ public class MemberEntity {
         return new MemberEntity(memberId, email,password,userName,phoneNumber,signupDate,memberRole,isConsulting,imageId,imageLink,address, reasonRejection);
     }
 
-//    // 연관관계 설정 (한 명의 회원이 여러 개의 상품을 소유할 수 있음)
-//    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-//    private List<ProductEntity> products = new ArrayList<>();
-//
-//    // 연관관계 설정 (한 명의 회원이 여러 개의 문의를 작성할 수 있음)
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-//    private List<InquiryEntity> inquiries = new ArrayList<>();
 }

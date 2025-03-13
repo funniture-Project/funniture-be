@@ -39,49 +39,6 @@ public class InquiryController {
         return headers;
     }
 
-    // 문의 전체 조회
-//    @GetMapping
-//    public ResponseEntity<ResponseMessage> findAllInquiry (){
-//
-//        List<InquiryDTO> result = inquiryService.findAllInquiry();
-//
-//        Map<String , Object> map = new HashMap<>();
-//        map.put("result" , result);
-//
-//        return ResponseEntity.ok()
-//                .headers(headersMethod())
-//                .body(new ResponseMessage(200 , "조회 성공",map));
-//    }
-
-//    @Operation(summary = "문의 번호로 문의 조회)",
-//            description = "문의 번호로 조회",
-//            parameters = {
-//                    @Parameter(name = "inquiryNo", description = "조회할 문의 번호"),
-//            }
-//    )
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "404",description = "등록된 문의 없음"),
-//            @ApiResponse(responseCode = "200", description = "문의 조회 성공")
-//    })
-//    // 문의 번호로 조회
-//    @GetMapping("/{inquiryNo}")
-//    public ResponseEntity<ResponseMessage> findByInquiryNo(@PathVariable String inquiryNo){
-//
-//        InquiryDTO inquiry = inquiryService.findByInqiryNo(inquiryNo);
-//
-//        Map <String , Object> map = new HashMap<>();
-//        map.put("map", inquiry);
-//
-//        if (inquiry == null){
-//            return ResponseEntity.ok()
-//                    .headers(headersMethod())
-//                    .body(new ResponseMessage(204, "등록된 문의가 없습니다.", null));
-//        }
-//            return ResponseEntity.ok()
-//                    .headers(headersMethod())
-//                    .body(new ResponseMessage(200, "문의 조회에 성공하였습니다.", map));
-//    }
-
     @Operation(summary = "상품 번호로 문의 조회)",
             description = "상세페이지에 있는 모든 문의 조회",
             parameters = {
@@ -95,9 +52,8 @@ public class InquiryController {
     // 상세 페이지에 해당 상품에 대한 전체 문의
     @GetMapping ("/product/{productNo}")
     public ResponseEntity<ResponseMessage> findByProductNo (@PathVariable String productNo){
-        System.out.println("컨트롤러 productNo = " + productNo);
+
         List<InquiryDTO> result = inquiryService.findByProductNo(productNo);
-//        System.out.println("서비스  result = " + result);
         Map <String , Object> map = new HashMap<>();
         map.put("map", result);
 
@@ -122,10 +78,7 @@ public class InquiryController {
     @PostMapping("/regist")
     public ResponseEntity<ResponseMessage> inquiryRegist(@RequestBody InquiryDTO inquiryDTO){
 
-        System.out.println("살인마 json에서 들어온 inquiryDTO = " + inquiryDTO);
-
         String maxInquiry = inquiryService.getMaxInquiry();
-        System.out.println("유어 마인드 컨트롤러 maxInquiry = " + maxInquiry);
 
         String newNo = returnInquiryNo(maxInquiry);
         inquiryDTO.setInquiryNo(newNo);
@@ -142,7 +95,6 @@ public class InquiryController {
             return "INQ001";
         } else {
             int newInquiryNo = Integer.parseInt(maxInquiry.substring(3)) + 1;
-            System.out.println("newInquiryNo = " + newInquiryNo);
             return String.format("INQ%03d",newInquiryNo);
         }
     }
@@ -159,7 +111,6 @@ public class InquiryController {
     // 문의 번호로 삭제하기
     @DeleteMapping("/delete/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryDelete(@PathVariable String inquiryNo){
-        System.out.println("화면에서 inquiryNo 잘 받아오나 = " + inquiryNo);
 
         inquiryService.deleteByInquiryNo(inquiryNo);
 
@@ -186,10 +137,6 @@ public class InquiryController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @PathVariable String ownerNo) {
-
-        System.out.println("프론트에서 memberId 잘 받아오는지 = " + ownerNo);
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
 
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = inquiryService.findByInquiryOwnerPage(ownerNo, cri);
@@ -225,10 +172,6 @@ public class InquiryController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @PathVariable String memberId) {
 
-        System.out.println("프론트에서 memberId 잘 받아오는지 = " + memberId);
-        System.out.println("프론트에서 잘 넘어 왔는지 page = " + page);
-        System.out.println("프론트에서 잘 넘어 왔는지 size = " + size);
-
         Criteria cri = new Criteria(page, size);
         PagingResponseDTO pagingResponseDTO = inquiryService.findByInquiryUserPage(memberId, cri);
 
@@ -260,8 +203,6 @@ public class InquiryController {
     @PutMapping("/modify/{inquiryNo}")
     public ResponseEntity<ResponseMessage> inquiryModify(@PathVariable String inquiryNo
             ,@RequestBody InquiryDTO inquiryDTO){
-
-        System.out.println("컨트롤러 : 화면에서 inquiryNo 받아오나 = " + inquiryNo);
 
         inquiryService.modifyByInquiryNo(inquiryNo,inquiryDTO);
 

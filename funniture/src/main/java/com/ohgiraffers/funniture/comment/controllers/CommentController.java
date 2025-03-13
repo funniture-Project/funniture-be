@@ -52,11 +52,9 @@ public class CommentController {
     public ResponseEntity<ResponseMessage> inquiryAnswerRegist(@RequestBody CommentRegistDTO commentRegistDTO){
         // DB에서 해당 문의에 대한 마지막 댓글 번호를 가져옴
         int maxComment = commentService.getMaxComment();
-        System.out.println("maxComment = " + maxComment);
 
         // 새로운 댓글 번호 생성
         int newCommentNo = returnCommentNo(maxComment);
-        System.out.println("생성된 newCommentNo = " + newCommentNo);
 
         // commentLevel 설정
         commentRegistDTO.setCommentLevel(1); // 최상위 댓글로 간주
@@ -79,7 +77,6 @@ public class CommentController {
             return 1;
         } else {
             int newCommentNo = maxComment + 1;
-            System.out.println("newCommentNo = " + newCommentNo);
             return newCommentNo;
         }
     }
@@ -97,8 +94,6 @@ public class CommentController {
     // inquiryNo에 따른 개별 문의 답변 조회(일단 대댓글은 안 하고 답글만 할 거기 때문에 이렇게 조회)
     @GetMapping("/inquiry/{inquiryNo}")
     public ResponseEntity<ResponseMessage> findCommentUserPageInquiry(@PathVariable String inquiryNo) {
-
-        System.out.println("프론트에서 inquiryNo 잘 받아오는지 = " + inquiryNo);
 
         CommentByMyPageDTO result = commentService.findByInquiryComment(inquiryNo);
         Map<String, Object> map = new HashMap<>();
@@ -128,8 +123,6 @@ public class CommentController {
     // inquiryNo에 따른 상세페이지 개별 문의 답변 조회(일단 대댓글은 안 하고 답글만 할 거기 때문에 이렇게 조회)
     @GetMapping("/product/{inquiryNo}")
     public ResponseEntity<ResponseMessage> findCommentProductPageInquiry(@PathVariable String inquiryNo) {
-
-        System.out.println("프론트에서 inquiryNo 잘 받아오는지 = " + inquiryNo);
 
         CommentByProductDTO result = commentService.findCommentByProduct(inquiryNo);
         Map<String, Object> map = new HashMap<>();
