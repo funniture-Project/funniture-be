@@ -32,35 +32,21 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
         try {
             authRequest = getAuthRequest(request); // json 데이터에서 ID, PW 추출
-            System.out.println("✅ CustomAuthenticationFilter - attemptAuthentication 시작");
-            System.out.println("authRequest : "+authRequest);
             setDetails(request, authRequest); // 요청 정보 설정
-            System.out.println("setDetails 이후, authRequest : " + authRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("✅ this.getAuthenticationManager().authenticate(authRequest : ");
-        System.out.println(this.getAuthenticationManager().authenticate(authRequest));
         return this.getAuthenticationManager().authenticate(authRequest); // 인증 수행
     }
 
     // 사용자의 로그인 리소스 요청 시 요청 정보를 임시 토큰에 저장하는 메소드
     private UsernamePasswordAuthenticationToken getAuthRequest (HttpServletRequest request) throws IOException {
 
-        System.out.println("✅ getAuthRequest의 request = " + request);
-
         ObjectMapper objectMapper = new ObjectMapper();
         //  JSR310 모듈 등록 (LocalDateTime 지원)
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
         MemberDTO member = objectMapper.readValue(request.getInputStream(), MemberDTO.class);
-        System.out.println("✅ getAuthRequest의 request.getInputStream()");
-        System.out.println(request.getInputStream());
-        System.out.println("✅ getAuthRequest의 MemberDTO.class");
-        System.out.println(MemberDTO.class);
-
-        System.out.println("✅ getAuthRequest의 member");
-        System.out.println(member);
 
         return new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword());
     }

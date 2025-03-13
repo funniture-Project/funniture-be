@@ -1,11 +1,13 @@
 package com.ohgiraffers.funniture.product.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -49,4 +51,5 @@ public class ProductDTO {
 
     // 대표이미지 ID
     private String productImageId;
+
 }

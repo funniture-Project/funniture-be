@@ -28,6 +28,8 @@ public class RentalDetailDTO {
 
     private String productName;     // 상품명
 
+    private String productImageLink;    // 이미지 링크
+
     private int rentalPrice;        // 렌탈 가격
 
     private int rentalTerm;         // 렌탈 개월수

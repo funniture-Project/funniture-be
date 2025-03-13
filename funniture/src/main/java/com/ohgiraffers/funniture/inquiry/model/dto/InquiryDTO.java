@@ -26,9 +26,6 @@ public class InquiryDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime qnaWriteTime;
 
-//    private MemberDTO memberDTO;
-//    private ProductDTO productDTO;
-
     // InquiryEntity에 해당되지 않는 userName(member)와 productName(product)를
     // 연관관계 형성하지 않고 삽입
     private String userName;

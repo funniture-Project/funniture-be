@@ -1,5 +1,6 @@
 package com.ohgiraffers.funniture.rental.model.dao;
 
+import com.ohgiraffers.funniture.member.entity.QMemberEntity;
 import com.ohgiraffers.funniture.product.entity.QProductEntity;
 import com.ohgiraffers.funniture.product.entity.QRentalOptionInfoEntity;
 import com.ohgiraffers.funniture.rental.entity.QUserRentalEntity;
@@ -25,6 +26,7 @@ public class OwnerSalesRepositoryCustomIpml implements OwnerSalesRepositoryCusto
         QUserRentalEntity rental = QUserRentalEntity.userRentalEntity;
         QProductEntity product = QProductEntity.productEntity;
         QRentalOptionInfoEntity rentalOptionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
+        QMemberEntity member = QMemberEntity.memberEntity;
 
         // YearMonth 파싱 (예: "2025-03" -> YearMonth 객체)
         YearMonth targetMonth = YearMonth.parse(yearMonth);
@@ -35,6 +37,8 @@ public class OwnerSalesRepositoryCustomIpml implements OwnerSalesRepositoryCusto
         builder.and(rental.ownerNo.eq(ownerNo))
                 .and(rental.orderDate.between(startDate, endDate));
 
+        builder.and(rental.rentalState.in("예약완료", "배송중", "배송완료", "반납요청", "수거중", "반납완료"));
+
         // productNo 조건 추가 (비동기 필터링 대비)
         if(productNo != null && !productNo.isEmpty()) {
             builder.and(product.productNo.eq(productNo));
@@ -44,7 +48,7 @@ public class OwnerSalesRepositoryCustomIpml implements OwnerSalesRepositoryCusto
                 .select(Projections.constructor(
                         OwnerSalesDTO.class,
                         rental.rentalNo,
-                        rental.memberId,
+                        member.userName,
                         rental.orderDate,
                         rental.rentalStartDate,
                         rental.rentalEndDate,
@@ -56,6 +60,7 @@ public class OwnerSalesRepositoryCustomIpml implements OwnerSalesRepositoryCusto
                 .from(rental)
                 .join(rental.productEntity, product)
                 .join(rental.rentalOptionInfoEntity, rentalOptionInfo)
+                .join(member).on(rental.memberId.eq(member.memberId))
                 .where(builder)
                 .orderBy(rental.rentalNo.asc())
                 .fetch();

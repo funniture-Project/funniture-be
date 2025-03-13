@@ -19,7 +19,14 @@ public class UserOrderViewDTO {
 
     private String rentalState;
 
+    private int rentalNumber;
+
+    private String productImageLink;
+
     private String productName;
 
+    private String productNo;
+
     private int rentalPrice;
+
 }

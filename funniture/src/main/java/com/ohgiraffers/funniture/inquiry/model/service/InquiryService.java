@@ -33,7 +33,6 @@ public class InquiryService {
     public List<InquiryDTO> findAllInquiry() {
 
         List<InquiryEntity> inquiryEntity = inquiryRepository.findAll();
-        System.out.println("서비스 : 엔터티 inquiry = " + inquiryEntity);
         return inquiryEntity.stream().map(all -> modelMapper.map(all , InquiryDTO.class))
                 .collect(Collectors.toList());
     }
@@ -41,7 +40,6 @@ public class InquiryService {
     public InquiryDTO findByInqiryNo(String inquiryNo) {
 
         InquiryEntity result = inquiryRepository.findById(inquiryNo).orElseThrow();
-        System.out.println("서비스에서 result = " + result);
 
         return modelMapper.map(result ,InquiryDTO.class);
     }
@@ -56,16 +54,12 @@ public class InquiryService {
         MemberEntity memberEntity = memberRepository.findById(inquiryDTO.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾을 수 없습니다."));
 
-
-        System.out.println("문의 등록 userName과 phoneNumber 세팅하고 결과 값 확인 : " + inquiryDTO);
-
         inquiryRepository.save(modelMapper.map(inquiryDTO , InquiryEntity.class));
     }
 
     public String getMaxInquiry() {
 
         String maxIn = inquiryRepository.maxInquiry();
-        System.out.println("maxIn 잘 받아 오는지 = " + maxIn);
 
         return maxIn;
     }
@@ -74,16 +68,6 @@ public class InquiryService {
     public void modifyByInquiryNo(String inquiryNo, InquiryDTO inquiryDTO) {
 
         InquiryEntity result = inquiryRepository.findById(inquiryNo).orElseThrow();
-        System.out.println("inquiryNO로 잘 조회해 오는지 = " + result);
-
-
-//        result = result.toBuilder()
-//                .member(inquiryDTO.getMember().getMemberId())
-//                .inquiryContent(inquiryDTO.getInquiryContent())
-//                .showStatus(inquiryDTO.getShowStatus())
-//                .qnaType(inquiryDTO.getQnaType())
-//                .product(inquiryDTO.getProduct())
-//                .qnaWriteTime(LocalDateTime.now()).build();
 
         inquiryRepository.save(result);
 
@@ -92,19 +76,9 @@ public class InquiryService {
     @Transactional
     public void deleteByInquiryNo(String inquiryNo) {
 
-        System.out.println("서비스에 inquiryNo 잘 넘어오나 = " + inquiryNo);
-
         inquiryRepository.deleteById(inquiryNo);
     }
 
-//    public List<InquiryDTO> findByProductNo(String productNo) {
-//        System.out.println("서비스 productNo = " + productNo);
-//
-//        List<InquiryEntity> result = inquiryRepository.findByProductNo(productNo);
-//
-//        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class))
-//                        .collect(Collectors.toList());
-//    }
 
     public List<InquiryDTO> findByProductNo(String productNo) {
         List<Object[]> results = inquiryRepository.findDetailedByProductNo(productNo);
@@ -125,70 +99,39 @@ public class InquiryService {
     }
 
 
-//    public List<InquiryDTO> findByInquiryOwnerPage(String ownerNo) {
-//
-//        // 조인하는 엔티티 다시 만들어야 함. Inquiry 말고 조인한 애로
-//        List<InquiryEntity> result = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
-//
-//        System.out.println("레파지토리에서 넘어온 result = " + result);
-//
-//        return result.stream().map(all -> modelMapper.map(all , InquiryDTO.class)).collect(Collectors.toList());
-//    }
-
-//    public List<OwnerInquiryDTO> findByInquiryOwnerPage(String ownerNo, Criteria cri) {
-//        int total = inquiryRepository.countAllinquiryOwnerPage();
-//        int offset = (cri.getPageNum() - 1) * cri.getAmount();
-//
-//        List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo);
-//
-//        return results.stream().map(obj -> new OwnerInquiryDTO(
-//                (String) obj[0],  // inquiryNo
-//                (String) obj[1],  // memberId
-//                (String) obj[2],  // inquiryContent
-//                (Integer) obj[3], // showStatus
-//                (Integer) obj[4], // qnaType
-//                (String) obj[5],  // productNo
-//                ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
-//                (String) obj[7],  // userName (from tbl_member)
-//                (String) obj[8],  // productName (from tbl_product)
-//                (String) obj[9],  // phoneNumber (from tbl_member)
-//                (String) obj[10]  // productImageLink (from tbl_product)
-//        )).collect(Collectors.toList());
-//    }
-public PagingResponseDTO findByInquiryOwnerPage(String ownerNo, Criteria cri) {
-    System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : "+ ownerNo +"  " + cri);
-    int offset = (cri.getPageNum() - 1) * cri.getAmount();
-    int limit = cri.getAmount();
-    List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo, limit, offset);
+    public PagingResponseDTO findByInquiryOwnerPage(String ownerNo, Criteria cri) {
+        int offset = (cri.getPageNum() - 1) * cri.getAmount();
+        int limit = cri.getAmount();
+        List<Object[]> results = inquiryRepository.findAllInquiryOwnerPage(ownerNo, limit, offset);
 
 
-    int total = inquiryRepository.countAllInquiryOwnerPage(ownerNo);
+        int total = inquiryRepository.countAllInquiryOwnerPage(ownerNo);
 
-    List<OwnerInquiryDTO> dtos = results.stream().map(obj -> new OwnerInquiryDTO(
-            (String) obj[0],  // inquiryNo
-            (String) obj[1],  // memberId
-            (String) obj[2],  // inquiryContent
-            (Integer) obj[3], // showStatus
-            (Integer) obj[4], // qnaType
-            (String) obj[5],  // productNo
-            ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
-            (String) obj[7],  // userName (from tbl_member)
-            (String) obj[8],  // productName (from tbl_product)
-            (String) obj[9],  // phoneNumber (from tbl_member)
-            (String) obj[10]  // productImageLink (from tbl_product)
-    )).collect(Collectors.toList());
+        List<OwnerInquiryDTO> dtos = results.stream().map(obj -> new OwnerInquiryDTO(
+                (String) obj[0],  // inquiryNo
+                (String) obj[1],  // memberId
+                (String) obj[2],  // inquiryContent
+                (Integer) obj[3], // showStatus
+                (Integer) obj[4], // qnaType
+                (String) obj[5],  // productNo
+                ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
+                (String) obj[7],  // userName (from tbl_member)
+                (String) obj[8],  // phoneNumber (from tbl_member)
+                (String) obj[9],  // productName (from tbl_product)
+                (String) obj[10],  // productImageLink (from tbl_product)
+                (String) obj[11]  // answerStatus
+        )).collect(Collectors.toList());
 
-    PageDTO pageInfo = new PageDTO(cri, total);
+        PageDTO pageInfo = new PageDTO(cri, total);
 
-    PagingResponseDTO response = new PagingResponseDTO();
-    response.setData(dtos);
-    response.setPageInfo(pageInfo);
+        PagingResponseDTO response = new PagingResponseDTO();
+        response.setData(dtos);
+        response.setPageInfo(pageInfo);
 
-    return response;
-}
+        return response;
+    }
 
     public PagingResponseDTO findByInquiryUserPage(String memberId, Criteria cri) {
-        System.out.println("컨트롤러에서 데이터 잘 넘어 왔는지? : " + memberId + "  " + cri);
 
         int offset = (cri.getPageNum() - 1) * cri.getAmount();
         int limit = cri.getAmount();
@@ -208,7 +151,8 @@ public PagingResponseDTO findByInquiryOwnerPage(String ownerNo, Criteria cri) {
                 (String) obj[7],  // userName (from tbl_member)
                 (String) obj[8],  // productName (from tbl_product)
                 (String) obj[9],  // phoneNumber (from tbl_member)
-                (String) obj[10]  // productImageLink (from tbl_product)
+                (String) obj[10],  // productImageLink (from tbl_product)
+                (String) obj[11]
         )).collect(Collectors.toList());
 
         PageDTO pageInfo = new PageDTO(cri, total);

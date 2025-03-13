@@ -52,7 +52,6 @@ public class MailService {
     public String sendSimpleMessage(String sendEmail) throws MessagingException {
         String authCode = createCode(); // 랜덤 인증번호 생성
 
-        System.out.println("서비스에서 인증번호 잘 생성 됐는지 = " + authCode);
         MimeMessage message = createMail(sendEmail, authCode); // 메일 생성
         try {
             javaMailSender.send(message); // 메일 발송

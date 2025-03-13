@@ -40,10 +40,8 @@ public class MailController {
     @PostMapping("/{email}")
     public ResponseEntity<ResponseMessage> sendEmail(@PathVariable String email) throws MessagingException {
 
-        System.out.println("이메일 잘 들어왔는지 email = " + email);
         String isSend = mailService.sendSimpleMessage(email);
 
-        System.out.println("이메일 서비스 잘 다녀 왔는지 isSend = " + isSend);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 

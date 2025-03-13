@@ -27,16 +27,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String email = loginToken.getName();
         String password = (String) loginToken.getCredentials();
 
-        System.out.println("✅ Authentication authenticate 동작 : email = " + email);
-        System.out.println("✅ Authentication authenticate 동작 : password = " + password);
-
         MemberDTO member = (MemberDTO) detailsService.loadUserByUsername(email);
-        System.out.println("✅ Authentication authenticate에서  = " + member);
 
         if(!passwordEncoder.matches(password, member.getPassword())){
             throw new BadCredentialsException(password + "는 비밀번호가 아닙니다.");
         }
-        System.out.println("✅ 일단조회" + member.getAuthorities());
         return new UsernamePasswordAuthenticationToken(member, password, member.getAuthorities());
     }
 

@@ -3,6 +3,7 @@ package com.ohgiraffers.funniture.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +55,9 @@ public class ProductWithPriceEntity {
     // 대표 이미지 ID(삭제 시 필요)
     @Column(name = "product_image_id")
     private String productImageId;
+
+    @Column(name = "regist_date")
+    private LocalDateTime registerData;
 
     @Transient
     private String storeName;

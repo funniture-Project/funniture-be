@@ -59,8 +59,6 @@ public class ProductController {
     @GetMapping({"", "/"})
     public ResponseEntity<ResponseMessage> getProductAll(@ModelAttribute ProductSearchCondition condition){
 
-        System.out.println("컨트롤러 단의 제품 검색 조건 = " + condition);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
 
@@ -69,9 +67,7 @@ public class ProductController {
         // 관리자 페이지에서만 페이징 처리 동작
         if (condition.getPageNum() != null) {
             Criteria cri = new Criteria(Integer.valueOf(condition.getPageNum()), 10);
-            System.out.println("cri = " + cri);
 
-            System.out.println("페이징 할꺼임!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             Page<ProductWithPriceDTO> pagingResults = productService.getPagingProductAll(condition,cri);
 
             if (pagingResults.isEmpty()){
@@ -82,7 +78,6 @@ public class ProductController {
 
             responseMap.put("result", pagingResults.getContent());  // 실제 데이터 (content) 가져오기
             responseMap.put("pageInfo", new PageDTO(cri, (int) pagingResults.getTotalElements()));  // PageDTO 정보 포함
-            System.out.println("results.size() = " + pagingResults.getContent().size());
 
             return ResponseEntity.ok()
                     .headers(headers)
@@ -90,9 +85,7 @@ public class ProductController {
         }
 
         // 페이징 처리가 없을때의 제품 정보 가져오기
-        System.out.println("페이징 안해!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         List<ProductWithPriceDTO> results = productService.getProductAll(condition);
-        System.out.println("results.size() = " + results.size());
 
         if (results.isEmpty()){
             return ResponseEntity.ok()
@@ -197,10 +190,8 @@ public class ProductController {
                                 @RequestPart(value = "productImage", required = false) MultipartFile file,
                                 BindingResult bindingResult) {
 
-        System.out.println("rentalOptionList = " + rentalOptionList);
 
         if (file != null && !file.isEmpty()) {
-            System.out.println("파일명: " + file.getOriginalFilename());
             // cloudinary 에 파일올리고 url 받아오기
             Map<String, Object> response = cloudinaryService.uploadFile(file);
             if (response != null){
@@ -218,7 +209,6 @@ public class ProductController {
 
         // 예외처리 확인 validation
         if (bindingResult.hasErrors()){
-            System.out.println("bindingResult = " + bindingResult);
 
             responseMap.put("errors",bindingResult.getAllErrors().stream().map(error -> error.getDefaultMessage()));
 
@@ -228,22 +218,16 @@ public class ProductController {
         } else {
             String maxNo = productService.findMaxNO();
 
-            System.out.println("mawNo = " + maxNo);
-
             if (maxNo == null || maxNo.isEmpty()){
                 product.setProductNo("PRD001");
             } else {
                 String newNo = String.format("PRD%03d", Integer.parseInt(maxNo.substring(3)) + 1);
-                System.out.println("newNo = " + newNo);
-
                 product.setProductNo(newNo);
             }
 
-            System.out.println("저장 전 product = " + product);
             productService.registerProduct(product);
 
             String checkNo = productService.findMaxNO();
-            System.out.println("product = " + product.getProductNo() + ", checkNo : " + checkNo);
 
             if (product.getProductNo().equals(checkNo)){
 
@@ -347,8 +331,6 @@ public class ProductController {
     })
     @PutMapping(value = "/changestatus")
     private ResponseEntity<ResponseMessage> modifyProductStatus(@RequestBody ChangeStatusDTO changeStatusList ){
-        System.out.println("changeStatusList = " + changeStatusList);
-
         Map<Integer, String> result = productService.modifyProductStatus(changeStatusList);
 
         Integer code = result.keySet().stream().findFirst().orElse(500);
@@ -378,11 +360,9 @@ public class ProductController {
                                    @RequestPart(value = "rentalOptions") List<RentalOptionInfoDTO> rentalOptionList,
                                    @RequestPart(value = "productImage", required = false) MultipartFile file){
 
-        System.out.println("수정 대상 productNo = " + productNo);
         product.setProductNo(productNo);
 
         // 사진을 변경하는게 아니라면 기존의 image link 와 id 사용하기
-        System.out.println("화면에서 넘어온 대표 이미지 file = " + file);
         if (file == null || file.isEmpty()){
             ProductDetailDTO findProduct = productService.getProductInfoByNo(productNo);
 
@@ -398,8 +378,6 @@ public class ProductController {
 
         Integer productUpdateResult =  productService.updateProductInfo(productNo,product);
         Integer optionUpdateResult = 500;
-
-        System.out.println("수정 product = " + product);
 
         rentalOptionList.forEach(option->{
             option.setProductNo(productNo);
@@ -434,12 +412,8 @@ public class ProductController {
     })
     @PostMapping("/quillimg")
     private Map<String, Object> quillImgUpload(@RequestParam("file") MultipartFile file){
-        System.out.println("프론트에서 넘겨받은 file = " + file);
-        System.out.println("파일명: " + file.getOriginalFilename());
         // cloudinary 에 파일올리고 url 받아오기
         Map<String, Object> response = cloudinaryService.uploadFile(file);
-
-        System.out.println("response = " + response);
 
         Map<String, Object> uploadResult = new HashMap<>();
 
@@ -476,6 +450,36 @@ public class ProductController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new ResponseMessage(200, "상품 정보 정상 조회", result));
+    }
+
+    // 카테고리별 등록 현황
+    @Operation(summary = "카테고리별 등록 현황",
+            description = "판매 중이거나 품절인 상품을 포함한 카테고리별 상품 등록 현황(개수)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "카테고리별 등록 수 반환"),
+            @ApiResponse(responseCode = "204", description = "등록된 상품 없음")
+    })
+    @GetMapping("/count")
+    public ResponseEntity<ResponseMessage> getProductCount(){
+        List<Map<String,Integer>> result = productService.getProductCountByCategory();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application","json", Charset.forName("UTF-8")));
+
+        Map<String, Object> resultMap = new HashMap<>();
+
+        if (result.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 상품이 없습니다.", null));
+        }
+
+        resultMap.put("result", result);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new ResponseMessage(200, "상품 정보 정상 조회", resultMap));
     }
 
 }

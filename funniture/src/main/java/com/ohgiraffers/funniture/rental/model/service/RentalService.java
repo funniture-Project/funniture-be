@@ -1,18 +1,23 @@
 package com.ohgiraffers.funniture.rental.model.service;
 
 import com.ohgiraffers.funniture.common.Criteria;
-import com.ohgiraffers.funniture.deliveryaddress.entity.DeliveryAddressEntity;
-import com.ohgiraffers.funniture.member.entity.MemberEntity;
-import com.ohgiraffers.funniture.member.model.dao.MemberRepository;
+import com.ohgiraffers.funniture.member.entity.QOwnerInfoEntity;
 import com.ohgiraffers.funniture.point.entity.PointEntity;
 import com.ohgiraffers.funniture.point.model.dao.PointRepository;
 import com.ohgiraffers.funniture.product.entity.ProductEntity;
+import com.ohgiraffers.funniture.product.entity.QProductEntity;
+import com.ohgiraffers.funniture.product.entity.QRentalOptionInfoEntity;
 import com.ohgiraffers.funniture.product.entity.RentalOptionInfoEntity;
 import com.ohgiraffers.funniture.product.model.dao.ProductRepository;
 import com.ohgiraffers.funniture.product.model.dao.RentalOptionInfoRepository;
+import com.ohgiraffers.funniture.rental.entity.QUserRentalEntity;
 import com.ohgiraffers.funniture.rental.entity.RentalEntity;
 import com.ohgiraffers.funniture.rental.model.dao.*;
 import com.ohgiraffers.funniture.rental.model.dto.*;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -23,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -30,20 +36,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RentalService {
 
-    private final RentalMapper rentalMapper;
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
+
+    // 관리자 레파지토리
     private final AdminRentalRepositoryCustom adminRentalRepositoryCustom;
     private final AdminSalesRepositoryCustom adminSalesRepositoryCustom;
+    private final SalesRepositoryCustom salesRepositoryCustom;
+
+    // 사용자 레파지토리
     private final UserRentalRepositoryCustom userRentalRepositoryCustom;
-    private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
-    private final OwnerSalesRepositoryCustom ownerSalesRepositoryCustom;
-    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
     private final UserActiveRentalRepositoryCustom userActiveRentalRepositoryCustom;
     private final UserRentalStateCountRepositoryCustom userRentalStateCountRepositoryCustom;
+    private final DetailRentalRepositoryCustom detailRentalRepositoryCustom;
+
+    // 제공자 레파지토리
+    private final OwnerCurrentMonthSalesRepositoryCustom ownerCurrentMonthSalesRepositoryCustom;
+    private final OwnerMonthlySalesRepositoryCustom ownerMonthlySalesRepositoryCustom;
+    private final OwnerRentalStateCountRepositoryCustom ownerRentalStateCountRepositoryCustom;
+    private final OwnerRentalRepositoryCustom ownerRentalRepositoryCustom;
+    private final OwnerSalesRepositoryCustom ownerSalesRepositoryCustom;
+    private final OwnerPeriodCountRepositoryCustom ownerPeriodCountRepositoryCustom;
+
+    // 다른쪽 레파지토리
     private final PointRepository pointRepository;
     private final RentalOptionInfoRepository rentalOptionInfoRepository;
     private final ProductRepository productRepository;
+    private final JPAQueryFactory jpaQueryFactory;
 
 
 /* comment.-------------------------------------------- 사용자 -----------------------------------------------*/
@@ -75,7 +94,8 @@ public class RentalService {
         RentalOptionInfoEntity rentalOption = rentalOptionInfoRepository.findById(rentalDTO.getRentalInfoNo())
                 .orElseThrow(() -> new RuntimeException("대여 조건 정보 없음"));
 
-        int rentalPrice = rentalDTO.getRentalNumber() * rentalOption.getRentalPrice(); // 렌탈 가격 계산
+        int rentalPrice = (int)Math.floor(rentalDTO.getRentalNumber() * rentalOption.getRentalPrice() * 0.9); // 렌탈 가격 계산
+
 
         // 포인트 부족 여부 확인
         if (currentPoints < rentalPrice) {
@@ -92,6 +112,19 @@ public class RentalService {
                 .build();
 
         pointRepository.save(pointUsage);
+
+        int pointEvent = (int)Math.floor(rentalDTO.getRentalNumber() * rentalOption.getRentalPrice() * 0.01); // 렌탈 가격 계산
+
+        // 포인트이벤트 저장
+        PointEntity pointAdd = PointEntity.builder()
+                .memberId(rentalDTO.getMemberId())
+                .usedPoint(0)
+                .addPoint(pointEvent)
+                .currentPoint(currentPoints - rentalPrice + pointEvent) // 포인트 이벤트 금액 추가
+                .pointDateTime(LocalDateTime.now().plusSeconds(1))
+                .build();
+
+        pointRepository.save(pointAdd);
 
         // 상품 정보 조회
         ProductEntity product = productRepository.findById(rentalDTO.getProductNo())
@@ -162,6 +195,44 @@ public class RentalService {
         return adminSalesRepositoryCustom.findSalesByDate(yearMonth, storeName, pageable);
     }
 
+    // 관리자 - 매출 합산 조회(차트)
+    public List<AdminMonthlySalesDTO> getSales(String yearMonth, String groupBy) {
+        return salesRepositoryCustom.getSales(yearMonth, groupBy);
+    }
+
+    public List<OwnerTopDTO> getTopMonthlySales(String yearMonth) {
+        QUserRentalEntity rental = QUserRentalEntity.userRentalEntity;
+        QProductEntity product = QProductEntity.productEntity;
+        QRentalOptionInfoEntity rentalOptionInfo = QRentalOptionInfoEntity.rentalOptionInfoEntity;
+        QOwnerInfoEntity ownerInfo = QOwnerInfoEntity.ownerInfoEntity;
+
+        YearMonth targetMonth = YearMonth.parse(yearMonth);
+        LocalDateTime startDate = targetMonth.atDay(1).atStartOfDay();
+        LocalDateTime endDate = targetMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(rental.orderDate.between(startDate, endDate))
+                .and(rental.rentalState.in("예약완료", "배송중", "배송완료", "반납요청", "수거중", "반납완료"));
+
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        OwnerTopDTO.class,
+                        rental.ownerNo,
+                        ownerInfo.storeName, // 제공자 회사명 추가
+                        rentalOptionInfo.rentalPrice.multiply(rental.rentalNumber).sum().as("totalSales")
+                ))
+                .from(rental)
+                .join(rental.productEntity, product)
+                .join(rental.rentalOptionInfoEntity, rentalOptionInfo)
+                .join(ownerInfo).on(rental.ownerNo.eq(ownerInfo.memberId)) // storeNo 기준 조인
+                .where(builder)
+                .groupBy(rental.ownerNo, ownerInfo.storeName) // 제공자명 포함 그룹화
+                .orderBy(rentalOptionInfo.rentalPrice.multiply(rental.rentalNumber).sum().desc()) // 매출 내림차순 정렬
+                .limit(5) // TOP 5 제한
+                .fetch();
+    }
+
+
 /* comment.-------------------------------------------- 제공자 -----------------------------------------------*/
 
     // 제공자 - 예약 조회(쿼리 DSL)
@@ -190,6 +261,45 @@ public class RentalService {
         RentalEntity rental = rentalRepository.findByRentalNo(rentalNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 예약 정보를 찾을 수 없습니다: " + rentalNo));
 
+        // 최신 포인트 가져오기
+        int currentPoints = pointRepository.findCurrentPointByUser(rental.getMemberId());
+
+        // 렌탈 옵션 정보 조회
+        RentalOptionInfoEntity rentalOption = rentalOptionInfoRepository.findById(rental.getRentalInfoNo())
+                .orElseThrow(() -> new RuntimeException("대여 조건 정보 없음"));
+
+        int rentalPrice = (int)Math.floor(rental.getRentalNumber() * rentalOption.getRentalPrice() * 0.9); // 렌탈 가격 계산
+        int pointEvent = (int)Math.floor(rental.getRentalNumber() * rentalOption.getRentalPrice() * 0.01); // 포인트 이벤트 계산
+
+        // 렌탈 금액만큼 포인트 추가
+        PointEntity pointAdd = PointEntity.builder()
+                .memberId(rental.getMemberId())
+                .usedPoint(0)
+                .addPoint(rentalPrice)
+                .currentPoint(currentPoints + rentalPrice) // 포인트 추가
+                .pointDateTime(LocalDateTime.now())
+                .build();
+
+        pointRepository.save(pointAdd);
+
+        // 이벤트 포인트만큼 포인트 차감
+        PointEntity pointUsage = PointEntity.builder()
+                .memberId(rental.getMemberId())
+                .usedPoint(pointEvent)
+                .addPoint(0)
+                .currentPoint(currentPoints + rentalPrice - pointEvent) // 이벤트 포인트 차감
+                .pointDateTime(LocalDateTime.now().plusSeconds(1))
+                .build();
+
+        pointRepository.save(pointUsage);
+
+        // 상품 정보 조회
+        ProductEntity product = productRepository.findById(rental.getProductNo())
+                .orElseThrow(() -> new RuntimeException("상품 정보 없음"));
+
+        // 사용 중 재고 감소
+        productRepository.decrementUsedStock(product.getProductNo(), rental.getRentalNumber());
+
         rental.changeRentalState(rentalState);  // Setter 대신 메서드 사용
     }
 
@@ -214,6 +324,14 @@ public class RentalService {
             rentalEntity.changeRentalPeriod(LocalDateTime.now(), rentalOption.getRentalTerm());
         } else if ("수거중".equals(currentState)) {
             rentalEntity.changeRentalState("반납완료");
+
+            // 상품 정보 조회
+            ProductEntity product = productRepository.findById(rentalEntity.getProductNo())
+                    .orElseThrow(() -> new RuntimeException("상품 정보 없음"));
+
+            // 사용 중 재고 감소
+            productRepository.decrementUsedStock(product.getProductNo(), rentalEntity.getRentalNumber());
+
         } else if ("배송완료".equals(currentState)) {
             rentalEntity.changeRentalState("반납요청");
         } else {
@@ -245,4 +363,27 @@ public class RentalService {
     public List<OwnerSalesDTO> getSalesByOwner(String ownerNo, String yearMonth, String productNo) {
         return ownerSalesRepositoryCustom.getSalesByOwner(ownerNo, yearMonth, productNo);
     }
+
+
+    // 이번 달 매출 API
+    public List<CurrentMonthSalesDTO> getCurrentMonthSales(String ownerNo, String yearMonth) {
+        return ownerCurrentMonthSalesRepositoryCustom.getCurrentMonthSales(ownerNo, yearMonth);
+    }
+
+    // 월별 매출 API
+    public List<MonthlySalesDTO> getMonthlySales(String ownerNo, String yearMonth) {
+        return ownerMonthlySalesRepositoryCustom.getMonthlySales(ownerNo, yearMonth);
+    }
+
+    // 제공자의 마이페이지 예약진행상태 카운트
+    public List<RentalStateCountDTO> countRentalStatesByOwner(String ownerNo) {
+        return ownerRentalStateCountRepositoryCustom.countRentalStatesByOwner(ownerNo);
+    }
+
+    // 제공자의 마이페이지 만료기간별 카운트
+    public List<RentalPeriodCountDTO> countRentalsByPeriod(String ownerNo, String period) {
+        return ownerPeriodCountRepositoryCustom.countRentalsByPeriod(ownerNo, period);
+    }
+
+
 }

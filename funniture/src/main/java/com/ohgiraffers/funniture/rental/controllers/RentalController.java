@@ -263,45 +263,6 @@ public class RentalController {
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자별 예약 조회 성공", res));
     }
 
-//    @Operation(summary = "제공자별 예약 조회",
-//            description = "제공자 마이페이지 예약/배송/반납에서 사용",
-//            parameters = {
-//                    @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
-//                    @Parameter(name = "period", description = "현재날짜로(currentDate)부터 만료일(rental_end_date) 1주일/1개월/3개월 필터링(선택)"),
-//                    @Parameter(name = "rentalTab", description = "예약/배송/반납 필터링 조회(선택)"),
-//                    @Parameter(name = "offset", description = "현재페이지")
-//
-//            }
-//    )
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "204",description = "예약 내역이 없습니다."),
-//            @ApiResponse(responseCode = "200", description = "제공자별 예약 조회 성공")
-//    })
-//    @GetMapping("/{ownerNo}/sales")
-//    public ResponseEntity<ResponseMessage> getSalesByOwner(@PathVariable String ownerNo,
-//                                                          @RequestParam String period,
-//                                                          @RequestParam(required = false) String ren) {
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
-//
-//        // Page로 변경하여 페이징된 데이터 가져오기
-//        Page<OwnerRentalViewDTO> ownerRentalList = rentalService.findRentalListByOwner(ownerNo, period);
-//
-//        if (ownerRentalList.isEmpty()){
-//            return ResponseEntity.ok()
-//                    .headers(headers)
-//                    .body(new ResponseMessage(204, "예약 내역이 없습니다.", null));
-//        }
-//
-//        // 페이징 정보 포함
-//        Map<String, Object> res = new HashMap<>();
-//        res.put("ownerRentalList", ownerRentalList.getContent());  // 실제 데이터 (content) 가져오기
-//        res.put("pageInfo", new PageDTO(cri, (int) ownerRentalList.getTotalElements()));  // PageDTO 정보 포함
-//
-//        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자별 예약 조회 성공", res));
-//    }
-
     @Operation(summary = "다중선택하여 예약대기에서 예약완료 상태 업데이트",
             description = "제공자 예약/배송/반납페이지에서 사용",
             parameters = {
@@ -426,7 +387,7 @@ public class RentalController {
             @ApiResponse(responseCode = "200", description = "제공자의 월별 매출내역 조회 성공")
     })
     // 제공자별 매출 현황 조회
-    @GetMapping("{ownerNo}/sales")
+    @GetMapping("/{ownerNo}/sales")
     public ResponseEntity<ResponseMessage> getSalesByOwner(@PathVariable String ownerNo,
                                                            @RequestParam String yearMonth,
                                                            @RequestParam(required = false) String productNo) {
@@ -447,6 +408,140 @@ public class RentalController {
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 월별 매출내역 조회 성공", res));
     }
+
+    @Operation(summary = "제공자별 이번 달 매출 조회(상품별 합산)",
+            description = "제공자 마이페이지 메인페이지에서 차트의 데이터로 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 회원번호(필수)"),
+                    @Parameter(name = "yearMonth", description = "월별 필터링(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "매출내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자의 이번 달 매출 조회 성공")
+    })
+    // 이번 달 매출 API
+    @GetMapping("/{ownerNo}/chart/currentMonth")
+    public ResponseEntity<ResponseMessage> getCurrentMonthSales(@PathVariable String ownerNo,
+                                                                @RequestParam String yearMonth) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<CurrentMonthSalesDTO> currentSalesData = rentalService.getCurrentMonthSales(ownerNo, yearMonth);
+
+        if (currentSalesData.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "매출내역이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("currentSalesData", currentSalesData);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 이번 달 매출 조회 성공", res));
+    }
+
+    @Operation(summary = "제공자별 월별 매출 조회(상품전체 합산)",
+            description = "제공자 마이페이지 메인페이지에서 차트의 데이터로 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 회원번호(필수)"),
+                    @Parameter(name = "yearMonth", description = "월별 필터링(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "매출내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자의 월별 매출 조회 성공")
+    })
+    // 월별 매출 API
+    @GetMapping("/{ownerNo}/chart/monthly")
+    public ResponseEntity<ResponseMessage> getMonthlySales(@PathVariable String ownerNo,
+                                                           @RequestParam String yearMonth) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        // 월별 매출 데이터 조회
+        List<MonthlySalesDTO> monthlySalesData = rentalService.getMonthlySales(ownerNo, yearMonth);
+
+        // 매출 데이터가 없는 경우 처리
+        if (monthlySalesData.isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "매출내역이 없습니다.", null));
+        }
+
+        // 응답 데이터 구성
+        Map<String, Object> res = new HashMap<>();
+        res.put("monthlySalesData", monthlySalesData);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 월별 매출 조회 성공", res));
+    }
+
+    @Operation(summary = "제공자의 예약진행상태별 Count",
+            description = "제공자 마이페이지의 메인에서 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 ID(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 예약이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자의 예약진행상태별 count 성공")
+    })
+    // 제공자의 마이페이지 예약진행상태 카운트
+    @GetMapping("/{ownerNo}/count")
+    public ResponseEntity<ResponseMessage> countRentalStatesByOwner(@PathVariable String ownerNo) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<RentalStateCountDTO> rentalStateCount = rentalService.countRentalStatesByOwner(ownerNo);
+
+        if (rentalStateCount.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("rentalStateCount", rentalStateCount);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 예약진행상태별 count 성공", res));
+    }
+
+    @Operation(summary = "제공자의 마이페이지 만료기간별 카운트 Count",
+            description = "제공자 마이페이지의 메인에서 사용",
+            parameters = {
+                    @Parameter(name = "ownerNo", description = "제공자 ID(필수)"),
+                    @Parameter(name = "period", description = "기간(3MONTH/1MONTH/1WEEK)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "등록된 예약이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "제공자의 마이페이지 만료기간별 카운트 count 성공")
+    })
+    // 제공자의 마이페이지 만료기간별 카운트
+    @GetMapping("/{ownerNo}/period/count")
+    public ResponseEntity<ResponseMessage> countRentalsByPeriod(@PathVariable String ownerNo,
+                                                                @RequestParam String period) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<RentalPeriodCountDTO> rentalStateCount = rentalService.countRentalsByPeriod(ownerNo, period);
+
+        if (rentalStateCount.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "등록된 예약이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("rentalStateCount", rentalStateCount);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "제공자의 마이페이지 만료기간별 카운트 count 성공", res));
+    }
+
 
     /* comment.-------------------------------------------- 관리자 -----------------------------------------------*/
 
@@ -543,6 +638,72 @@ public class RentalController {
         res.put("pageInfo", new PageDTO(cri, (int) salesData.getTotalElements()));
 
         return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "월별 매출내역 조회 성공", res));
+    }
+
+    @Operation(summary = "월별/일별 매출 차트",
+            description = "관리자 마이페이지 메인에서 사용",
+            parameters = {
+                    @Parameter(name = "yearMonth", description = "날짜 데이터"),
+                    @Parameter(name = "groupBy", description = "일별/월별 구분(day/month)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",description = "매출내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "매출내역 합산 조회 성공")
+    })
+    // 관리자 - 매출 합산 조회(차트)
+    @GetMapping("/chart")
+    public ResponseEntity<ResponseMessage> getSales(@RequestParam String yearMonth,
+                                                    @RequestParam String groupBy) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        List<AdminMonthlySalesDTO> sales = rentalService.getSales(yearMonth, groupBy);
+
+        if (sales.isEmpty()){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "매출내역이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("sales", sales);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "매출내역 합산 조회 성공", res));
+    }
+
+
+    @Operation(summary = "TOP 5 제공자 월별 매출 조회",
+            description = "TOP 5 제공자의 월별 매출을 차트 데이터로 반환",
+            parameters = {
+                    @Parameter(name = "yearMonth", description = "월별 필터링(필수)")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "매출내역이 없습니다."),
+            @ApiResponse(responseCode = "200", description = "TOP 5 제공자의 월별 매출 조회 성공")
+    })
+    // 전체 제공자 매출 TOP5
+    @GetMapping("/chart/monthly/top")
+    public ResponseEntity<ResponseMessage> getTopMonthlySales(@RequestParam String yearMonth) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("Application", "json", Charset.forName("UTF-8")));
+
+        // TOP 5 매출 데이터 조회
+        List<OwnerTopDTO> topSalesData = rentalService.getTopMonthlySales(yearMonth);
+
+        if (topSalesData.isEmpty()) {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new ResponseMessage(204, "매출내역이 없습니다.", null));
+        }
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("topSalesData", topSalesData);
+
+        return ResponseEntity.ok().headers(headers).body(new ResponseMessage(200, "TOP 5 제공자의 월별 매출 조회 성공", res));
     }
 
 }
