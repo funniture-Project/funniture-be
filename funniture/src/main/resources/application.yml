@@ -9,9 +9,9 @@ spring:
 #    url: jdbc:mysql://localhost:3306/funniture
 #    username: funniture
 #    password: funniture
-  url: jdbc:mysql://${SPRING_DATASOURCE_USERNAME}:${SPRING_DATASOURCE_PASSWORD}@${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_NAME}?ssl-ca=classpath:ca.pem&ssl-mode=VERIFY_CA
-  username: ${SPRING_DATASOURCE_USERNAME}
-  password: ${SPRING_DATASOURCE_PASSWORD}
+  url: jdbc:mysql://avnadmin:AVNS_SWLWXdL-_BwbdSHrU0D@mysql-2c87b137-newuseryejin.h.aivencloud.com:21411/defaultdb?ssl-mode=REQUIRED
+  username: avnadmin
+  password: AVNS_SWLWXdL-_BwbdSHrU0D
 
   jpa:
     show-sql: true
