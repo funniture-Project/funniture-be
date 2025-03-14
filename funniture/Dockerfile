@@ -5,7 +5,7 @@ FROM eclipse-temurin:17
 WORKDIR /springboot-app
 
 # 'JAR_FILE'이라는 빌드 인수를 정의(빌드된 JAR 파일의 경로)
-ARG JAR_FILE=build/libs/*.jar
+ARG JAR_FILE=build/libs/funniture-0.0.1-SNAPSHOT.jar
 
 # JAR_FILE 경로에 있는 파일(.jar)을 위에서 설정한 작업 디렉토리로 복사
 COPY ${JAR_FILE} app.jar
