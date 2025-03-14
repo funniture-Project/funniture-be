@@ -6,9 +6,12 @@ springdoc:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/funniture
-    username: funniture
-    password: funniture
+#    url: jdbc:mysql://localhost:3306/funniture
+#    username: funniture
+#    password: funniture
+  url: jdbc:mysql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:3306}/${SPRING_DATASOURCE_NAME:funniture}
+  username: ${SPRING_DATASOURCE_USERNAME}
+  password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     show-sql: true
@@ -22,8 +25,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: kimkunam06@gmail.com
-    password: tflrntthtvyqatzt
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -52,7 +55,9 @@ jwt:
   time: 43200000
 
 cloudinary:
-  cloud-name: dor26tdln
-  api-key: 659494227654522
-  api-secret: b-xU9Jbu0YyiUlNkidJZZaCUsVo
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
 
+server:
+  port: 8887
