@@ -16,7 +16,7 @@ FROM eclipse-temurin:17
 WORKDIR /app
 
 # copy the jar file, 위에서 정한 /app 디렉터리에 app.jar 라는 이름으로 jar가 복사된다.
-COPY build/libs/funniture-0.0.1-SNAPSHOT.jar app.jar
+COPY buildfile/funniture-0.0.1-SNAPSHOT.jar app.jar
 
 # run the jar file, 컨테이너가 시작될 때 실행할 명령어를 설정한다. 여기서는 app.jar를 실행한다.
 ENTRYPOINT ["java", "-jar", "app.jar"]
