@@ -1,5 +1,5 @@
-# Temurin OpenJDK 17을 베이스 이미지로 사용
-FROM eclipse-temurin:21
+# 1단계: 빌드 단계
+FROM eclipse-temurin:21 AS build
 
 # 빌드된 애플리케이션 파일 저장 위치 설정
 WORKDIR /springboot-app
@@ -8,11 +8,11 @@ WORKDIR /springboot-app
 COPY . /springboot-app
 RUN ./gradlew clean build
 
-# 'JAR_FILE'이라는 빌드 인수를 정의(빌드된 JAR 파일의 경로)
+# 2단계: 실행 단계
+FROM eclipse-temurin:21
 
 # JAR_FILE 경로에 있는 파일(.jar)을 위에서 설정한 작업 디렉토리로 복사
-COPY build/libs/funniture-0.0.1-SNAPSHOT.jar app.jar
-
+COPY --from=build /app/build/libs/*.jar app.jar
 # 포트 번호 변경
 EXPOSE 8887
 
