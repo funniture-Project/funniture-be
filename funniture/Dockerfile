@@ -6,7 +6,9 @@ WORKDIR /springboot-app
 
 # Gradle 설치 및 빌드 단계 추가
 COPY . /springboot-app
-RUN ./gradlew build
+RUN ./gradlew clean build
+
+# 'JAR_FILE'이라는 빌드 인수를 정의(빌드된 JAR 파일의 경로)
 
 # JAR_FILE 경로에 있는 파일(.jar)을 위에서 설정한 작업 디렉토리로 복사
 COPY build/libs/funniture-0.0.1-SNAPSHOT.jar app.jar
