@@ -27,6 +27,8 @@ public class OwnerRentalViewDTO {
 
     private String productName;     // 상품명
 
+    private String productImageLink; // 상품 이미지
+
     private int rentalPrice;        // 렌탈 가격
 
     private int rentalTerm;         // 렌탈 개월수
