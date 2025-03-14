@@ -1,5 +1,5 @@
 # Temurin OpenJDK 17을 베이스 이미지로 사용
-FROM eclipse-temurin:17
+FROM eclipse-temurin:21
 
 # 빌드된 애플리케이션 파일 저장 위치 설정
 WORKDIR /springboot-app
