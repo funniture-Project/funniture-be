@@ -6,12 +6,13 @@ springdoc:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/funniture
-#    username: funniture
-#    password: funniture
-  url: jdbc:mysql://${SPRING_DATASOURCE_USERNAME}:${SPRING_DATASOURCE_PASSWORD}@${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_NAME}?ssl-ca=classpath:ca.pem&ssl-mode=VERIFY_CA
-  username: ${SPRING_DATASOURCE_USERNAME}
-  password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:mysql://localhost:3306/funniture
+    username: funniture
+    password: funniture
+#  url: jdbc:mysql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:3306}/${SPRING_DATASOURCE_NAME:funniture}
+#  username: ${SPRING_DATASOURCE_USERNAME}
+#  password: ${SPRING_DATASOURCE_PASSWORD}
+
 
   jpa:
     show-sql: true
