@@ -26,8 +26,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${SPRING_MAIL_USERNAME}
-    password: ${SPRING_MAIL_PASSWORD}
+    username: kimkunam06@gmail.com
+    password: tflrntthtvyqatzt
     properties:
       mail:
         smtp:
@@ -56,9 +56,9 @@ jwt:
   time: 43200000
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
+  cloud-name: dor26tdln
+  api-key: 659494227654522
+  api-secret: b-xU9Jbu0YyiUlNkidJZZaCUsVo
 
 server:
   port: 8887
