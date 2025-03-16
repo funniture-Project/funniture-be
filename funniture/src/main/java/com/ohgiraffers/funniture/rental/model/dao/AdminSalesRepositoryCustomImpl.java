@@ -73,8 +73,8 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
 
         List<AdminSalesDTO> salesData = query.fetch();
 
-        JPAQuery<Integer> countQuery = jpaQueryFactory
-                .select(Expressions.ONE)
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(rental.count())  // 정확한 카운트 로직
                 .from(rental)
                 .join(rental.rentalOptionInfo, rentalOptionInfo)
                 .join(rental.adminProduct, product)
@@ -85,10 +85,9 @@ public class AdminSalesRepositoryCustomImpl implements AdminSalesRepositoryCusto
                         product.productName,
                         category.categoryName,
                         ownerInfo.storeName,
-                        formattedOrderDate);
+                        Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", rental.orderDate));  // 월별 그룹화 추가
 
-        Integer countResult = countQuery.fetchOne();
-        long totalCount = (countResult != null) ? countResult : 0;
+        long totalCount = countQuery.fetch().size();
 
         return new PageImpl<>(salesData, pageable, totalCount);
     }

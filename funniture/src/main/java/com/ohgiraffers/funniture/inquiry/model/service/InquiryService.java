@@ -111,8 +111,8 @@ public class InquiryService {
                 (String) obj[0],  // inquiryNo
                 (String) obj[1],  // memberId
                 (String) obj[2],  // inquiryContent
-                (Integer) obj[3], // showStatus
-                (Integer) obj[4], // qnaType
+                obj[3] instanceof Boolean ? ((Boolean) obj[3] ? 1 : 0) : (Integer) obj[3],
+                obj[4] instanceof Boolean ? ((Boolean) obj[4] ? 1 : 0) : (Integer) obj[4],
                 (String) obj[5],  // productNo
                 ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
                 (String) obj[7],  // userName (from tbl_member)
@@ -144,8 +144,8 @@ public class InquiryService {
                 (String) obj[0],  // inquiryNo
                 (String) obj[1],  // memberId
                 (String) obj[2],  // inquiryContent
-                (Integer) obj[3], // showStatus
-                (Integer) obj[4], // qnaType
+                obj[3] instanceof Boolean ? ((Boolean) obj[3] ? 1 : 0) : (Integer) obj[3],
+                obj[4] instanceof Boolean ? ((Boolean) obj[4] ? 1 : 0) : (Integer) obj[4],
                 (String) obj[5],  // productNo
                 ((Timestamp) obj[6]).toLocalDateTime(), // qnaWriteTime
                 (String) obj[7],  // userName (from tbl_member)
