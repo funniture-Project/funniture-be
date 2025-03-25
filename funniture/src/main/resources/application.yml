@@ -9,6 +9,10 @@ spring:
     url: jdbc:mysql://localhost:3306/funniture
     username: funniture
     password: funniture
+#  url: jdbc:mysql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:3306}/${SPRING_DATASOURCE_NAME:funniture}
+#  username: ${SPRING_DATASOURCE_USERNAME}
+#  password: ${SPRING_DATASOURCE_PASSWORD}
+
 
   jpa:
     show-sql: true
@@ -55,4 +59,3 @@ cloudinary:
   cloud-name: dor26tdln
   api-key: 659494227654522
   api-secret: b-xU9Jbu0YyiUlNkidJZZaCUsVo
-
